@@ -28,7 +28,7 @@ def login():
 
         flash(err)
         
-    return render_template("auth/login.html")
+    return render_template("auth/login.html.j2")
 
 
 @bp.route("/cool")
