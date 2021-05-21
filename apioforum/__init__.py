@@ -23,6 +23,9 @@ def create_app():
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import forum
+    app.register_blueprint(forum.bp)
+
     @app.route("/")
     def main():
         return "the"

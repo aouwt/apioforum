@@ -1,0 +1,23 @@
+{% extends 'base.html.j2' %}
+{% block header %}<h1>{% block title %}apio forum george etc{%endblock%}</h1>{%endblock%}
+{%block content%}
+<p>the</p>
+<table>
+    <tr>
+        <th>id</th>
+        <th>title</th>
+        <th>creator</th>
+        <th>created</th>
+        <th>updated</th>
+    </tr>
+{%for thread in threads%}
+<tr>
+    <td>#{{thread.id}}</td>
+    <td><a href="#">{{thread.title}}</a></td>
+    <td>{{thread.creator}}</td>
+    <td>{{thread.created}}</td>
+    <td>{{thread.updated}}</td>
+</tr>
+{%endfor%}
+</table>
+{%endblock%}

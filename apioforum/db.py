@@ -26,18 +26,18 @@ CREATE TABLE users (
 );""",
 """
 CREATE TABLE threads (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     creator TEXT NOT NULL REFERENCES users(username),
-    created INT NOT NULL,
-    updated INT NOT NULL
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL
 );
 CREATE TABLE posts (
-    id INT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     content TEXT,
-    thread INT NOT NULL REFERENCES threads(id),
+    thread INTEGER NOT NULL REFERENCES threads(id),
     author TEXT NOT NULL REFERENCES users(username),
-    idx INT NOT NULL
+    idx INTEGER NOT NULL
 );
 CREATE INDEX posts_thread_idx ON posts (thread);
 """,
