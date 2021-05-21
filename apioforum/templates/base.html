@@ -1,0 +1,16 @@
+{# BASED? BASED ON WHAT? #}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{%block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        {% block header %}{% endblock %}
+        {% for msg in get_flashed_messages() %}
+            <div class="flash">{{ msg }}</div>
+        {% endfor %}
+        {%block content %}{% endblock %}
+    </body>
+</html>
+
