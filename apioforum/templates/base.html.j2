@@ -6,6 +6,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
+        <nav>
+            <h1>apioforum</h1>
+            <ul>
+                {% if g.user %}
+                <li>{{ g.user['username'] }}</li>
+                <li><a href="{{ url_for('auth.logout') }}">logout</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">login</a></li>
+                <li><a href="{{ url_for('auth.register') }}">register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+           
         {% block header %}{% endblock %}
         {% for msg in get_flashed_messages() %}
             <div class="flash">{{ msg }}</div>

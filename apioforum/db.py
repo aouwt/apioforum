@@ -19,6 +19,28 @@ def close_db(e=None):
         db.close()
 
 migrations = [
+"""
+CREATE TABLE users (
+    username TEXT PRIMARY KEY,
+    password TEXT NOT NULL
+);""",
+"""
+CREATE TABLE threads (
+    id INT PRIMARY KEY,
+    title TEXT NOT NULL,
+    creator TEXT NOT NULL REFERENCES users(username),
+    created INT NOT NULL,
+    updated INT NOT NULL
+);
+CREATE TABLE posts (
+    id INT PRIMARY KEY,
+    content TEXT,
+    thread INT NOT NULL REFERENCES threads(id),
+    author TEXT NOT NULL REFERENCES users(username),
+    idx INT NOT NULL
+);
+CREATE INDEX posts_thread_idx ON posts (thread);
+""",
 ]
 
 def init_db():
