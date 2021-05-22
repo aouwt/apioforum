@@ -32,7 +32,7 @@ def login():
 
         flash(err)
         
-    return render_template("auth/login.html.j2")
+    return render_template("auth/login.html")
 
 @bp.route("/register", methods=("GET","POST"))
 def register():
@@ -62,7 +62,7 @@ def register():
 
         flash(err)
             
-    return render_template("auth/register.html.j2")
+    return render_template("auth/register.html")
 
 @bp.route("/logout")
 def logout():

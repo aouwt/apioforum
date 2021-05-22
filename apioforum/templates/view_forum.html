@@ -1,4 +1,4 @@
-{% extends 'base.html.j2' %}
+{% extends 'base.html' %}
 {% block header %}<h1>{% block title %}apio forum george etc{%endblock%}</h1>{%endblock%}
 {%block content%}
 <p>the</p>
@@ -13,7 +13,7 @@
 {%for thread in threads%}
 <tr>
     <td>#{{thread.id}}</td>
-    <td><a href="#">{{thread.title}}</a></td>
+    <td><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></td>
     <td>{{thread.creator}}</td>
     <td>{{thread.created}}</td>
     <td>{{thread.updated}}</td>

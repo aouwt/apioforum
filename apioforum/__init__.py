@@ -26,6 +26,9 @@ def create_app():
     from . import forum
     app.register_blueprint(forum.bp)
 
+    from . import thread
+    app.register_blueprint(thread.bp)
+
     @app.route("/")
     def main():
         return "the"
