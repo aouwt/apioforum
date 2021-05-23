@@ -29,13 +29,4 @@ def create_app():
     from . import thread
     app.register_blueprint(thread.bp)
 
-    @app.route("/")
-    def main():
-        return "the"
-
-    @app.route("/b")
-    def b():
-        db=get_db()
-        return str(db.execute("select 2 + 2;").fetchone()[0])
-
     return app

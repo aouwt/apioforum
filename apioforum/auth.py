@@ -75,9 +75,14 @@ def load_user():
     if username is None:
         g.user = None
     else:
-        g.user = get_db().execute(
+        row = get_db().execute(
             "SELECT * FROM users WHERE username = ?;", (username,)
         ).fetchone()
+        if row is None:
+            g.user = None
+        else:
+            g.user = row['username']
+        
 
 def login_required(view):
     @functools.wraps(view)

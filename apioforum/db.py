@@ -37,8 +37,9 @@ CREATE TABLE posts (
     content TEXT,
     thread INTEGER NOT NULL REFERENCES threads(id),
     author TEXT NOT NULL REFERENCES users(username),
-    idx INTEGER NOT NULL
+    created TIMESTAMP NOT NULL
 );
+
 CREATE INDEX posts_thread_idx ON posts (thread);
 """,
 ]

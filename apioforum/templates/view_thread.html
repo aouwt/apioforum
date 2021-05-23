@@ -8,11 +8,16 @@
 <p>by {{thread.creator}}</p>
 <dl>
 {% for post in posts %}
-<dt>{{post.author}}</dt>
+<dt>{{post.author}} {{post.created}}</dt>
 <dd>{{post.content}}</dd>
 {% else %}
 <dt>there weren't</dt>
 <dd>any posts</dd>
 {% endfor %}
 </dl>
+{% if g.user %}
+<p>loggedi n as {{ g.user }}</p>
+{% else %}
+<p>not logged in</p>
+{% endif %}
 {% endblock %}
