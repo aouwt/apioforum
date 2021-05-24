@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}create thread{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form action="{{url_for('forum.create_thread')}}", method="POST">
+    <label for="title">thread title</label>
+    <input name="title" id="title">
+    <label for="content">thread content</label>
+    <textarea name="content" id="content"></textarea>
+    <input type="submit" value="yes">
+</form>
+{% endblock %}

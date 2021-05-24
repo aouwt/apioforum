@@ -9,7 +9,7 @@
 <dl>
 {% for post in posts %}
 <dt>{{post.author}} {{post.created}}</dt>
-<dd>{{post.content}}</dd>
+<dd>{{rendered_posts[loop.index0] | safe}}<dd>
 {% else %}
 <dt>there weren't</dt>
 <dd>any posts</dd>
@@ -17,6 +17,10 @@
 </dl>
 {% if g.user %}
 <p>loggedi n as {{ g.user }}</p>
+<form action="{{url_for('thread.create_post',thread_id=thread_id)}}" method="POST">
+    <textarea name="content"></textarea>
+    <input type="submit" value="yes">
+</form>
 {% else %}
 <p>not logged in</p>
 {% endif %}
