@@ -9,13 +9,16 @@
     <body>
         <main>
             <nav>
+                <ul>
+
                     {% if g.user %}
-                    <div class="logged-in-user">{{ g.user }}</div>
-                    <a class="link-button logout" href="{{ url_for('auth.logout') }}">logout</a>
+                    <li>{{ g.user }}</li>
+                    <li><a href="{{ url_for('auth.logout') }}">logout</a></li>
                     {% else %}
-                    <a class="link-button login" href="{{ url_for('auth.login') }}">login</a>
-                    <a class="link-button register" href="{{ url_for('auth.register') }}">register</a>
+                    <li><a href="{{ url_for('auth.login') }}">login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}">register</a></li>
                     {% endif %}
+                </ul>
             </nav>
             {% for msg in get_flashed_messages() %}
                 <div class="flashmsg">{{ msg }}</div>

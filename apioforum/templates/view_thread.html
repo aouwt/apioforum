@@ -7,11 +7,10 @@
 <div class="posts">
     {% for post in posts %}
     <div class="post">
-        <div class="heading">
-            <div class="username">{{post.author}}</div>
-            <div><span class="timestamp">{{post.created}}</span></div>
+        <div class="post_heading">
+            {{post.author}} @{{post.created}}
         </div>
-        <div class="md">
+        <div class="post_content">
             {{rendered_posts[loop.index0] | safe}}
         </div>
     </div>
@@ -20,7 +19,7 @@
 {% if g.user %}
 <form class="new-post" action="{{url_for('thread.create_post',thread_id=thread_id)}}" method="POST">
     <textarea placeholder="your post here..." name="content"></textarea>
-    <input class="submit-post" type="submit" value="yes">
+    <input type="submit" value="yes">
 </form>
 {% else %}
 <p>not logged in</p>
