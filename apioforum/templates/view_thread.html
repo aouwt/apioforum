@@ -1,25 +1,26 @@
 {% extends 'base.html' %}
 {% block header %}
-<h1>{%block title %}thread{% endblock %}</h1>
+<h1>{%block title %}{{thread.title}}{% endblock %}</h1>
 {% endblock %}
 
 {%block content%}
-<h2>{{thread.title}}</h2>
-<p>by {{thread.creator}}</p>
-<dl>
-{% for post in posts %}
-<dt>{{post.author}} {{post.created}}</dt>
-<dd>{{rendered_posts[loop.index0] | safe}}<dd>
-{% else %}
-<dt>there weren't</dt>
-<dd>any posts</dd>
-{% endfor %}
-</dl>
+<div class="posts">
+    {% for post in posts %}
+    <div class="post">
+        <div class="heading">
+            <div class="username">{{post.author}}</div>
+            <div><span class="timestamp">{{post.created}}</span></div>
+        </div>
+        <div class="md">
+            {{rendered_posts[loop.index0] | safe}}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% if g.user %}
-<p>loggedi n as {{ g.user }}</p>
-<form action="{{url_for('thread.create_post',thread_id=thread_id)}}" method="POST">
-    <textarea name="content"></textarea>
-    <input type="submit" value="yes">
+<form class="new-post" action="{{url_for('thread.create_post',thread_id=thread_id)}}" method="POST">
+    <textarea placeholder="your post here..." name="content"></textarea>
+    <input class="submit-post" type="submit" value="yes">
 </form>
 {% else %}
 <p>not logged in</p>

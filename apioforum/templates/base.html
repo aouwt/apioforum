@@ -4,26 +4,29 @@
     <head>
         <title>{%block title %}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
-        <nav>
-            <h1>apioforum</h1>
-            <ul>
-                {% if g.user %}
-                <li>{{ g.user }}</li>
-                <li><a href="{{ url_for('auth.logout') }}">logout</a></li>
-                {% else %}
-                <li><a href="{{ url_for('auth.login') }}">login</a></li>
-                <li><a href="{{ url_for('auth.register') }}">register</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-           
-        {% block header %}{% endblock %}
-        {% for msg in get_flashed_messages() %}
-            <div class="flash">{{ msg }}</div>
-        {% endfor %}
-        {%block content %}{% endblock %}
+        <main>
+            <nav>
+                    {% if g.user %}
+                    <div class="logged-in-user">{{ g.user }}</div>
+                    <a class="link-button logout" href="{{ url_for('auth.logout') }}">logout</a>
+                    {% else %}
+                    <a class="link-button login" href="{{ url_for('auth.login') }}">login</a>
+                    <a class="link-button register" href="{{ url_for('auth.register') }}">register</a>
+                    {% endif %}
+            </nav>
+            {% for msg in get_flashed_messages() %}
+                <div class="flashmsg">{{ msg }}</div>
+            {% endfor %}
+
+            <div class="header">
+            {% block header %}{% endblock %}
+            </div>
+
+            {%block content %}{% endblock %}
+        </main>
     </body>
 </html>
 
