@@ -1,0 +1,56 @@
+body { font-family: sans-serif }
+
+.post { margin: 0px; }
+.post:nth-child(even) { background-color: #eee }
+.post:nth-child(odd)  { background-color: #ddd }
+.post {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+}
+.post:last-of-type { border-bottom: 1px solid black; }
+
+.post-heading {
+    color: grey;
+    font-size: smaller;
+}
+.post-content > * { margin-bottom: 0 }
+.post-content > *:nth-child(1) { margin-top: 2px }
+
+img { max-width: 100% }
+
+.post-heading-b { float: right; margin-right: 0.5em }
+
+nav ul { list-style-type: none; margin: 0px; padding: 0px }
+nav { width:max-content; padding: 5px; margin: 2px; border: 1px solid black }
+nav li { margin-left: 15px; margin-bottom: 10px; margin-right: 10px }
+nav li {display: inline }
+nav li:first-of-type { margin-left:0.5em }
+nav { float: right }
+nav a { color: blue; text-decoration: none }
+
+.flashmsg { border: 1px solid black; background-color: yellow; width: max-content; padding: 5px; }
+
+.threadlisting:nth-child(even) { background-color: #eee }
+.threadlisting:nth-child(odd) { background-color: #ddd }
+
+.threadlisting { display: flex; flex-flow: row wrap; text-align: center }
+.threadlisting-part { flex: 1 0px; display: table-cell; vertical-align: middle; }
+.threadlisting-part-title { flex: 3 0px }
+@media all and (max-width: 800px) {
+    .threadlisting-part-title { flex: 2 100%; }
+    .threadlisting { margin-bottom: 5px; }
+}
+
+.threadlisting-part-id { flex: 0.4 0px; }
+
+.threadlisting-part { border: 1px solid black }
+
+.actionbutton::before {
+    content: "[";
+    color: grey;
+}
+.actionbutton::after {
+    content: "]";
+    color: grey;
+}

@@ -49,3 +49,11 @@ def create_post(thread_id):
             db.commit()
             flash("post posted postfully")
     return redirect(url_for('thread.view_thread',thread_id=thread_id))
+
+@bp.route("/<int:thread_id>/delete_post/<int:post_id>", methods=["GET","POST"])
+def delete_post(thread_id, post_id):
+    return f"todo (t: {thread_id}, p: {post_id})"
+
+@bp.route("/<int:thread_id>/edit_post/<int:post_id>",methods=["GET","POST"])
+def edit_post(thread_id, post_id):
+    return f"todo (t: {thread_id}, p: {post_id})"

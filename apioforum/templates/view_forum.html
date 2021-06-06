@@ -3,22 +3,15 @@
 {%block content%}
 <p>the</p>
 <a href="{{url_for('forum.create_thread')}}">create thread</a>
-<table>
-    <tr>
-        <th>id</th>
-        <th>title</th>
-        <th>creator</th>
-        <th>created</th>
-        <th>updated</th>
-    </tr>
+<div class="threadlistings">
 {%for thread in threads%}
-<tr>
-    <td>#{{thread.id}}</td>
-    <td><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></td>
-    <td>{{thread.creator}}</td>
-    <td>{{thread.created}}</td>
-    <td>{{thread.updated}}</td>
-</tr>
+<div class="threadlisting">
+    <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></div>
+    <div class="threadlisting-part threadlisting-part-id">#{{thread.id}}</div>
+    <div class="threadlisting-part threadlisting-part-creator">{{thread.creator}}</div>
+    <div class="threadlisting-part threadlisting-part-created">{{thread.created}}</div>
+    <div class="threadlisting-part threadlisting-part-updated">{{thread.updated}}</div>
+</div>
 {%endfor%}
-</table>
+</div>
 {%endblock%}

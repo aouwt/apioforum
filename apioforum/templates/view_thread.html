@@ -1,3 +1,4 @@
+{% from 'common.html' import disp_post %}
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %}</h1>
@@ -6,14 +7,9 @@
 {%block content%}
 <div class="posts">
     {% for post in posts %}
-    <div class="post">
-        <div class="post_heading">
-            {{post.author}} @{{post.created}}
-        </div>
-        <div class="post_content">
-            {{rendered_posts[loop.index0] | safe}}
-        </div>
-    </div>
+    {% call disp_post(post, thread_id, True) %}
+        {{ rendered_posts[loop.index0] | safe}}
+    {% endcall %}
     {% endfor %}
 </div>
 {% if g.user %}
@@ -22,6 +18,6 @@
     <input type="submit" value="yes">
 </form>
 {% else %}
-<p>not logged in</p>
+<p>please log in to reply to this thread</p>
 {% endif %}
 {% endblock %}
