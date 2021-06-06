@@ -56,4 +56,5 @@ def delete_post(thread_id, post_id):
 
 @bp.route("/<int:thread_id>/edit_post/<int:post_id>",methods=["GET","POST"])
 def edit_post(thread_id, post_id):
-    return f"todo (t: {thread_id}, p: {post_id})"
+    if request.method == "GET":
+        return render_templace("edit_post.html")

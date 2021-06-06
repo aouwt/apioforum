@@ -1,0 +1,13 @@
+{% from 'common.html' import disp_post %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{%block title%}editing post{%endblock%}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+<textarea name="newcontent">
+    the
+</textarea>
+<input type="submit" value="go">
+</form>
