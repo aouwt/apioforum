@@ -7,11 +7,11 @@
         {% if buttons and post.author == g.user %}
         <span class="post-heading-b">
             <a class="actionbutton"
-               href="{{url_for('thread.edit_post',post_id=post.id,thread_id=thread_id)}}">
+               href="{{url_for('thread.edit_post',post_id=post.id)}}">
                 edit
             </a>
             <a class="actionbutton"
-               href="{{url_for('thread.delete_post',post_id=post.id,thread_id=thread_id)}}">
+               href="{{url_for('thread.delete_post',post_id=post.id)}}">
                 delete
             </a>
         </span>

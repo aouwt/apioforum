@@ -6,8 +6,7 @@
 
 {% block content %}
 <form method="post">
-<textarea name="newcontent">
-    the
-</textarea>
+<textarea name="newcontent">{{post.content}}</textarea>
 <input type="submit" value="go">
 </form>
+{% endblock %}

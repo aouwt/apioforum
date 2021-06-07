@@ -50,11 +50,38 @@ def create_post(thread_id):
             flash("post posted postfully")
     return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
-@bp.route("/<int:thread_id>/delete_post/<int:post_id>", methods=["GET","POST"])
-def delete_post(thread_id, post_id):
-    return f"todo (t: {thread_id}, p: {post_id})"
+@bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
+def delete_post(post_id):
+    return f"todo (p: {post_id})"
 
-@bp.route("/<int:thread_id>/edit_post/<int:post_id>",methods=["GET","POST"])
-def edit_post(thread_id, post_id):
-    if request.method == "GET":
-        return render_templace("edit_post.html")
+@bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
+def edit_post(post_id):
+    db = get_db()
+    post = db.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone()
+    if post is None:
+        flash("that post doesn't exist")
+        # todo: index route
+        return redirect("/")
+
+    if post['author'] != g.user:
+        flash("you can only edit posts that you created")
+        return redirect(url_for("thread.view_thread",thread_id=post['thread']))
+    # note: i am writing this while i am very tired, so probably
+    # come back and test this properly later
+    if request.method == "POST":
+        err = None 
+        newcontent = request.form['newcontent']
+        if len(newcontent.strip()) == 0:
+            err="post contents can't be empty"
+        print(err)
+        if err is None:
+            print("a")
+            db.execute("UPDATE posts SET content = ? WHERE id = ?",(newcontent,post_id))
+            db.commit()
+            flash("post edited editiously")
+            return redirect(url_for("thread.view_thread",thread_id=post['thread']))
+        else:
+            flash(err)
+    return render_template("edit_post.html",post=post)
+            
+        
