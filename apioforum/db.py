@@ -42,6 +42,10 @@ CREATE TABLE posts (
 
 CREATE INDEX posts_thread_idx ON posts (thread);
 """,
+"""
+ALTER TABLE posts ADD COLUMN edited INT NOT NULL DEFAULT 0;
+ALTER TABLE posts ADD COLUMN updated TIMESTAMP;
+""",
 ]
 
 def init_db():

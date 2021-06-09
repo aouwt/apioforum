@@ -105,9 +105,3 @@ def edit_post(post_id):
     return render_template("edit_post.html",post=post)
             
 
-@bp.route("/test")
-def test():
-    a = "<link rel=stylesheet href=/static/style.css>"
-    for i in range(1,17):
-        a += f'<span class="post-heading-em un-col-{i}">apiobee {i}</span><br>'
-    return a
