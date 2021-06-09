@@ -7,6 +7,7 @@ body { font-family: sans-serif }
     border-left: 1px solid black;
     border-right: 1px solid black;
     border-top: 1px solid black;
+    width: 100%
 }
 .post:last-of-type { border-bottom: 1px solid black; }
 
@@ -14,8 +15,27 @@ body { font-family: sans-serif }
     color: grey;
     font-size: smaller;
 }
+.post-heading-em { font-weight: bold; }
 .post-content > * { margin-bottom: 0 }
 .post-content > *:nth-child(1) { margin-top: 2px }
+.post-content { padding: 4px }
+
+.un-col-1 { color: hsl(0, 100%, 30%) }
+.un-col-2 { color: hsl(22.5, 100%, 30%) }
+.un-col-3 { color: hsl(45.0, 100%, 30%) }
+.un-col-4 { color: hsl(67.5, 100%, 30%) }
+.un-col-5 { color: hsl(90.0, 100%, 30%) }
+.un-col-6 { color: hsl(112.5, 100%, 30%) }
+.un-col-7 { color: hsl(135.0, 100%, 30%) }
+.un-col-8 { color: hsl(157.5, 100%, 30%) }
+.un-col-9 { color: hsl(180.0, 100%, 30%) }
+.un-col-10 { color: hsl(202.5, 100%, 30%) }
+.un-col-11 { color: hsl(225.0, 100%, 30%) }
+.un-col-12 { color: hsl(247.5, 100%, 30%) }
+.un-col-13 { color: hsl(270.0, 100%, 30%) }
+.un-col-14 { color: hsl(292.5, 100%, 30%) }
+.un-col-15 { color: hsl(315.0, 100%, 30%) }
+.un-col-16 { color: hsl(337.5, 100%, 30%) }
 
 img { max-width: 100% }
 
@@ -53,4 +73,12 @@ nav a { color: blue; text-decoration: none }
 .actionbutton::after {
     content: "]";
     color: grey;
+}
+
+.new-post-box {
+    height:20em;
+    resize:vertical;
+    width:100%;
+    border:1px solid black;
+    margin-top: 5px;
 }

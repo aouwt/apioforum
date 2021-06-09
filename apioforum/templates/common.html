@@ -1,11 +1,11 @@
-{% macro disp_post(post, thread_id, buttons=False) %}
+{% macro disp_post(post, buttons=False) %}
 <div class="post">
     <div class="post-heading">
         <span class="post-heading-a">
-            {{post.author}} @{{post.created}} #{{post.id}}
+            <span class="post-heading-em">{{post.author}}</span> {{post.created}}
         </span>
-        {% if buttons and post.author == g.user %}
         <span class="post-heading-b">
+        {% if buttons and post.author == g.user %}
             <a class="actionbutton"
                href="{{url_for('thread.edit_post',post_id=post.id)}}">
                 edit
@@ -14,8 +14,9 @@
                href="{{url_for('thread.delete_post',post_id=post.id)}}">
                 delete
             </a>
-        </span>
         {% endif %}
+        #{{post.id}}
+        </span>
     </div>
     <div class="post-content">
         {{ caller() }}

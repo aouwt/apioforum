@@ -4,9 +4,12 @@ from flask import (
     Blueprint, render_template, abort, request, g, redirect,
     url_for, flash
 )
-from markdown import markdown
-from markupsafe import escape
 from .db import get_db
+
+def render_md(md):
+    from markdown import markdown
+    from markupsafe import escape
+    return markdown(escape(md))
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
@@ -21,7 +24,7 @@ def view_thread(thread_id):
             "SELECT * FROM posts WHERE thread = ? ORDER BY created ASC;",
             (thread_id,)
         ).fetchall()
-        rendered_posts = [markdown(escape(q['content'])) for q in posts]
+        rendered_posts = [render_md(q['content']) for q in posts]
         return render_template("view_thread.html",posts=posts,thread=thread,thread_id=thread_id,rendered_posts=rendered_posts)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
@@ -52,7 +55,24 @@ def create_post(thread_id):
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
 def delete_post(post_id):
-    return f"todo (p: {post_id})"
+    db = get_db()
+    post = db.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone()
+    if post is None:
+        flash("that post doesn't exist")
+        return redirect("/")
+    if post['author'] != g.user:
+        flash("you can only delete posts that you created")
+        return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
+    if request.method == "POST":
+        # todo: don't actually delete, just mark as deleted or something (and wipe content)
+        # so that you can have a "this post was deleted" thing
+        db.execute("DELETE FROM posts WHERE id = ?",(post_id,))
+        db.commit()
+        flash("post deleted deletedly")
+        return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
+    else:
+        return render_template("delete_post.html",post=post,rendered_content=render_md(post["content"]))
+        
 
 @bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
 def edit_post(post_id):
@@ -84,4 +104,10 @@ def edit_post(post_id):
             flash(err)
     return render_template("edit_post.html",post=post)
             
-        
+
+@bp.route("/test")
+def test():
+    a = "<link rel=stylesheet href=/static/style.css>"
+    for i in range(1,17):
+        a += f'<span class="post-heading-em un-col-{i}">apiobee {i}</span><br>'
+    return a
