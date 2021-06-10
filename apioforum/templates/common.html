@@ -2,7 +2,10 @@
 <div class="post">
     <div class="post-heading">
         <span class="post-heading-a">
-            <span class="post-heading-em">{{post.author}}</span> {{post.created}}
+            <span class="post-heading-em">{{post.author}}</span> {{ts(post.created)}}
+            {% if post.edited %}
+                (edited {{ts(post.updated)}})
+            {% endif %}
         </span>
         <span class="post-heading-b">
         {% if buttons and post.author == g.user %}
@@ -23,3 +26,7 @@
     </div>
 </div>
 {% endmacro %}
+
+{% macro ts(dt) -%}
+<time title="{{dt.isoformat(' ')}}" datetime="{{dt.isoformat(' ')}}">{{dt | fuzzy}}</time>
+{%- endmacro %}

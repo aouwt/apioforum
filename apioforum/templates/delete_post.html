@@ -1,0 +1,17 @@
+{% from 'common.html' import disp_post %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}deleting post{% endblock %}</1h>
+{% endblock %}
+
+{% block content %}
+{% call disp_post(post, False) %}
+{{ rendered_content | safe }}
+{% endcall %}
+
+<form method="post">
+<p>confirm delete?</p>
+<input type="submit" value="delete">
+<a href="{{url_for('thread.view_thread',thread_id=post.thread)}}">cancel</a>
+</form>
+{% endblock %}

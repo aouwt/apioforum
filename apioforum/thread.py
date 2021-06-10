@@ -96,7 +96,8 @@ def edit_post(post_id):
         print(err)
         if err is None:
             print("a")
-            db.execute("UPDATE posts SET content = ? WHERE id = ?",(newcontent,post_id))
+            db.execute(
+                "UPDATE posts SET content = ?, edited = 1, updated = current_timestamp WHERE id = ?",(newcontent,post_id))
             db.commit()
             flash("post edited editiously")
             return redirect(url_for("thread.view_thread",thread_id=post['thread']))
