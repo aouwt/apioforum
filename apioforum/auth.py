@@ -8,6 +8,9 @@ import functools
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+def get_next():
+    return request.args.get('next',url_for('index'))
+
 @bp.route("/login",methods=('GET','POST'))
 def login():
     if request.method == "POST":
@@ -28,11 +31,13 @@ def login():
         if err is None:
             session.clear()
             session['user'] = username
-            return redirect(url_for('auth.cool'))
+            flash("logged in successfully")
+            return redirect(get_next())
 
         flash(err)
         
     return render_template("auth/login.html")
+
 
 @bp.route("/register", methods=("GET","POST"))
 def register():
@@ -58,7 +63,8 @@ def register():
             db.commit()
             flash("successfully created account")
             session['user'] = username
-            return redirect(url_for("auth.cool"))
+            flash("registered successfully")
+            return redirect(get_next())
 
         flash(err)
             
@@ -67,7 +73,8 @@ def register():
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("auth.cool"))
+    flash("logged out successfully")
+    return redirect(get_next())
 
 @bp.before_app_request
 def load_user():

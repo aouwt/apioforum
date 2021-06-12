@@ -17,10 +17,22 @@
 
                     {% if g.user %}
                     <li>{{ g.user }}</li>
-                    <li><a href="{{ url_for('auth.logout') }}">logout</a></li>
+                    <li>
+                        <a href="{{ url_for('auth.logout',next=request.path) }}">
+                            logout
+                        </a>
+                    </li>
                     {% else %}
-                    <li><a href="{{ url_for('auth.login') }}">login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}">register</a></li>
+                    <li>
+                        <a href="{{ url_for('auth.login',next=request.path) }}">
+                            login
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('auth.register',next=request.path) }}">
+                            register
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </nav>
