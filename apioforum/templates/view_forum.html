@@ -21,6 +21,7 @@
     <div class="threadlisting-part threadlisting-part-updated threadlisting-header">
         last updated
     </div>
+</div>
 {%for thread in threads%}
 <div class="threadlisting">
     <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></div>
