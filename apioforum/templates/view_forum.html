@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% from 'common.html' import ts %}
-{% block header %}<h1>{% block title %}apio forum george etc{%endblock%}</h1>{%endblock%}
+{% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
 {%block content%}
-<p>the</p>
-<a href="{{url_for('forum.create_thread')}}">create thread</a>
+<p>welcome to the apioforum</p>
+<p>forum rules: do not be a bad person. do not do bad things.</p>
+<a class="actionbutton" href="{{url_for('forum.create_thread')}}">create new thread</a>
+<br><br>
 <div class="threadlistings">
 <div class="threadlisting">
     <div class="threadlisting-part threadlisting-part-title threadlisting-header">

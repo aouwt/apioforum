@@ -78,6 +78,7 @@ nav a { color: blue; text-decoration: none }
     content: "]";
     color: grey;
 }
+.actionbutton { color:blue }
 
 .new-post-box {
     height:20em;

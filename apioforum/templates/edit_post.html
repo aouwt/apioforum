@@ -6,7 +6,9 @@
 
 {% block content %}
 <form method="post">
-<textarea name="newcontent">{{post.content}}</textarea>
-<input type="submit" value="go">
+<textarea class="new-post-box" name="newcontent">{{post.content}}</textarea>
+<p>confirm edit?</p>
+<input type="submit" value="confirm">
+<a href="{{url_for('thread.view_thread',thread_id=post.thread)}}">cancel</a>
 </form>
 {% endblock %}

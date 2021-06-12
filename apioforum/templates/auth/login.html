@@ -4,11 +4,14 @@
 {% endblock %}
 
 {% block content %}
+<p>log in using an existing account here. if you don't already have an account, <a href="{{url_for('auth.register')}}">register</a> first instead.</p>
 <form method="post">
     <label for="username">Username</label>
     <input name="username" id="username" required>
+    <br>
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>
-    <input type="submit" value="yes">
+    <br>
+    <input type="submit" value="login">
 </form>
 {% endblock %}
