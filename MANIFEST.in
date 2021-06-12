@@ -1,0 +1,2 @@
+graft apioforum/static
+graft apioforum/templates

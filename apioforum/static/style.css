@@ -55,15 +55,19 @@ nav a { color: blue; text-decoration: none }
 .threadlisting:nth-child(odd) { background-color: #ddd }
 
 .threadlisting { display: flex; flex-flow: row wrap; text-align: center }
-.threadlisting-part { flex: 1 0px; display: table-cell; vertical-align: middle; }
+.threadlisting-part { flex: 1 0px; display: table-cell; vertical-align: middle; padding: 3px}
 .threadlisting-part-title { flex: 3 0px }
+.threadlisting-header { font-weight: bold }
 @media all and (max-width: 800px) {
     .threadlisting-part-title { flex: 2 100%; }
     .threadlisting { margin-bottom: 5px; }
 }
 
-.threadlisting-part-id { flex: 0.4 0px; }
+@media all and (min-width: 1200px) {
+    .threadlisting { width: 1200px }
+}
 
+.threadlisting-part-id { flex: 0.4 0px; }
 .threadlisting-part { border: 1px solid black }
 
 .actionbutton::before {

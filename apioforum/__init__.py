@@ -32,4 +32,6 @@ def create_app():
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
 
+    app.add_url_rule("/",endpoint="index")
+
     return app

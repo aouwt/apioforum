@@ -2,3 +2,6 @@ instance/*
 venv/*
 *.db
 *.py[cod]
+build/*
+dist/*
+apioforum.egg-info/*
