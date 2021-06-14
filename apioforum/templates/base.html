@@ -7,43 +7,42 @@
         <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
+        <nav>
+            <ul>
+                <li>
+                    <span style="font-family: monospace;"><b>apio</b><i>forum</i>&trade;</span>
+                </li>
+                <li><a href="{{url_for('index')}}">home</a></li>
+
+                {% if g.user %}
+                <li>{{ g.user }}</li>
+                <li>
+                    <a href="{{ url_for('auth.logout',next=request.path) }}">
+                        logout
+                    </a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{{ url_for('auth.login',next=request.path) }}">
+                        login
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.register',next=request.path) }}">
+                        register
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% for msg in get_flashed_messages() %}
+            <div class="flashmsg">{{ msg }}</div>
+        {% endfor %}
+
+        <div class="header">
+        {% block header %}{% endblock %}
+        </div>
         <main>
-            <nav>
-                <ul>
-                    <li>
-                        <span style="font-family: monospace;"><b>apio</b><i>forum</i>&trade;</span>
-                    </li>
-                    <li><a href="{{url_for('index')}}">home</a></li>
-
-                    {% if g.user %}
-                    <li>{{ g.user }}</li>
-                    <li>
-                        <a href="{{ url_for('auth.logout',next=request.path) }}">
-                            logout
-                        </a>
-                    </li>
-                    {% else %}
-                    <li>
-                        <a href="{{ url_for('auth.login',next=request.path) }}">
-                            login
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('auth.register',next=request.path) }}">
-                            register
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% for msg in get_flashed_messages() %}
-                <div class="flashmsg">{{ msg }}</div>
-            {% endfor %}
-
-            <div class="header">
-            {% block header %}{% endblock %}
-            </div>
-
             {%block content %}{% endblock %}
         </main>
     <script>/* bees */</script>

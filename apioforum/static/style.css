@@ -2,7 +2,7 @@ body { font-family: sans-serif }
 
 :root {
     --alternating-colour-even: hsl(0,0%,96%);
-    --alternating-colour-odd:  hsl(0,0%,89%);
+    --alternating-colour-odd:  hsl(0,0%,91%);
 }
 
 .post { margin: 0px; }
@@ -81,10 +81,6 @@ nav a { color: blue; text-decoration: none }
     }
 
 }
-/* very wide screens */
-@media all and (min-width: 1200px) {
-    .threadlistings { width: 1200px }
-}
 
 /* small screens */
 @media not all and (min-width: 800px) {
@@ -138,4 +134,11 @@ nav a { color: blue; text-decoration: none }
     width:100%;
     border:1px solid black;
     margin-top: 5px;
+}
+
+@media all and (min-width: 81px ) {
+    main {
+        width: 800px;
+        margin: auto;
+    }
 }
