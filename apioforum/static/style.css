@@ -69,7 +69,7 @@ nav .links { display: flex; }
     .threadlisting { display: contents }
     .threadlistings {
         display: grid;
-        grid-template-columns: 2fr 0.8fr 1.2fr 1.2fr 0.8fr 0.4fr;
+        grid-template-columns: 2fr repeat(4,1fr) 0.4fr;
     }
 
     .threadlisting-part {
