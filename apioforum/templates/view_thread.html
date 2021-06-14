@@ -5,7 +5,9 @@
 {% endblock %}
 
 {%block content%}
-<a class="actionbutton" href="{{url_for('thread.config_thread',thread_id=thread_id)}}">configure</a>
+{% if g.user == thread.creator %}
+<a class="actionbutton" href="{{url_for('thread.config_thread',thread_id=thread_id)}}">configure thread</a>
+{% endif %}
 <div class="posts">
     {% for post in posts %}
     {% call disp_post(post, True) %}
