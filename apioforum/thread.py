@@ -9,6 +9,9 @@ from .mdrender import render
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
+def post_jump(thread_id, post_id):
+    return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
+
 @bp.route("/<int:thread_id>")
 def view_thread(thread_id):
     db = get_db()
@@ -37,17 +40,19 @@ def create_post(thread_id):
         elif not thread:
             flash("that thread does not exist")
         else:
-            db.execute(
+            cur = db.cursor()
+            cur.execute(
                 "INSERT INTO posts (thread,author,content,created) VALUES (?,?,?,current_timestamp);",
                 (thread_id,g.user,content)
             )
-            db.execute(
+            post_id = cur.lastrowid
+            cur.execute(
                 "UPDATE threads SET updated = current_timestamp WHERE id = ?;",
                 (thread_id,)
             )
             db.commit()
             flash("post posted postfully")
-    return redirect(url_for('thread.view_thread',thread_id=thread_id))
+    return redirect(post_jump(thread_id, post_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
 def delete_post(post_id):
@@ -91,12 +96,11 @@ def edit_post(post_id):
             err="post contents can't be empty"
         print(err)
         if err is None:
-            print("a")
             db.execute(
                 "UPDATE posts SET content = ?, edited = 1, updated = current_timestamp WHERE id = ?",(newcontent,post_id))
             db.commit()
             flash("post edited editiously")
-            return redirect(url_for("thread.view_thread",thread_id=post['thread']))
+            return redirect(post_jump(post['thread'],post_id))
         else:
             flash(err)
     return render_template("edit_post.html",post=post)

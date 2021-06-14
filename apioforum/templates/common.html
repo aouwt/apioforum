@@ -1,5 +1,5 @@
 {% macro disp_post(post, buttons=False) %}
-<div class="post">
+<div class="post" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
             <span class="post-heading-em">{{post.author}}</span> {{ts(post.created)}}
@@ -14,7 +14,7 @@
             <a class="actionbutton"
                href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
         {% endif %}
-        #{{post.id}}
+        <a class="post-anchor-link" href="#post_{{post.id}}">#{{post.id}}</a>
         </span>
     </div>
     <div class="post-content">

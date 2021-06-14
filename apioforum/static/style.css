@@ -28,6 +28,8 @@ body { font-family: sans-serif }
 .post-heading-a { margin-left: 0.2em }
 .post-heading-b { float: right; margin-right: 0.5em }
 
+.post-anchor-link { color: hsl(0,0%,25%); }
+
 .un-col-1 { color: hsl(0, 100%, 30%) }
 .un-col-2 { color: hsl(22.5, 100%, 30%) }
 .un-col-3 { color: hsl(45.0, 100%, 30%) }
