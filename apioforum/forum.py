@@ -3,7 +3,7 @@
 
 from flask import (
     Blueprint, render_template, request,
-    g, redirect, url_for
+    g, redirect, url_for, flash
 )
 from .db import get_db
 
@@ -18,13 +18,16 @@ def view_forum():
 @bp.route("/create_thread",methods=("GET","POST"))
 def create_thread():
     db = get_db()
+    
+    if g.user is None:
+        flash("you need to be logged in to create a thread")
+        return redirect(url_for('index'))
+        
     if request.method == "POST":
         title = request.form['title']
         content = request.form['content']
         err = None
-        if g.user is None:
-            err = "you need to be logged in to create a thread"
-        elif len(title.strip()) == 0 or len(content.strip()) == 0:
+        if len(title.strip()) == 0 or len(content.strip()) == 0:
             err = "title and content can't be empty"
 
         if err is None:
@@ -40,6 +43,7 @@ def create_thread():
             )
             db.commit()
             return redirect(url_for('thread.view_thread',thread_id=thread_id))
+        flash(err)
         
         
     return render_template("create_thread.html")
