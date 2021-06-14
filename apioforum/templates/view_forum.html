@@ -4,8 +4,11 @@
 {%block content%}
 <p>welcome to the apioforum</p>
 <p>forum rules: do not be a bad person. do not do bad things.</p>
-<a class="actionbutton" href="{{url_for('forum.create_thread')}}">create new thread</a>
-<br><br>
+{% if g.user %}
+<p><a class="actionbutton" href="{{url_for('forum.create_thread')}}">create new thread</a></p>
+{% else %}
+<p>please log in to create a new thread</p>
+{% endif %}
 <div class="threadlistings">
 <div class="threadlisting">
     <div class="threadlisting-part threadlisting-part-title threadlisting-header">
