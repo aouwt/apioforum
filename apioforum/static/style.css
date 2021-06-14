@@ -136,7 +136,7 @@ nav a { color: blue; text-decoration: none }
     margin-top: 5px;
 }
 
-@media all and (min-width: 81px ) {
+@media all and (min-width: 810px ) {
     main {
         width: 800px;
         margin: auto;
