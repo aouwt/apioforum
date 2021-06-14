@@ -49,26 +49,71 @@ nav li:first-of-type { margin-left:0.5em }
 nav { float: right }
 nav a { color: blue; text-decoration: none }
 
-.flashmsg { border: 1px solid black; background-color: yellow; width: max-content; padding: 5px; }
+/* todo: make the navbar less bad */
+.flashmsg { border: 1px solid black; background-color: yellow; width: max-content; padding: 5px; clear: both;}
 
 .threadlisting:nth-child(even) { background-color: #eee }
 .threadlisting:nth-child(odd) { background-color: #ddd }
 
-.threadlisting { display: flex; flex-flow: row wrap; text-align: center }
-.threadlisting-part { flex: 1 0px; display: table-cell; vertical-align: middle; padding: 3px}
-.threadlisting-part-title { flex: 3 0px }
-.threadlisting-header { font-weight: bold }
-@media all and (max-width: 800px) {
-    .threadlisting-part-title { flex: 2 100%; }
-    .threadlisting { margin-bottom: 5px; }
-}
+/* wide screens */
+@media all and (min-width: 800px) {
+    .threadlisting { display: contents }
+    .threadlistings {
+        display: grid;
+        grid-template-columns: 2fr 0.4fr repeat(3, 1fr) 0.4fr;
+    }
 
+    /* borders */
+    .threadlisting-part {
+        border-left: 1px solid black;
+        border-top: 1px solid black;
+    }
+    .threadlistings {
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+}
+/* very wide screens */
 @media all and (min-width: 1200px) {
-    .threadlisting { width: 1200px }
+    .threadlistings { width: 1200px }
 }
 
-.threadlisting-part-id { flex: 0.4 0px; }
-.threadlisting-part { border: 1px solid black }
+/* small screens */
+@media not all and (min-width: 800px) {
+    .threadlisting {
+        display: grid;
+        grid-template-columns: repeat(5,1fr);
+        margin-bottom: 5px;
+    }
+    .threadlisting-part-title {
+        grid-column: 1 / -1;
+    }
+    .threadlisting-part {
+        border-left: 1px solid black;
+        border-top: 1px solid black;
+    }
+    .threadlisting {
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+}
+
+
+.threadlisting-part {
+    background-color: inherit;
+    display: table-cell;
+    vertical-align: middle;
+    padding: 3px;
+    text-align: center;
+}
+
+.threadlisting-part-title {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.threadlisting-header { font-weight: bold }
 
 .actionbutton::before {
     content: "[";

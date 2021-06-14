@@ -12,7 +12,14 @@ bp = Blueprint("forum", __name__, url_prefix="/")
 @bp.route("/")
 def view_forum():
     db = get_db()
-    threads = db.execute("SELECT * FROM threads ORDER BY updated DESC;").fetchall()
+    threads = db.execute(
+        """SELECT threads.id, threads.title, threads.creator, threads.created,
+        threads.updated, count(posts.id) as num_replies
+        FROM threads
+        INNER JOIN posts ON posts.thread = threads.id
+        GROUP BY threads.id
+        ORDER BY threads.updated DESC;
+        """).fetchall()
     return render_template("view_forum.html",threads=threads)
 
 @bp.route("/create_thread",methods=("GET","POST"))

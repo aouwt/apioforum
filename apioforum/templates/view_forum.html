@@ -23,6 +23,9 @@
     <div class="threadlisting-part threadlisting-part-updated threadlisting-header">
         last updated
     </div>
+    <div class="threadlisting-part threadlisting-part-numreplies threadlisting-header">
+        replies
+    </div>
 </div>
 {%for thread in threads%}
 <div class="threadlisting">
@@ -31,6 +34,7 @@
     <div class="threadlisting-part threadlisting-part-creator">{{thread.creator}}</div>
     <div class="threadlisting-part threadlisting-part-created">{{ts(thread.created)}}</div>
     <div class="threadlisting-part threadlisting-part-updated">{{ts(thread.updated)}}</div>
+    <div class="threadlisting-part threadlisting-part-numreplies">{{thread.num_replies}}</div>
 </div>
 {%endfor%}
 </div>
