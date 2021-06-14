@@ -64,15 +64,16 @@ nav a { color: blue; text-decoration: none }
 .threadlisting:nth-child(even) { background-color: var(--alternating-colour-even) }
 .threadlisting:nth-child(odd) { background-color: var(--alternating-colour-odd) }
 
+
+
 /* wide screens */
 @media all and (min-width: 800px) {
     .threadlisting { display: contents }
     .threadlistings {
         display: grid;
-        grid-template-columns: 2fr 0.4fr repeat(3, 1fr) 0.4fr;
+        grid-template-columns: 2fr 0.8fr 1.2fr 1.2fr 0.8fr 0.4fr;
     }
 
-    /* borders */
     .threadlisting-part {
         border-left: 1px solid black;
         border-top: 1px solid black;

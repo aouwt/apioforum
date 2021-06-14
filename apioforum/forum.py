@@ -14,7 +14,7 @@ def view_forum():
     db = get_db()
     threads = db.execute(
         """SELECT threads.id, threads.title, threads.creator, threads.created,
-        threads.updated, count(posts.id) as num_replies
+        threads.updated, count(posts.id) as num_replies, max(posts.id), posts.author as last_user
         FROM threads
         INNER JOIN posts ON posts.thread = threads.id
         GROUP BY threads.id
