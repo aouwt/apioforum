@@ -1,0 +1,18 @@
+{% from 'common.html' import disp_post %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{%block title %}Results for {{query}}{% endblock %}</h1>
+{% endblock %}
+
+{%block content%}
+<div class="results">
+    {% for result in results %}
+    {% if display_thread_id[loop.index0] %}
+        <h3><a href="{{url_for('thread.view_thread', thread_id=result.thread)}}">{{ result.thread_title }}</a></h3>
+    {% endif %}
+    {% call disp_post(result, True) %}
+        {{ rendered_posts[loop.index0] | safe}}
+    {% endcall %}
+    {% endfor %}
+</div>
+{% endblock %}

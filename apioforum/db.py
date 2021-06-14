@@ -46,6 +46,26 @@ CREATE INDEX posts_thread_idx ON posts (thread);
 ALTER TABLE posts ADD COLUMN edited INT NOT NULL DEFAULT 0;
 ALTER TABLE posts ADD COLUMN updated TIMESTAMP;
 """,
+"""
+CREATE VIRTUAL TABLE posts_fts USING fts5(
+    content,
+    content=posts,
+    content_rowid=id,
+    tokenize='porter unicode61 remove_diacritics 2'
+);
+INSERT INTO posts_fts (rowid, content) SELECT id, content FROM posts;
+
+CREATE TRIGGER posts_ai AFTER INSERT ON posts BEGIN
+    INSERT INTO posts_fts(rowid, content) VALUES (new.id, new.content);
+END;
+CREATE TRIGGER posts_ad AFTER DELETE ON posts BEGIN
+    INSERT INTO posts_fts(posts_fts, rowid, content) VALUES('delete', old.id, old.content);
+END;
+CREATE TRIGGER posts_au AFTER UPDATE ON posts BEGIN
+    INSERT INTO posts_fts(posts_fts, rowid, content) VALUES('delete', old.id, old.content);
+    INSERT INTO posts_fts(rowid, content) VALUES (new.id, new.content);
+END;
+"""
 ]
 
 def init_db():

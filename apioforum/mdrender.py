@@ -10,6 +10,7 @@ allowed_tags = [
     'h6',
     'pre',
     'del',
+    'mark'
 ]
 allowed_tags.extend(bleach.sanitizer.ALLOWED_TAGS)
 

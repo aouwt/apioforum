@@ -6,6 +6,7 @@ from flask import (
     g, redirect, url_for, flash
 )
 from .db import get_db
+from .mdrender import render
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
@@ -55,3 +56,25 @@ def create_thread():
         
     return render_template("create_thread.html")
 
+@bp.route("/search")
+def search():
+    db = get_db()
+    query = request.args["q"]
+    results = db.execute("""
+    SELECT posts.id, highlight(posts_fts, 0, '<mark>', '</mark>') AS content, posts.thread, posts.author, posts.created, posts.edited, posts.updated, threads.title AS thread_title
+    FROM posts_fts
+    JOIN posts ON posts_fts.rowid = posts.id
+    JOIN threads ON threads.id = posts.thread
+    WHERE posts_fts MATCH ?
+    ORDER BY rank
+    LIMIT 50
+    """, (query,)).fetchall()
+
+    display_thread_id = [ True ] * len(results)
+    last_thread = None
+    for ix, result in enumerate(results):
+        if result["thread"] == last_thread:
+            display_thread_id[ix] = False
+        last_thread = result["thread"]
+    rendered_posts = [render(q['content']) for q in results]
+    return render_template("search_results.html", results=results, query=query, rendered_posts=rendered_posts, display_thread_id=display_thread_id)
