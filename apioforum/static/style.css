@@ -1,8 +1,13 @@
 body { font-family: sans-serif }
 
+:root {
+    --alternating-colour-even: hsl(0,0%,96%);
+    --alternating-colour-odd:  hsl(0,0%,89%);
+}
+
 .post { margin: 0px; }
-.post:nth-child(even) { background-color: #eee }
-.post:nth-child(odd)  { background-color: #ddd }
+.post:nth-child(even) { background-color: var(--alternating-colour-even) }
+.post:nth-child(odd)  { background-color: var(--alternating-colour-odd) }
 .post {
     border-left: 1px solid black;
     border-right: 1px solid black;
@@ -12,13 +17,16 @@ body { font-family: sans-serif }
 .post:last-of-type { border-bottom: 1px solid black; }
 
 .post-heading {
-    color: grey;
+    color: hsl(0,0%,25%);
     font-size: smaller;
 }
 .post-heading-em { font-weight: bold; }
-.post-content > * { margin-bottom: 0 }
-.post-content > *:nth-child(1) { margin-top: 2px }
+.post-content > * { margin-bottom: 8px; margin-top: 8px; }
+.post-content > *:first-child { margin-top: 2px }
+.post-content > *:last-child { margin-bottom: 0}
 .post-content { padding: 4px }
+.post-heading-a { margin-left: 0.2em }
+.post-heading-b { float: right; margin-right: 0.5em }
 
 .un-col-1 { color: hsl(0, 100%, 30%) }
 .un-col-2 { color: hsl(22.5, 100%, 30%) }
@@ -39,7 +47,6 @@ body { font-family: sans-serif }
 
 img { max-width: 100% }
 
-.post-heading-b { float: right; margin-right: 0.5em }
 
 nav ul { list-style-type: none; margin: 0px; padding: 0px }
 nav { width:max-content; padding: 5px; margin: 2px; border: 1px solid black }
@@ -52,8 +59,8 @@ nav a { color: blue; text-decoration: none }
 /* todo: make the navbar less bad */
 .flashmsg { border: 1px solid black; background-color: yellow; width: max-content; padding: 5px; clear: both;}
 
-.threadlisting:nth-child(even) { background-color: #eee }
-.threadlisting:nth-child(odd) { background-color: #ddd }
+.threadlisting:nth-child(even) { background-color: var(--alternating-colour-even) }
+.threadlisting:nth-child(odd) { background-color: var(--alternating-colour-odd) }
 
 /* wide screens */
 @media all and (min-width: 800px) {
