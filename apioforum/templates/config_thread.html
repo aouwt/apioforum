@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block header %}<h1>{% block title %}configure thread '{{thread.title}}'{% endblock %}</h1>{% endblock %}
+{% block content %}
+<form method="post">
+<p>if you want to change the title of this thread, make sure you check the "change title?" box.</p>
+<label for="do_title">change title?</label>
+<input type="checkbox" name="do_title"><br>
+<label for="title">thread title</label>
+<input type="text" id="title" name="title" value="{{thread.title}}">
+<br>
+<p>confirm changes?</p>
+<input type="submit" value="confirm">
+<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">cancel</a>
+</form>
+{% endblock %}

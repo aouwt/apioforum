@@ -105,4 +105,37 @@ def edit_post(post_id):
             flash(err)
     return render_template("edit_post.html",post=post)
             
+@bp.route("/<int:thread_id>/config",methods=["GET","POST"])
+def config_thread(thread_id):
+    db = get_db()
+    thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+    err = None
+    if g.user is None:
+        err = "you need to be logged in to do that"
+    elif g.user != thread['creator']:
+        err = "you can only configure threads that you own"
 
+    if err is not None:
+        flash(err)
+        return redirect(url_for("thread.view_thread",thread_id=thread_id))
+
+    if request.method == "POST":
+        err = []
+        if 'do_title' in request.form:
+            title = request.form['title']
+            if len(title.strip()) == 0:
+                err.append("title can't be empty")
+            else:
+                db.execute("update threads set title = ? where id = ?;",(title,thread_id))
+                flash("title updated successfully")
+                db.commit()
+
+        if len(err) > 0:
+            for e in err:
+                flash(e)
+        else:
+            return redirect(url_for("thread.view_thread",thread_id=thread_id))
+            
+
+    return render_template("config_thread.html", thread=thread)
+    
