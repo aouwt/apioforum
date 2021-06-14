@@ -14,7 +14,7 @@
             <a class="actionbutton"
                href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
         {% endif %}
-        <a class="post-anchor-link" href="{{url_for('thread.view_thread', thread_id=post.thread)}}}#post_{{post.id}}">#{{post.id}}</a>
+        <a class="post-anchor-link" href="{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}">#{{post.id}}</a>
         </span>
     </div>
     <div class="post-content">
