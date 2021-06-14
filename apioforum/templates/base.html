@@ -8,32 +8,32 @@
     </head>
     <body>
         <nav>
-            <ul>
-                <li>
-                    <span style="font-family: monospace;"><b>apio</b><i>forum</i>&trade;</span>
-                </li>
-                <li><a href="{{url_for('index')}}">home</a></li>
+			<p style="font-family: monospace;"><b>apio</b><i>forum</i>&trade;</p>
+			<form class="search-form" action="/search">
+				<input type="search" placeholder="query" name="q">
+				<input type="submit" value="search">
+			</form>
+			<p><a href="{{url_for('index')}}">home</a></p>
 
-                {% if g.user %}
-                <li>{{ g.user }}</li>
-                <li>
-                    <a href="{{ url_for('auth.logout',next=request.path) }}">
-                        logout
-                    </a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="{{ url_for('auth.login',next=request.path) }}">
-                        login
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('auth.register',next=request.path) }}">
-                        register
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
+			{% if g.user %}
+			<p>{{ g.user }}</p>
+			<p>
+				<a href="{{ url_for('auth.logout',next=request.path) }}">
+					logout
+				</a>
+			</p>
+			{% else %}
+			<p>
+				<a href="{{ url_for('auth.login',next=request.path) }}">
+					login
+				</a>
+			</p>
+			<p>
+				<a href="{{ url_for('auth.register',next=request.path) }}">
+					register
+				</a>
+			</p>
+			{% endif %}
         </nav>
 
         <div class="header">
