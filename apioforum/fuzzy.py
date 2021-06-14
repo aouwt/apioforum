@@ -16,6 +16,7 @@ def fuzzy(seconds, ago=False):
     elif isinstance(seconds, datetime):
         seconds = (seconds.replace(tzinfo=timezone.utc) - datetime.now(tz=timezone.utc)).total_seconds()
 
+    components_used = 0
     fmt = "{}"
     buf = ""
     if ago:
@@ -24,9 +25,11 @@ def fuzzy(seconds, ago=False):
     seconds = abs(seconds)
     for short, _, _, unit_length in units:
         if seconds >= unit_length:
+            components_used += 1
             qty = seconds // unit_length
             buf += str(int(qty)) + short
             seconds -= qty * unit_length
+        if components_used == 2: break
     if not buf: return "now"
 
     return fmt.format(buf)
