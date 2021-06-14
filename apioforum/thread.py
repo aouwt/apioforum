@@ -5,11 +5,7 @@ from flask import (
     url_for, flash
 )
 from .db import get_db
-
-def render_md(md):
-    from markdown import markdown
-    from markupsafe import escape
-    return markdown(escape(md))
+from .mdrender import render
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
@@ -24,7 +20,7 @@ def view_thread(thread_id):
             "SELECT * FROM posts WHERE thread = ? ORDER BY created ASC;",
             (thread_id,)
         ).fetchall()
-        rendered_posts = [render_md(q['content']) for q in posts]
+        rendered_posts = [render(q['content']) for q in posts]
         return render_template("view_thread.html",posts=posts,thread=thread,thread_id=thread_id,rendered_posts=rendered_posts)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))

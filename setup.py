@@ -8,5 +8,7 @@ setup(
     install_requires = [
         'flask',
         'markdown',
+        'bleach',
+        'pymdown-extensions',
     ],
 )
