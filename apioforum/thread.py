@@ -105,4 +105,12 @@ def edit_post(post_id):
             flash(err)
     return render_template("edit_post.html",post=post)
             
+@bp.route("/<int:thread_id>/config",methods=["GET","POST"])
+def config_thread(thread_id):
+    db = get_db()
+    thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+    if request.method == "POST":
+        abort(418)
 
+    return render_template("config_thread.html", thread=thread)
+    
