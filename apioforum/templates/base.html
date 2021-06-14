@@ -35,13 +35,15 @@
                 {% endif %}
             </ul>
         </nav>
-        {% for msg in get_flashed_messages() %}
-            <div class="flashmsg">{{ msg }}</div>
-        {% endfor %}
 
         <div class="header">
         {% block header %}{% endblock %}
         </div>
+
+        {% for msg in get_flashed_messages() %}
+            <div class="flashmsg">{{ msg }}</div>
+        {% endfor %}
+
         <main>
             {%block content %}{% endblock %}
         </main>

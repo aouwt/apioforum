@@ -57,7 +57,7 @@ nav { float: right }
 nav a { color: blue; text-decoration: none }
 
 /* todo: make the navbar less bad */
-.flashmsg { border: 1px solid black; background-color: yellow; width: max-content; padding: 5px; clear: both;}
+.flashmsg { border: 1px solid black; background-color: yellow; max-width: max-content; padding: 5px; clear: both;}
 
 .threadlisting:nth-child(even) { background-color: var(--alternating-colour-even) }
 .threadlisting:nth-child(odd) { background-color: var(--alternating-colour-odd) }
