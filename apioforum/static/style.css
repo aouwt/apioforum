@@ -50,10 +50,9 @@ body { font-family: sans-serif }
 img { max-width: 100% }
 
 
-nav { width:max-content; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center }
+nav { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
 nav p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
 nav p:first-of-type { margin-left:0.5em }
-nav { float: right }
 nav a { color: blue; text-decoration: none }
 
 /* todo: make the navbar less bad */
@@ -151,5 +150,5 @@ blockquote {
 }
 
 .search-form {
-    display: inline;
+    display: inline-block;
 }
