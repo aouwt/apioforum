@@ -137,11 +137,9 @@ nav .links { display: flex; }
     margin-top: 5px;
 }
 
-@media all and (min-width: 810px ) {
-    main {
-        width: 800px;
-        margin: auto;
-    }
+main {
+    max-width: 60ch;
+    margin: auto;
 }
 
 blockquote {
