@@ -21,7 +21,7 @@ body { font-family: sans-serif }
     font-size: smaller;
 }
 .post-heading-em { font-weight: bold; }
-.post-content > * { margin-bottom: 8px; margin-top: 8px; }
+.post-content   * { margin-bottom: 8px; margin-top: 8px; }
 .post-content > *:first-child { margin-top: 2px }
 .post-content > *:last-child { margin-bottom: 0}
 .post-content { padding: 4px }
