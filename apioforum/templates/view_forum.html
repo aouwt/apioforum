@@ -13,9 +13,9 @@
 <div class="threadlistings">
 <div class="threadlisting">
     <div class="threadlisting-part threadlisting-part-title threadlisting-header">
-        name
+        name<span class="only-small"> &amp; tags</span>
     </div>
-    <div class="threadlisting-part threadlisting-part-tags threadlisting-header">
+    <div class="threadlisting-part threadlisting-part-tags threadlisting-header only-big">
         tags
     </div>
     <div class="threadlisting-part threadlisting-part-creator threadlisting-header">
@@ -36,8 +36,16 @@
 </div>
 {%for thread in threads%}
 <div class="threadlisting">
-    <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></div>
-    <div class="threadlisting-part threadlisting-part-tags">
+    <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a>
+        {% if thread_tags[thread.id]|length > 0 %}
+            <span class="only-small">
+                {% for the_tag in thread_tags[thread.id] %}
+                    {{tag(the_tag)}}
+                {% endfor %}
+            </span>
+        {%endif%}
+    </div>
+    <div class="threadlisting-part threadlisting-part-tags only-big">
         {% for the_tag in thread_tags[thread.id] %}
             {{tag(the_tag)}}
         {% endfor %}
