@@ -65,7 +65,19 @@ CREATE TRIGGER posts_au AFTER UPDATE ON posts BEGIN
     INSERT INTO posts_fts(posts_fts, rowid, content) VALUES('delete', old.id, old.content);
     INSERT INTO posts_fts(rowid, content) VALUES (new.id, new.content);
 END;
+""",
 """
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    text_colour TEXT NOT NULL,
+    bg_colour TEXT NOT NULL
+);
+CREATE TABLE thread_tags (
+    thread INTEGER NOT NULL REFERENCES threads(id),
+    tag INTEGER NOT NULL REFERENCES tags(id)
+);
+""",
 ]
 
 def init_db():

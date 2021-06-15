@@ -30,6 +30,20 @@ body { font-family: sans-serif }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
 
+.thread-top-bar {
+    margin-bottom: 4px;
+}
+
+.thread-top-bar-b {
+    float: right;
+    margin-right: -2px;
+}
+
+.thread-top-bar-b .tag {
+    font-size: .9rem;
+}
+
+
 .un-col-1 { color: hsl(0, 100%, 30%) }
 .un-col-2 { color: hsl(22.5, 100%, 30%) }
 .un-col-3 { color: hsl(45.0, 100%, 30%) }
@@ -69,7 +83,7 @@ nav .links { display: flex; }
     .threadlisting { display: contents }
     .threadlistings {
         display: grid;
-        grid-template-columns: 2fr repeat(4,1fr) 0.4fr;
+        grid-template-columns: 2fr repeat(5,1fr) 0.4fr;
     }
 
     .threadlisting-part {
@@ -80,6 +94,9 @@ nav .links { display: flex; }
         border-right: 1px solid black;
         border-bottom: 1px solid black;
     }
+
+    .only-small { display: none !important }
+
 
 }
 
@@ -101,6 +118,8 @@ nav .links { display: flex; }
         border-right: 1px solid black;
         border-bottom: 1px solid black;
     }
+
+    .only-big { display: none !important }
 }
 
 
@@ -141,6 +160,9 @@ main {
     max-width: 60ch;
     margin: auto;
 }
+main.widemain {
+    max-width: 120ch;
+}
 
 blockquote {
     margin-left: 10px;
@@ -150,4 +172,10 @@ blockquote {
 
 .search-form {
     display: inline-block;
+}
+
+.tag {
+    font-size: .75rem;
+    padding: 1px 3px;
+    border: 1px solid black;
 }

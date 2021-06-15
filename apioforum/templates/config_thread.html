@@ -1,13 +1,30 @@
 {% extends 'base.html' %}
+{% from 'common.html' import tag %}
 {% block header %}<h1>{% block title %}configure thread '{{thread.title}}'{% endblock %}</h1>{% endblock %}
 {% block content %}
 <form method="post">
+<fieldset>
+<legend>title</legend>
 <p>if you want to change the title of this thread, make sure you check the "change title?" box.</p>
 <label for="do_title">change title?</label>
-<input type="checkbox" name="do_title"><br>
+<input type="checkbox" id="do_title" name="do_title"><br>
 <label for="title">thread title</label>
 <input type="text" id="title" name="title" value="{{thread.title}}">
-<br>
+</fieldset>
+<fieldset>
+<legend>tags</legend>
+<p>if you want to change the tags on this thread, make sure you check the "change tags?" box.</p>
+<label for="do_chtags">change tags?</label>
+<input type="checkbox" name="do_chtags" id="do_chtags"><br>
+<ul>
+    {% for the_tag in avail_tags %}
+    <li>
+        <input  type="checkbox" id="tag_{{the_tag.id}}" name="tag_{{the_tag.id}}" {%- if the_tag.id in thread_tags %} checked{% endif %}>
+        <label for="tag_{{the_tag.id}}">#{{the_tag.id}} {{tag(the_tag)}}</label>
+    </li>
+    {% endfor %}
+</ul>
+</fieldset>
 <p>confirm changes?</p>
 <input type="submit" value="confirm">
 <a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">cancel</a>
