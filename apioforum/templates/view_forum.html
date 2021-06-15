@@ -37,7 +37,11 @@
 {%for thread in threads%}
 <div class="threadlisting">
     <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a></div>
-    <div class="threadlisting-part threadlisting-part-tags">{{tag("the","black","yellow")}} {{tag("bees","yellow","black")}} {{tag("excellent","black","lightsteelblue")}}</div>
+    <div class="threadlisting-part threadlisting-part-tags">
+        {% for the_tag in thread_tags[thread.id] %}
+            {{tag(the_tag)}}
+        {% endfor %}
+    </div>
     <div class="threadlisting-part threadlisting-part-creator">{{thread.creator}}</div>
     <div class="threadlisting-part threadlisting-part-created">{{ts(thread.created)}}</div>
     <div class="threadlisting-part threadlisting-part-updated">{{ts(thread.updated)}}</div>
