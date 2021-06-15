@@ -1,7 +1,7 @@
 # boilerplate boilerplate boilerplate
 # yay
 
-from flask import Flask
+from flask import Flask, request
 from .db import get_db
 import os
 
@@ -31,6 +31,14 @@ def create_app():
 
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
+
+    @app.context_processor
+    def path_for_next():
+        p = request.path
+        if len(request.query_string) > 0:
+            p += "?" + request.query_string.decode("utf-8")
+        return dict(path_for_next=p)
+    
 
     app.add_url_rule("/",endpoint="index")
 
