@@ -136,6 +136,7 @@ def config_thread(thread_id):
                 flash("title updated successfully")
                 db.commit()
         if 'do_chtags' in request.form:
+            changed = False
             wanted_tags = []
             for tagid in range(1,len(avail_tags)+1):
                 current = tagid in thread_tags
@@ -143,11 +144,13 @@ def config_thread(thread_id):
                 print(tagid, current, wanted)
                 if wanted and not current:
                     db.execute("insert into thread_tags (thread, tag) values (?,?)",(thread_id,tagid))
-                    flash(f"added tag {tagid}")
+                    changed = True
                 elif current and not wanted:
                     db.execute("delete from thread_tags where thread = ? and tag = ?",(thread_id,tagid))
-                    flash(f"removed tag {tagid}")
-            db.commit()
+                    changed = True
+            if changed:
+                db.commit()
+                flash("tags updated successfully")
 
         if len(err) > 0:
             for e in err:
