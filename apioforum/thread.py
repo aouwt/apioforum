@@ -72,7 +72,7 @@ def delete_post(post_id):
         flash("post deleted deletedly")
         return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
     else:
-        return render_template("delete_post.html",post=post,rendered_content=render_md(post["content"]))
+        return render_template("delete_post.html",post=post,rendered_content=render(post["content"]))
         
 
 @bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
