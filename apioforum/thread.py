@@ -113,6 +113,8 @@ def edit_post(post_id):
 def config_thread(thread_id):
     db = get_db()
     thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+    thread_tags = [r['tag'] for r in db.execute("select tag from thread_tags where thread = ?",(thread_id,)).fetchall()]
+    avail_tags = db.execute("select * from tags order by id").fetchall()
     err = None
     if g.user is None:
         err = "you need to be logged in to do that"
@@ -133,6 +135,19 @@ def config_thread(thread_id):
                 db.execute("update threads set title = ? where id = ?;",(title,thread_id))
                 flash("title updated successfully")
                 db.commit()
+        if 'do_chtags' in request.form:
+            wanted_tags = []
+            for tagid in range(1,len(avail_tags)+1):
+                current = tagid in thread_tags
+                wanted  = f'tag_{tagid}' in request.form
+                print(tagid, current, wanted)
+                if wanted and not current:
+                    db.execute("insert into thread_tags (thread, tag) values (?,?)",(thread_id,tagid))
+                    flash(f"added tag {tagid}")
+                elif current and not wanted:
+                    db.execute("delete from thread_tags where thread = ? and tag = ?",(thread_id,tagid))
+                    flash(f"removed tag {tagid}")
+            db.commit()
 
         if len(err) > 0:
             for e in err:
@@ -141,5 +156,5 @@ def config_thread(thread_id):
             return redirect(url_for("thread.view_thread",thread_id=thread_id))
             
 
-    return render_template("config_thread.html", thread=thread)
+    return render_template("config_thread.html", thread=thread,thread_tags=thread_tags,avail_tags=avail_tags)
     
