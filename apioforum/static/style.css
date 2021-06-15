@@ -30,6 +30,20 @@ body { font-family: sans-serif }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
 
+.thread-top-bar {
+    margin-bottom: 4px;
+}
+
+.thread-top-bar-b {
+    float: right;
+    margin-right: -2px;
+}
+
+.thread-top-bar-b .tag {
+    font-size: .9rem;
+}
+
+
 .un-col-1 { color: hsl(0, 100%, 30%) }
 .un-col-2 { color: hsl(22.5, 100%, 30%) }
 .un-col-3 { color: hsl(45.0, 100%, 30%) }

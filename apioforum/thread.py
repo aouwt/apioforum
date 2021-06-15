@@ -23,8 +23,12 @@ def view_thread(thread_id):
             "SELECT * FROM posts WHERE thread = ? ORDER BY created ASC;",
             (thread_id,)
         ).fetchall()
+        tags = db.execute(
+            """SELECT tags.* FROM tags
+            INNER JOIN thread_tags ON thread_tags.tag = tags.id
+            WHERE thread_tags.thread = ?""",(thread_id,)).fetchall()
         rendered_posts = [render(q['content']) for q in posts]
-        return render_template("view_thread.html",posts=posts,thread=thread,thread_id=thread_id,rendered_posts=rendered_posts)
+        return render_template("view_thread.html",posts=posts,thread=thread,rendered_posts=rendered_posts,tags=tags)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):
