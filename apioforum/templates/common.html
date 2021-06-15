@@ -26,3 +26,7 @@
 {% macro ts(dt) -%}
 <time title="{{dt.isoformat(' ')}}" datetime="{{dt.isoformat(' ')}}">{{dt | fuzzy}}</time>
 {%- endmacro %}
+
+{% macro tag(name, fg, bg) -%}
+<span class="tag" style="color: {{fg}}; background-color: {{bg}}">{{name}}</span>
+{%- endmacro %}

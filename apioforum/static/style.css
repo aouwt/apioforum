@@ -69,7 +69,7 @@ nav .links { display: flex; }
     .threadlisting { display: contents }
     .threadlistings {
         display: grid;
-        grid-template-columns: 2fr repeat(4,1fr) 0.4fr;
+        grid-template-columns: 2fr repeat(5,1fr) 0.4fr;
     }
 
     .threadlisting-part {
@@ -81,13 +81,14 @@ nav .links { display: flex; }
         border-bottom: 1px solid black;
     }
 
+
 }
 
 /* small screens */
 @media not all and (min-width: 800px) {
     .threadlisting {
         display: grid;
-        grid-template-columns: repeat(5,1fr);
+        grid-template-columns: repeat(6,1fr);
         margin-bottom: 5px;
     }
     .threadlisting-part-title {
@@ -141,6 +142,9 @@ main {
     max-width: 60ch;
     margin: auto;
 }
+main.widemain {
+    max-width: 120ch;
+}
 
 blockquote {
     margin-left: 10px;
@@ -150,4 +154,10 @@ blockquote {
 
 .search-form {
     display: inline-block;
+}
+
+.tag {
+    font-size: .75rem;
+    padding: 1px 3px;
+    border: 1px solid black;
 }

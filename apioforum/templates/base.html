@@ -49,9 +49,11 @@
             <div class="flashmsg">{{ msg }}</div>
         {% endfor %}
 
+        {% block nmcontent %}
         <main>
             {%block content %}{% endblock %}
         </main>
+        {% endblock %}
     <script>/* bees */</script>
     </body>
 </html>
