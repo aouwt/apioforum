@@ -78,6 +78,8 @@ CREATE TABLE thread_tags (
     tag INTEGER NOT NULL REFERENCES tags(id)
 );
 """,
+"""CREATE INDEX thread_tags_thread ON thread_tags (thread);""",
+"""ALTER TABLE users ADD COLUMN admin INT NOT NULL DEFAULT 0""",
 ]
 
 def init_db():
