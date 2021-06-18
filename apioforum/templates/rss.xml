@@ -1,0 +1,17 @@
+<rss version="2.0">
+    <channel>
+        <title>{{title}}</title>
+        <link>{{link}}</link>
+        <description>{{description}}</description>
+        <generator>Apioforum internal RSS generation</generator>
+        {% for item in items %}
+        <item>
+            <description>{{item.rendered}}</description>
+            <pubDate>{{item.updated | rss_datetime}}</pubDate>
+            <link>{{item.link}}</link>
+            <author>{{item.author}}</author>
+            <guid>{{item.id}}</guid>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>

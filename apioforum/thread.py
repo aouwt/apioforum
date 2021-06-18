@@ -2,7 +2,7 @@
 
 from flask import (
     Blueprint, render_template, abort, request, g, redirect,
-    url_for, flash
+    url_for, flash, Response
 )
 from .db import get_db
 from .mdrender import render
@@ -72,7 +72,7 @@ def delete_post(post_id):
         flash("post deleted deletedly")
         return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
     else:
-        return render_template("delete_post.html",post=post,rendered_content=render_md(post["content"]))
+        return render_template("delete_post.html",post=post,rendered_content=render(post["content"]))
         
 
 @bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
@@ -104,5 +104,12 @@ def edit_post(post_id):
         else:
             flash(err)
     return render_template("edit_post.html",post=post)
-            
 
+@bp.route("/<int:thread_id>/rss")
+def rss_feed(thread_id):
+    db = get_db()
+    thread = db.execute("SELECT * FROM threads WHERE id = ?", (thread_id,)).fetchone()
+    items = db.execute("SELECT * FROM posts WHERE thread = ? ORDER BY updated DESC LIMIT 50", (thread_id,))
+    items = [ { **item, "rendered": render(item["content"]), "link": request.base_url + post_jump(item["thread"], item["id"]), "updated": item["updated"] or item["created"] } for item in items ]
+    return Response(render_template("rss.xml", description=f"Posts in thread {thread_id}", title=f'''{thread['title']} - Apioforum''', 
+        link=request.base_url.rstrip("/rss"), items=items), mimetype="text/xml")

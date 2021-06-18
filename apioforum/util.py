@@ -9,6 +9,7 @@ units = (
 )
 
 from datetime import datetime, timedelta, timezone
+import email.utils
 
 def fuzzy(seconds, ago=False):
     if isinstance(seconds, timedelta):
@@ -33,3 +34,6 @@ def fuzzy(seconds, ago=False):
     if not buf: return "now"
 
     return fmt.format(buf)
+
+def rss_datetime(dt):
+    return email.utils.format_datetime(dt.replace(tzinfo=timezone.utc))

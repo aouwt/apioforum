@@ -29,8 +29,9 @@ def create_app():
     from . import thread
     app.register_blueprint(thread.bp)
 
-    from .fuzzy import fuzzy
-    app.jinja_env.filters['fuzzy']=fuzzy
+    from .util import fuzzy, rss_datetime
+    app.jinja_env.filters["fuzzy"]=fuzzy
+    app.jinja_env.filters["rss_datetime"]=rss_datetime
 
     app.add_url_rule("/",endpoint="index")
 
