@@ -80,6 +80,10 @@ CREATE TABLE thread_tags (
 """,
 """CREATE INDEX thread_tags_thread ON thread_tags (thread);""",
 """ALTER TABLE users ADD COLUMN admin INT NOT NULL DEFAULT 0""",
+"""
+ALTER TABLE users ADD COLUMN bio TEXT;
+ALTER TABLE users ADD COLUMN joined TIMESTAMP;
+""",
 ]
 
 def init_db():
