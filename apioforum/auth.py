@@ -81,14 +81,17 @@ def load_user():
     username = session.get("user")
     if username is None:
         g.user = None
+        g.user_info = None
     else:
         row = get_db().execute(
             "SELECT * FROM users WHERE username = ?;", (username,)
         ).fetchone()
         if row is None:
             g.user = None
+            g.user_info = None
         else:
             g.user = row['username']
+            g.user_info = row
         
 
 def login_required(view):
@@ -112,3 +115,4 @@ def cool():
 @login_required
 def cooler():
     return "bee"
+

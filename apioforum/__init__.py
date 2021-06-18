@@ -19,6 +19,8 @@ def create_app():
 
     from . import db
     db.init_app(app)
+    from . import permissions
+    permissions.init_app(app)
 
     from . import auth
     app.register_blueprint(auth.bp)
@@ -28,6 +30,9 @@ def create_app():
 
     from . import thread
     app.register_blueprint(thread.bp)
+
+    from . import admin
+    app.register_blueprint(admin.bp)
 
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
