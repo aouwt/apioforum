@@ -19,4 +19,14 @@
 		{% endif %}
 	</dl>
 </div>
+{% if posts %}
+	<h2>recent posts</h2>
+	<div class="user_posts">
+		{% for post in posts %}
+			{% call disp_post(post, False) %}
+				{{ rendered_posts[loop.index0] | safe}}
+			{% endcall %}
+		{% endfor %}
+	</div>
+{% endif %}
 {% endblock %}
