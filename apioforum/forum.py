@@ -78,12 +78,26 @@ def search():
             display_thread_id[ix] = False
         last_thread = result["thread"]
     rendered_posts = [render(q['content']) for q in results]
-    return render_template("search_results.html", results=results, query=query, rendered_posts=rendered_posts, display_thread_id=display_thread_id)
+    return render_template("search_results.html", 
+            results=results, 
+            query=query,
+            rendered_posts=rendered_posts, 
+            display_thread_id=display_thread_id
+            )
 
 @bp.route("/rss")
 def rss_feed():
     db = get_db()
     print(request.host_url)
     items = db.execute("SELECT * FROM posts ORDER BY updated DESC LIMIT 50")
-    items = [ { **item, "rendered": render(item["content"]), "link": request.base_url + post_jump(item["thread"], item["id"]), "updated": item["updated"] or item["created"] } for item in items ]
-    return Response(render_template("rss.xml", title="New posts feed", description="The latest posts on the Apioforum", link=request.base_url, items=items), mimetype="text/xml")
+    items = [ { 
+        **item,
+        "rendered": render(item["content"]), 
+        "link": request.base_url + post_jump(item["thread"], item["id"]), 
+        "updated": item["updated"] or item["created"] 
+    } for item in items ]
+    return Response(render_template("rss.xml", 
+            title="New posts feed", 
+            description="The latest posts on the Apioforum", 
+            link=request.base_url, items=items), 
+        mimetype="text/xml")
