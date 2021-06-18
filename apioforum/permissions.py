@@ -38,4 +38,6 @@ def make_admin(username):
 
 def init_app(app):
     app.cli.add_command(make_admin)
+    app.context_processor(lambda: dict(is_admin=is_admin()))
+
 

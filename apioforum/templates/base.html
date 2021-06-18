@@ -20,6 +20,11 @@
 
 				{% if g.user %}
 				<p>{{ g.user }}</p>
+
+				{% if is_admin %}
+				<p><a href="{{url_for('admin.adminpage')}}">admin</a></p>
+				{% endif %}
+    				
 				<p>
 					<a href="{{ url_for('auth.logout',next=path_for_next) }}">
 						logout

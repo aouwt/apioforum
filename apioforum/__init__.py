@@ -31,6 +31,9 @@ def create_app():
     from . import thread
     app.register_blueprint(thread.bp)
 
+    from . import admin
+    app.register_blueprint(admin.bp)
+
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
 
