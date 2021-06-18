@@ -1,0 +1,22 @@
+{% from 'common.html' import disp_post,ts %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{%block title %}{{user.username|e}}{% endblock %}</h1>
+{% endblock %}
+
+{%block content%}
+<div class="user_info">
+	<div class="user_bio_quote">
+		<div class="user_bio">{{rendered_bio|safe}}</div>
+		<p class="user_bio_attribution">— {{user.username|e}}</p>
+	</div>
+	<dl>
+		<dt>joined</dt>
+		{% if user.joined %}
+			<dd>{{ts(user.joined)}}</dd>
+		{% else %}
+			<dd>a very long time ago</dd>
+		{% endif %}
+	</dl>
+</div>
+{% endblock %}
