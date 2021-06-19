@@ -5,6 +5,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from .db import get_db
 import functools
+import datetime
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -57,8 +58,8 @@ def register():
 
         if err is None:
             db.execute(
-                "INSERT INTO users (username, password) VALUES (?,?);",
-                (username,generate_password_hash(password))
+                "INSERT INTO users (username, password, joined) VALUES (?,?,?);",
+                (username,generate_password_hash(password),datetime.datetime.now())
             )
             db.commit()
             flash("successfully created account")
@@ -81,14 +82,17 @@ def load_user():
     username = session.get("user")
     if username is None:
         g.user = None
+        g.user_info = None
     else:
         row = get_db().execute(
             "SELECT * FROM users WHERE username = ?;", (username,)
         ).fetchone()
         if row is None:
             g.user = None
+            g.user_info = None
         else:
             g.user = row['username']
+            g.user_info = row
         
 
 def login_required(view):
@@ -112,3 +116,4 @@ def cool():
 @login_required
 def cooler():
     return "bee"
+

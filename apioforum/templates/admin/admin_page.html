@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}admin page{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h2>admins</h2>
+<ul>
+    {% for admin in admins %}
+    <li>{{admin.username}}</li>
+    {% endfor %}
+</ul>
+<p>this page will have more things on it later, probably</p>
+{% endblock %}
+

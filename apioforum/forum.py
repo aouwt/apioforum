@@ -5,11 +5,13 @@ from flask import (
     Blueprint, render_template, request,
     g, redirect, url_for, flash, Response
 )
+
 from .db import get_db
 from .mdrender import render
 from .thread import post_jump
 
 bp = Blueprint("forum", __name__, url_prefix="/")
+
 
 @bp.route("/")
 def view_forum():
@@ -22,7 +24,15 @@ def view_forum():
         GROUP BY threads.id
         ORDER BY threads.updated DESC;
         """).fetchall()
-    return render_template("view_forum.html",threads=threads)
+    thread_tags = {}
+    #todo: somehow optimise this
+    for thread in threads:
+        thread_tags[thread['id']] = db.execute(
+            """SELECT tags.* FROM tags
+            INNER JOIN thread_tags ON thread_tags.tag = tags.id
+            WHERE thread_tags.thread = ?;
+            """,(thread['id'],)).fetchall()
+    return render_template("view_forum.html",threads=threads,thread_tags=thread_tags)
 
 @bp.route("/create_thread",methods=("GET","POST"))
 def create_thread():

@@ -19,20 +19,25 @@
 				<p><a href="{{url_for('index')}}">home</a></p>
 
 				{% if g.user %}
-				<p>{{ g.user }}</p>
+				<p><a href="{{url_for('user.view_user', username=g.user)}}">{{g.user}}</a></p>
+
+				{% if is_admin %}
+				<p><a href="{{url_for('admin.admin_page')}}">admin</a></p>
+				{% endif %}
+    				
 				<p>
-					<a href="{{ url_for('auth.logout',next=request.path) }}">
+					<a href="{{url_for('auth.logout',next=path_for_next)}}">
 						logout
 					</a>
 				</p>
 				{% else %}
 				<p>
-					<a href="{{ url_for('auth.login',next=request.path) }}">
+					<a href="{{url_for('auth.login',next=path_for_next)}}">
 						login
 					</a>
 				</p>
 				<p>
-					<a href="{{ url_for('auth.register',next=request.path) }}">
+					<a href="{{url_for('auth.register',next=path_for_next)}}">
 						register
 					</a>
 				</p>
@@ -49,10 +54,14 @@
             <div class="flashmsg">{{ msg }}</div>
         {% endfor %}
 
+        {% block nmcontent %}
         <main>
             {%block content %}{% endblock %}
         </main>
+        {% endblock %}
     <script>/* bees */</script>
+	<!-- citrons was here -->
+	<!-- Complete hybridisation of various species of wild duck gene pools could result in the extinction of many indigenous waterfowl. -->
     </body>
 </html>
 

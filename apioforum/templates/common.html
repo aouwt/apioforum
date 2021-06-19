@@ -1,8 +1,13 @@
+{% macro disp_user(username) -%} 
+<a href="{{url_for('user.view_user',username=username)}}" class="username">{{username}}</a>
+{%- endmacro %}
+
 {% macro disp_post(post, buttons=False) %}
 <div class="post" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
-            <span class="post-heading-em">{{post.author}}</span> {{ts(post.created)}}
+			<span class="post-heading-em">{{disp_user(post.author)}}</span> 
+			{{ts(post.created)}}
             {% if post.edited %}
                 (edited {{ts(post.updated)}})
             {% endif %}
@@ -25,4 +30,8 @@
 
 {% macro ts(dt) -%}
 <time title="{{dt.isoformat(' ')}}" datetime="{{dt.isoformat(' ')}}">{{dt | fuzzy}}</time>
+{%- endmacro %}
+
+{% macro tag(the_tag) -%}
+<span class="tag" style="color: {{the_tag.text_colour}}; background-color: {{the_tag.bg_colour}}">{{the_tag.name}}</span>
 {%- endmacro %}

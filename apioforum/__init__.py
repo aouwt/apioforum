@@ -1,7 +1,7 @@
 # boilerplate boilerplate boilerplate
 # yay
 
-from flask import Flask
+from flask import Flask, request
 from .db import get_db
 import os
 
@@ -19,6 +19,8 @@ def create_app():
 
     from . import db
     db.init_app(app)
+    from . import permissions
+    permissions.init_app(app)
 
     from . import auth
     app.register_blueprint(auth.bp)
@@ -32,6 +34,20 @@ def create_app():
     from .util import fuzzy, rss_datetime
     app.jinja_env.filters["fuzzy"]=fuzzy
     app.jinja_env.filters["rss_datetime"]=rss_datetime
+
+    from . import admin
+    app.register_blueprint(admin.bp)
+
+    from . import user
+    app.register_blueprint(user.bp)
+
+    @app.context_processor
+    def path_for_next():
+        p = request.path
+        if len(request.query_string) > 0:
+            p += "?" + request.query_string.decode("utf-8")
+        return dict(path_for_next=p)
+    
 
     app.add_url_rule("/",endpoint="index")
 

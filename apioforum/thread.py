@@ -23,8 +23,12 @@ def view_thread(thread_id):
             "SELECT * FROM posts WHERE thread = ? ORDER BY created ASC;",
             (thread_id,)
         ).fetchall()
+        tags = db.execute(
+            """SELECT tags.* FROM tags
+            INNER JOIN thread_tags ON thread_tags.tag = tags.id
+            WHERE thread_tags.thread = ?""",(thread_id,)).fetchall()
         rendered_posts = [render(q['content']) for q in posts]
-        return render_template("view_thread.html",posts=posts,thread=thread,thread_id=thread_id,rendered_posts=rendered_posts)
+        return render_template("view_thread.html",posts=posts,thread=thread,rendered_posts=rendered_posts,tags=tags)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):
@@ -104,6 +108,56 @@ def edit_post(post_id):
         else:
             flash(err)
     return render_template("edit_post.html",post=post)
+@bp.route("/<int:thread_id>/config",methods=["GET","POST"])
+def config_thread(thread_id):
+    db = get_db()
+    thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+    thread_tags = [r['tag'] for r in db.execute("select tag from thread_tags where thread = ?",(thread_id,)).fetchall()]
+    avail_tags = db.execute("select * from tags order by id").fetchall()
+    err = None
+    if g.user is None:
+        err = "you need to be logged in to do that"
+    elif g.user != thread['creator']:
+        err = "you can only configure threads that you own"
+
+    if err is not None:
+        flash(err)
+        return redirect(url_for("thread.view_thread",thread_id=thread_id))
+
+    if request.method == "POST":
+        err = []
+        if 'do_title' in request.form:
+            title = request.form['title']
+            if len(title.strip()) == 0:
+                err.append("title can't be empty")
+            else:
+                db.execute("update threads set title = ? where id = ?;",(title,thread_id))
+                flash("title updated successfully")
+                db.commit()
+        if 'do_chtags' in request.form:
+            changed = False
+            wanted_tags = []
+            for tagid in range(1,len(avail_tags)+1):
+                current = tagid in thread_tags
+                wanted  = f'tag_{tagid}' in request.form
+                print(tagid, current, wanted)
+                if wanted and not current:
+                    db.execute("insert into thread_tags (thread, tag) values (?,?)",(thread_id,tagid))
+                    changed = True
+                elif current and not wanted:
+                    db.execute("delete from thread_tags where thread = ? and tag = ?",(thread_id,tagid))
+                    changed = True
+            if changed:
+                db.commit()
+                flash("tags updated successfully")
+
+        if len(err) > 0:
+            for e in err:
+                flash(e)
+        else:
+            return redirect(url_for("thread.view_thread",thread_id=thread_id))
+    return render_template("config_thread.html", thread=thread,thread_tags=thread_tags,avail_tags=avail_tags)
+            
 
 @bp.route("/<int:thread_id>/rss")
 def rss_feed(thread_id):
