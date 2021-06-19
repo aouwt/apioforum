@@ -1,8 +1,13 @@
+{% macro disp_user(username) -%} 
+<a href="{{url_for('user.view_user',username=username)}}" class="username">{{username}}</a>
+{%- endmacro %}
+
 {% macro disp_post(post, buttons=False) %}
 <div class="post" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
-            <span class="post-heading-em">{{post.author}}</span> {{ts(post.created)}}
+			<span class="post-heading-em">{{disp_user(post.author)}}</span> 
+			{{ts(post.created)}}
             {% if post.edited %}
                 (edited {{ts(post.updated)}})
             {% endif %}

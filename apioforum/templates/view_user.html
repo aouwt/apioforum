@@ -1,0 +1,37 @@
+{% from 'common.html' import disp_post,ts %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{%block title %}{{user.username|e}}{% endblock %}</h1>
+{% endblock %}
+
+{%block content%}
+<div class="user-top-bar">
+	{% if g.user == user.username %}
+	<a class="actionbutton" href="{{url_for('user.edit_user',username=user.username)}}">settings</a>
+	{% endif %}
+</div>
+<div class="user_info">
+	<div class="user_bio_quote">
+		<div class="user_bio">{{rendered_bio|safe}}</div>
+		<p class="user_bio_attribution">— {{user.username|e}}</p>
+	</div>
+	<dl>
+		<dt>joined</dt>
+		{% if user.joined %}
+			<dd>{{ts(user.joined)}} ago</dd>
+		{% else %}
+			<dd>a very long time ago</dd>
+		{% endif %}
+	</dl>
+</div>
+{% if posts %}
+	<h2>recent posts</h2>
+	<div class="user_posts">
+		{% for post in posts %}
+			{% call disp_post(post, False) %}
+				{{ rendered_posts[loop.index0] | safe}}
+			{% endcall %}
+		{% endfor %}
+	</div>
+{% endif %}
+{% endblock %}
