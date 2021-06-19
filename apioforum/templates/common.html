@@ -6,7 +6,7 @@
 <div class="post" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
-			<span class="post-heading-em">{{disp_user(post.author)}}</span> 
+			{{disp_user(post.author)}}
 			{{ts(post.created)}}
             {% if post.edited %}
                 (edited {{ts(post.updated)}})

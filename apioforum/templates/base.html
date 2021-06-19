@@ -20,7 +20,7 @@
 				<p><a href="{{url_for('index')}}">home</a></p>
 
 				{% if g.user %}
-				<p><a href="{{url_for('user.view_user', username=g.user)}}">{{g.user}}</a></p>
+				<p><a class="username" href="{{url_for('user.view_user', username=g.user)}}">{{g.user}}</a></p>
 
 				{% if is_admin %}
 				<p><a href="{{url_for('admin.admin_page')}}">admin</a></p>

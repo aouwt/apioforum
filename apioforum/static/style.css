@@ -17,8 +17,12 @@ body { font-family: sans-serif; word-wrap: break-word; }
 .post:last-of-type { border-bottom: 1px solid black; }
 
 .post-heading { font-size: smaller; }
-.post-heading,.post-heading .username,.post-heading a:visited { 
+.post-heading,a.username {
 	color: hsl(0,0%,25%); 
+}
+a.username {
+    font-weight: bold;
+    text-decoration: underline;
 }
 .post-heading-em { font-weight: bold; }
 .post-content   * { margin-bottom: 8px; margin-top: 8px; }
