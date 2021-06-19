@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block header %}<h1>{% block title %}user settings{% endblock %}</h1>{% endblock %}
+{% block content %}
+<form method="post">
+<fieldset>
+<legend>change password</legend>
+<p>if you want to change your password, make sure you check the "change password?" box.</p>
+<label for="do_chpass">change password?</label>
+<input type="checkbox" id="do_chpass" name="do_chpass"><br>
+<label for="password">current password</label>
+<input type="text" id="password" name="password"><br>
+<label for="new_password">new password</label>
+<input type="text" id="new_password" name="new_password">
+</fieldset>
+<fieldset>
+<legend>change bio</legend>
+<p>if you want to change your bio, make sure you check the "change bio?" box.</p>
+<label for="do_chbio">change bio?</label>
+<input type="checkbox" name="do_chbio" id="do_chbio"><br>
+<textarea class="new-post-box" name="bio">{{user.bio or "hail GEORGE"}}</textarea>
+</fieldset>
+<p>confirm changes?</p>
+<input type="submit" value="confirm">
+<a href="{{url_for('user.view_user',username=user.username)}}">cancel</a>
+</form>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag %}
+{% from 'common.html' import ts, tag, disp_user %}
 {% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
 {%block nmcontent%}
 <main class="widemain">
@@ -50,10 +50,10 @@
             {{tag(the_tag)}}
         {% endfor %}
     </div>
-    <div class="threadlisting-part threadlisting-part-creator">{{thread.creator}}</div>
+    <div class="threadlisting-part threadlisting-part-creator">{{disp_user(thread.creator)}}</div>
     <div class="threadlisting-part threadlisting-part-created">{{ts(thread.created)}}</div>
     <div class="threadlisting-part threadlisting-part-updated">{{ts(thread.updated)}}</div>
-    <div class="threadlisting-part threadlisting-part-lastactivityby">{{thread.last_user}}</div>
+    <div class="threadlisting-part threadlisting-part-lastactivityby">{{disp_user(thread.last_user)}}</div>
     <div class="threadlisting-part threadlisting-part-numreplies">{{thread.num_replies}}</div>
 </div>
 {%endfor%}

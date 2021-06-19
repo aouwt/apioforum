@@ -1,4 +1,4 @@
-body { font-family: sans-serif }
+body { font-family: sans-serif; word-wrap: break-word; }
 
 :root {
     --alternating-colour-even: hsl(0,0%,96%);
@@ -16,10 +16,8 @@ body { font-family: sans-serif }
 }
 .post:last-of-type { border-bottom: 1px solid black; }
 
-.post-heading {
-    color: hsl(0,0%,25%);
-    font-size: smaller;
-}
+.post-heading { font-size: smaller; }
+.post-heading,.post-heading .username { color: hsl(0,0%,25%); }
 .post-heading-em { font-weight: bold; }
 .post-content   * { margin-bottom: 8px; margin-top: 8px; }
 .post-content > *:first-child { margin-top: 2px }
@@ -30,7 +28,7 @@ body { font-family: sans-serif }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
 
-.thread-top-bar {
+.thread-top-bar, .user-top-bar {
     margin-bottom: 4px;
 }
 
@@ -49,8 +47,8 @@ body { font-family: sans-serif }
     width: 100%;
 	padding: 4px;
 }
-.user_bio_quote { width: max-content; }
-.user_bio_attribution { text-align: right; }
+.user_bio_quote { width: max-content; max-width: 100% }
+.user_bio_attribution { text-align: right; font-style: italic; }
 
 dt { font-weight: bold }
 
