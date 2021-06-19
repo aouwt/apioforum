@@ -10,14 +10,21 @@ allowed_tags = [
     'h6',
     'pre',
     'del',
-    'mark'
+    'mark',
+    'img',
 ]
+
+allowed_attributes = bleach.sanitizer.ALLOWED_ATTRIBUTES.copy()
+allowed_attributes.update(
+    img='src',
+)
+
 allowed_tags.extend(bleach.sanitizer.ALLOWED_TAGS)
 
-cleaner = bleach.sanitizer.Cleaner(tags=allowed_tags)
+cleaner = bleach.sanitizer.Cleaner(tags=allowed_tags,attributes=allowed_attributes)
 
 import markdown
-md = markdown.Markdown(extensions=['pymdownx.tilde'])
+md = markdown.Markdown(extensions=['pymdownx.tilde','fenced_code'])
 
 def render(text):
     text = md.reset().convert(text)
