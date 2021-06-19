@@ -17,7 +17,9 @@
 <p>if you want to change your bio, make sure you check the "change bio?" box.</p>
 <label for="do_chbio">change bio?</label>
 <input type="checkbox" name="do_chbio" id="do_chbio"><br>
-<textarea class="new-post-box" name="bio">{{user.bio or "hail GEORGE"}}</textarea>
+<textarea class="new-post-box" name="bio" maxlength="4000">
+	{{- user.bio or "hail GEORGE" -}}
+</textarea>
 </fieldset>
 <p>confirm changes?</p>
 <input type="submit" value="confirm">

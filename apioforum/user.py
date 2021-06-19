@@ -49,7 +49,7 @@ def edit_user(username):
         if 'do_chbio' in request.form:
             if len(request.form['bio'].strip()) == 0:
                 err.append("please submit nonempty bio")
-            elif len(request.form['bio']) > 4000:
+            elif len(request.form['bio']) > 4500:
                 err.append("bio is too long!!")
             else:
                 db.execute("update users set bio = ? where username = ?", (request.form['bio'], username))
