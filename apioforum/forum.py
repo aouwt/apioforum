@@ -29,7 +29,8 @@ def view_forum():
         thread_tags[thread['id']] = db.execute(
             """SELECT tags.* FROM tags
             INNER JOIN thread_tags ON thread_tags.tag = tags.id
-            WHERE thread_tags.thread = ?;
+            WHERE thread_tags.thread = ?
+            ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
     return render_template("view_forum.html",threads=threads,thread_tags=thread_tags)
 
