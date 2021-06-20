@@ -13,6 +13,9 @@ from sqlite3 import OperationalError
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
+@bp.route("/")
+def not_actual_index():
+    return redirect("/1")
 
 @bp.route("/<int:forum_id>")
 def view_forum(forum_id):
@@ -46,6 +49,10 @@ def view_forum(forum_id):
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
 def create_thread(forum_id):
     db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
+    if forum is None:
+        flash("that forum doesn't exist")
+        return redirect(url_for('index'))
     
     if g.user is None:
         flash("you need to be logged in to create a thread")
@@ -61,8 +68,8 @@ def create_thread(forum_id):
         if err is None:
             cur = db.cursor()
             cur.execute(
-                "INSERT INTO threads (title,creator,created,updated) VALUES (?,?,current_timestamp,current_timestamp);",
-                (title,g.user)
+                "INSERT INTO threads (title,creator,created,updated,forum) VALUES (?,?,current_timestamp,current_timestamp,?);",
+                (title,g.user,forum_id)
             )
             thread_id = cur.lastrowid
             cur.execute(
