@@ -54,6 +54,8 @@ def register():
             "SELECT 1 FROM users WHERE username = ?;", (username,)
         ).fetchone() is not None:
             err = f"User {username} is already registered."
+        elif len(username) > 20:
+            err = "username can't be longer than 20 characters"
 
         if err is None:
             db.execute(
