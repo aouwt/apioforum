@@ -84,6 +84,17 @@ CREATE TABLE thread_tags (
 ALTER TABLE users ADD COLUMN bio TEXT;
 ALTER TABLE users ADD COLUMN joined TIMESTAMP;
 """,
+"""
+CREATE TABLE forums (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    parent INTEGER REFERENCES forums(id),
+    description TEXT
+);
+INSERT INTO forums (name,parent,description) values ('root',null,'the default root forum');
+ALTER TABLE threads ADD COLUMN forum NOT NULL DEFAULT 1 REFERENCES forums(id);
+""",
+    
 ]
 
 def init_db():
