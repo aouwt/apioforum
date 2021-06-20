@@ -26,6 +26,7 @@ def view_forum():
         ORDER BY threads.updated DESC;
         """).fetchall()
     thread_tags = {}
+    preview_post = {}
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -34,7 +35,15 @@ def view_forum():
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
-    return render_template("view_forum.html",threads=threads,thread_tags=thread_tags)
+        preview_post[thread['id']]  = db.execute(
+            """SELECT * FROM posts WHERE thread = ?
+            ORDER BY created DESC;
+            """,(thread['id'],)).fetchone()
+    return render_template("view_forum.html",
+            threads=threads,
+            thread_tags=thread_tags,
+            preview_post=preview_post
+            )
 
 @bp.route("/create_thread",methods=("GET","POST"))
 def create_thread():

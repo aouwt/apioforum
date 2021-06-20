@@ -10,53 +10,42 @@
 {% else %}
 <p>please log in to create a new thread</p>
 {% endif %}
-<div class="threadlistings">
-<div class="threadlisting">
-    <div class="threadlisting-part threadlisting-part-title threadlisting-header">
-        name<span class="only-small"> &amp; tags</span>
-    </div>
-    <div class="threadlisting-part threadlisting-part-tags threadlisting-header only-big">
-        tags
-    </div>
-    <div class="threadlisting-part threadlisting-part-creator threadlisting-header">
-        creator
-    </div>
-    <div class="threadlisting-part threadlisting-part-created threadlisting-header">
-        created
-    </div>
-    <div class="threadlisting-part threadlisting-part-updated threadlisting-header">
-        last updated
-    </div>
-    <div class="threadlisting-part threadlisting-part-lastactivityby threadlisting-header">
-        last post by
-    </div>
-    <div class="threadlisting-part threadlisting-part-numreplies threadlisting-header">
-        posts
-    </div>
-</div>
-{%for thread in threads%}
-<div class="threadlisting">
-    <div class="threadlisting-part threadlisting-part-title"><a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">{{thread.title}}</a>
-        {% if thread_tags[thread.id]|length > 0 %}
-            <span class="only-small">
-                {% for the_tag in thread_tags[thread.id] %}
-                    {{tag(the_tag)}}
-                {% endfor %}
-            </span>
-        {%endif%}
-    </div>
-    <div class="threadlisting-part threadlisting-part-tags only-big">
-        {% for the_tag in thread_tags[thread.id] %}
-            {{tag(the_tag)}}
-        {% endfor %}
-    </div>
-    <div class="threadlisting-part threadlisting-part-creator">{{disp_user(thread.creator)}}</div>
-    <div class="threadlisting-part threadlisting-part-created">{{ts(thread.created)}}</div>
-    <div class="threadlisting-part threadlisting-part-updated">{{ts(thread.updated)}}</div>
-    <div class="threadlisting-part threadlisting-part-lastactivityby">{{disp_user(thread.last_user)}}</div>
-    <div class="threadlisting-part threadlisting-part-numreplies">{{thread.num_replies}}</div>
-</div>
-{%endfor%}
+<div class="thread-list">
+	{%for thread in threads%}
+		<div class="thread-listing">
+			<div class="thread-listing-main">
+				<div class="thread-listing-title">
+					<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">
+						{{- thread.title -}}
+					</a>
+				</div>
+				<div class="thread-listing-tags">
+					{% for the_tag in thread_tags[thread.id] %}
+						{{tag(the_tag)}}
+					{% endfor %}
+				</div>
+				<div class="thread-listing-creation">
+					<div class="thread-listing-creator">
+						{{ disp_user(thread.creator) }} 
+					</div>
+					{{ ts(thread.created) }}
+				</div>
+			</div>
+			{% if preview_post[thread.id] %}
+				<div class="thread-preview">
+					{{ disp_user(preview_post[thread.id].author) }}
+					<span class="thread-preview-ts">
+						{{ ts(preview_post[thread.id].created) }}
+					</span>
+					<span class="thread-preview-post">
+						<a href="{{url_for('thread.view_thread', thread_id=thread.id)}}#post_{{preview_post[thread.id].id}}">
+							{{ preview_post[thread.id].content[:500]|e }}
+						</a>
+					</span>
+				</div>
+			{% endif %}
+		</div>
+	{%endfor%}
 </div>
 </main>
 {%endblock%}
