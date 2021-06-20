@@ -92,7 +92,22 @@ CREATE TABLE forums (
     description TEXT
 );
 INSERT INTO forums (name,parent,description) values ('root',null,'the default root forum');
-ALTER TABLE threads ADD COLUMN forum NOT NULL DEFAULT 1 REFERENCES forums(id);
+
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+CREATE TABLE threads_new (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL,
+    forum NOT NULL REFERENCES forums(id)
+);
+INSERT INTO threads_new (id,title,creator,created,updated,forum)
+    SELECT id,title,creator,created,updated,1 FROM threads;
+DROP TABLE threads;
+ALTER TABLE threads_new RENAME TO threads;
+COMMIT;
 """,
     
 ]

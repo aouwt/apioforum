@@ -14,17 +14,19 @@ from sqlite3 import OperationalError
 bp = Blueprint("forum", __name__, url_prefix="/")
 
 
-@bp.route("/")
-def view_forum():
+@bp.route("/<int:forum_id>")
+def view_forum(forum_id):
     db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
         """SELECT threads.id, threads.title, threads.creator, threads.created,
         threads.updated, count(posts.id) as num_replies, max(posts.id), posts.author as last_user
         FROM threads
         INNER JOIN posts ON posts.thread = threads.id
+        WHERE threads.forum = ?
         GROUP BY threads.id
         ORDER BY threads.updated DESC;
-        """).fetchall()
+        """,(forum_id,)).fetchall()
     thread_tags = {}
     #todo: somehow optimise this
     for thread in threads:
@@ -34,10 +36,15 @@ def view_forum():
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
-    return render_template("view_forum.html",threads=threads,thread_tags=thread_tags)
+    return render_template(
+        "view_forum.html",
+        threads=threads,
+        thread_tags=thread_tags,
+        forum=forum
+    )
 
-@bp.route("/create_thread",methods=("GET","POST"))
-def create_thread():
+@bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
+def create_thread(forum_id):
     db = get_db()
     
     if g.user is None:

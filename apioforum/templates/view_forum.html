@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% from 'common.html' import ts, tag, disp_user %}
-{% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
+{% block header %}<h1>{% block title %}{{forum.name}}{%endblock%}</h1>{%endblock%}
 {%block nmcontent%}
 <main class="widemain">
-<p>welcome to the apioforum</p>
-<p>forum rules: do not be a bad person. do not do bad things.</p>
+{{forum.description|md|safe}}
 {% if g.user %}
-<p><a class="actionbutton" href="{{url_for('forum.create_thread')}}">create new thread</a></p>
+<p><a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a></p>
 {% else %}
 <p>please log in to create a new thread</p>
 {% endif %}
