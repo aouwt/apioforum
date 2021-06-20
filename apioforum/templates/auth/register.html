@@ -7,7 +7,7 @@
 <p>create a new account here. if you already have an account, <a href="{{url_for('auth.login')}}">login</a> instead.</p>
 <form method="post">
     <label for="username">Username</label>
-    <input name="username" id="username" required>
+    <input name="username" id="username" maxlength="20" required>
     <br>
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>

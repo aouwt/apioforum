@@ -56,6 +56,8 @@ def register():
             err = f"User {username} is already registered."
         elif len(username) > 20:
             err = "username can't be longer than 20 characters"
+        elif not username.isalnum():
+            err = "username must be alphanumeric"
 
         if err is None:
             db.execute(
