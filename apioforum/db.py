@@ -108,6 +108,7 @@ INSERT INTO threads_new (id,title,creator,created,updated,forum)
 DROP TABLE threads;
 ALTER TABLE threads_new RENAME TO threads;
 COMMIT;
+PRAGMA foreign_keys = on;
 """,
     
 ]
