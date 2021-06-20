@@ -46,7 +46,11 @@ def create_app():
         if len(request.query_string) > 0:
             p += "?" + request.query_string.decode("utf-8")
         return dict(path_for_next=p)
-    
+
+    from .mdrender import render
+    @app.template_filter('md')
+    def md_render(s):
+        return render(s)
 
     app.add_url_rule("/",endpoint="index")
 

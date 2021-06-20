@@ -1,4 +1,5 @@
 {# BASED? BASED ON WHAT? #}
+{% from 'common.html' import disp_user with context %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -20,7 +21,7 @@
 				<p><a href="{{url_for('index')}}">home</a></p>
 
 				{% if g.user %}
-				<p><a class="username" href="{{url_for('user.view_user', username=g.user)}}">{{g.user}}</a></p>
+				<p>{{ disp_user(g.user) }}</p>
 
 				{% if is_admin %}
 				<p><a href="{{url_for('admin.admin_page')}}">admin</a></p>

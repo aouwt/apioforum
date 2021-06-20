@@ -5,9 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% call disp_post(post, False) %}
-{{ rendered_content | safe }}
-{% endcall %}
+{{ disp_post(post, False) }}
 
 <form method="post">
 <p>confirm delete?</p>

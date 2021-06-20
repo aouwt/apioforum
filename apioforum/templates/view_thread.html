@@ -21,9 +21,7 @@
 
 <div class="posts">
     {% for post in posts %}
-    {% call disp_post(post, True) %}
-        {{ rendered_posts[loop.index0] | safe}}
-    {% endcall %}
+	{{ disp_post(post, True) }}
     {% endfor %}
 </div>
 {% if g.user %}

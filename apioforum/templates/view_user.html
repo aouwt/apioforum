@@ -12,7 +12,7 @@
 </div>
 <div class="user_info">
 	<div class="user_bio_quote">
-		<div class="user_bio">{{rendered_bio|safe}}</div>
+		<div class="user_bio">{{(user.bio or "hail GEORGE")|md|safe}}</div>
 		<p class="user_bio_attribution">— {{user.username|e}}</p>
 	</div>
 	<dl>
@@ -28,9 +28,7 @@
 	<h2>recent posts</h2>
 	<div class="user_posts">
 		{% for post in posts %}
-			{% call disp_post(post, False) %}
-				{{ rendered_posts[loop.index0] | safe}}
-			{% endcall %}
+			{{ disp_post(post, False) }}
 		{% endfor %}
 	</div>
 {% endif %}

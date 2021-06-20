@@ -23,7 +23,7 @@
         </span>
     </div>
     <div class="post-content">
-        {{ caller() }}
+        {{ post.content|md|safe }}
     </div>
 </div>
 {% endmacro %}

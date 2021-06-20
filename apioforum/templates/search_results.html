@@ -16,9 +16,7 @@
         </a></h3>
         <div class="posts">
     {% endif %}
-    {% call disp_post(result, False) %}
-        {{ rendered_posts[loop.index0] | safe}}
-    {% endcall %}
+    {{ disp_post(result, False) }}
     {% endfor %}
 
     {% if results|length > 0 %}
