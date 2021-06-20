@@ -5,7 +5,6 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from .db import get_db
 import functools
-import datetime
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -58,8 +57,8 @@ def register():
 
         if err is None:
             db.execute(
-                "INSERT INTO users (username, password, joined) VALUES (?,?,?);",
-                (username,generate_password_hash(password),datetime.datetime.now())
+                "INSERT INTO users (username, password, joined) VALUES (?,?,current_timestamp);",
+                (username,generate_password_hash(password))
             )
             db.commit()
             flash("successfully created account")

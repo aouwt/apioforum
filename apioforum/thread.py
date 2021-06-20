@@ -5,7 +5,6 @@ from flask import (
     url_for, flash
 )
 from .db import get_db
-from .mdrender import render
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
@@ -28,8 +27,7 @@ def view_thread(thread_id):
             INNER JOIN thread_tags ON thread_tags.tag = tags.id
             WHERE thread_tags.thread = ?
             ORDER BY tags.id""",(thread_id,)).fetchall()
-        rendered_posts = [render(q['content']) for q in posts]
-        return render_template("view_thread.html",posts=posts,thread=thread,rendered_posts=rendered_posts,tags=tags)
+        return render_template("view_thread.html",posts=posts,thread=thread,tags=tags)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):
@@ -77,7 +75,7 @@ def delete_post(post_id):
         flash("post deleted deletedly")
         return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
     else:
-        return render_template("delete_post.html",post=post,rendered_content=render(post["content"]))
+        return render_template("delete_post.html",post=post)
         
 
 @bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
@@ -128,7 +126,7 @@ def config_thread(thread_id):
 
     if request.method == "POST":
         err = []
-        if 'do_title' in request.form:
+        if request.form['title'] != thread['title']:
             title = request.form['title']
             if len(title.strip()) == 0:
                 err.append("title can't be empty")
@@ -136,22 +134,20 @@ def config_thread(thread_id):
                 db.execute("update threads set title = ? where id = ?;",(title,thread_id))
                 flash("title updated successfully")
                 db.commit()
-        if 'do_chtags' in request.form:
-            changed = False
-            wanted_tags = []
-            for tagid in range(1,len(avail_tags)+1):
-                current = tagid in thread_tags
-                wanted  = f'tag_{tagid}' in request.form
-                print(tagid, current, wanted)
-                if wanted and not current:
-                    db.execute("insert into thread_tags (thread, tag) values (?,?)",(thread_id,tagid))
-                    changed = True
-                elif current and not wanted:
-                    db.execute("delete from thread_tags where thread = ? and tag = ?",(thread_id,tagid))
-                    changed = True
-            if changed:
-                db.commit()
-                flash("tags updated successfully")
+        changed = False
+        wanted_tags = []
+        for tagid in range(1,len(avail_tags)+1):
+            current = tagid in thread_tags
+            wanted  = f'tag_{tagid}' in request.form
+            if wanted and not current:
+                db.execute("insert into thread_tags (thread, tag) values (?,?)",(thread_id,tagid))
+                changed = True
+            elif current and not wanted:
+                db.execute("delete from thread_tags where thread = ? and tag = ?",(thread_id,tagid))
+                changed = True
+        if changed:
+            db.commit()
+            flash("tags updated successfully")
 
         if len(err) > 0:
             for e in err:

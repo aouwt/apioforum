@@ -9,6 +9,8 @@ from flask import (
 from .db import get_db
 from .mdrender import render
 
+from sqlite3 import OperationalError
+
 bp = Blueprint("forum", __name__, url_prefix="/")
 
 
@@ -71,15 +73,21 @@ def create_thread():
 def search():
     db = get_db()
     query = request.args["q"]
-    results = db.execute("""
-    SELECT posts.id, highlight(posts_fts, 0, '<mark>', '</mark>') AS content, posts.thread, posts.author, posts.created, posts.edited, posts.updated, threads.title AS thread_title
-    FROM posts_fts
-    JOIN posts ON posts_fts.rowid = posts.id
-    JOIN threads ON threads.id = posts.thread
-    WHERE posts_fts MATCH ?
-    ORDER BY rank
-    LIMIT 50
-    """, (query,)).fetchall()
+    try:
+        results = db.execute("""
+        SELECT posts.id, highlight(posts_fts, 0, '<mark>', '</mark>') AS 
+            content, posts.thread, posts.author, posts.created, posts.edited, 
+            posts.updated, threads.title AS thread_title
+        FROM posts_fts
+        JOIN posts ON posts_fts.rowid = posts.id
+        JOIN threads ON threads.id = posts.thread
+        WHERE posts_fts MATCH ?
+        ORDER BY rank
+        LIMIT 50
+        """, (query,)).fetchall()
+    except OperationalError:
+        flash('your search query was malformed.')
+        return redirect(url_for("forum.view_forum"))
 
     display_thread_id = [ True ] * len(results)
     last_thread = None
@@ -87,5 +95,4 @@ def search():
         if result["thread"] == last_thread:
             display_thread_id[ix] = False
         last_thread = result["thread"]
-    rendered_posts = [render(q['content']) for q in results]
-    return render_template("search_results.html", results=results, query=query, rendered_posts=rendered_posts, display_thread_id=display_thread_id)
+    return render_template("search_results.html", results=results, query=query, display_thread_id=display_thread_id)
