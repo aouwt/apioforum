@@ -67,7 +67,6 @@ def register():
             db.commit()
             flash("successfully created account")
             session['user'] = username
-            flash("registered successfully")
             return redirect(get_next())
 
         flash(err)
