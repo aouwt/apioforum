@@ -12,6 +12,7 @@ allowed_tags = [
     'del',
     'mark',
     'img',
+    'marquee'
 ]
 
 allowed_attributes = bleach.sanitizer.ALLOWED_ATTRIBUTES.copy()
