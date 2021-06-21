@@ -2,6 +2,10 @@
 <a href="{{url_for('user.view_user',username=username)}}" class="username">{{username}}</a>
 {%- endmacro %}
 
+{% macro post_url(post) -%}
+	{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}
+{%- endmacro %}
+
 {% macro disp_post(post, buttons=False) %}
 <div class="post" id="post_{{post.id}}">
     <div class="post-heading">
@@ -19,7 +23,7 @@
             <a class="actionbutton"
                href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
         {% endif %}
-        <a class="post-anchor-link" href="{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}">#{{post.id}}</a>
+		<a class="post-anchor-link" href="{{post_url(post)}}">#{{post.id}}</a>
         </span>
     </div>
     <div class="post-content">

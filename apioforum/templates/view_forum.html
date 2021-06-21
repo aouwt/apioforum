@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user %}
+{% from 'common.html' import ts, tag, disp_user, post_url %}
 {% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
 {%block nmcontent%}
 <main class="widemain">
@@ -38,7 +38,7 @@
 						{{ ts(preview_post[thread.id].created) }}
 					</span>
 					<span class="thread-preview-post">
-						<a href="{{url_for('thread.view_thread', thread_id=thread.id)}}#post_{{preview_post[thread.id].id}}">
+						<a href="{{post_url(preview_post[thread.id])}}">
 							{{ preview_post[thread.id].content[:500]|e }}
 						</a>
 					</span>
