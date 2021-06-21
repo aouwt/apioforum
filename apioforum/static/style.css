@@ -129,7 +129,10 @@ nav .links { display: flex; }
 	text-overflow: ellipsis;
 	margin-top: 10px;
 }
-.thread-preview a, .thread-preview a:visited { color: black; text-decoration: none; }
+.thread-preview-post a, .thread-preview-post a:visited { 
+	color: black; 
+	text-decoration: none; 
+}
 .thread-preview-post { font-style: italic; }
 .thread-preview-ts { font-weight: bold; }
 
