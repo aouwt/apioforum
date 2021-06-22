@@ -2,6 +2,14 @@
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %}</h1>
+<nav aria-label="Breadcrumb">
+<ol class="breadcrumbs">
+    <li><a href="{{url_for('index')}}">apioforum</a></li>
+    <li><a href="#">the</a></li>
+    <li>the</li>
+</ol>
+</nav>
+    
 {% endblock %}
 
 {%block content%}

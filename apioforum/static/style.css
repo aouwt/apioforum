@@ -79,11 +79,11 @@ dt { font-weight: bold }
 img { max-width: 100% }
 
 
-nav { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
-nav p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
-nav p:first-of-type { margin-left:0.5em }
-nav a { color: blue; text-decoration: none }
-nav .links { display: flex; }
+nav#navbar { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
+nav#navbar p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
+nav#navbar p:first-of-type { margin-left:0.5em }
+nav#navbar a { color: blue; text-decoration: none }
+nav#navbar .links { display: flex; }
 
 /* todo: make the navbar less bad */
 .flashmsg { border: 1px solid black; background-color: yellow; max-width: max-content; padding: 5px; clear: both;}
@@ -194,3 +194,17 @@ blockquote {
     padding: 1px 3px;
     border: 1px solid black;
 }
+
+.breadcrumbs {
+    list-style: none;
+}
+
+.breadcrumbs li {
+    display: inline;
+}
+
+.breadcrumbs li+li::before {
+    content: "/\00a0";
+    padding: 8px;
+}
+    
