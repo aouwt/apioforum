@@ -91,7 +91,7 @@ CREATE TABLE forums (
     parent INTEGER REFERENCES forums(id),
     description TEXT
 );
-INSERT INTO forums (name,parent,description) values ('root',null,'the default root forum');
+INSERT INTO forums (name,parent,description) values ('apioforum',null,'the default root forum');
 
 PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;

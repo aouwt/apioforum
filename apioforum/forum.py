@@ -11,13 +11,22 @@ from .mdrender import render
 
 from sqlite3 import OperationalError
 
-from sqlite3 import OperationalError
-
 bp = Blueprint("forum", __name__, url_prefix="/")
 
 @bp.route("/")
 def not_actual_index():
     return redirect("/1")
+
+def forum_path(forum_id):
+    db = get_db()
+    i = forum_id
+    path = []
+    while i != None:
+        forum = db.execute("SELECT * FROM forums WHERE id = ?",(i,)).fetchone()
+        path.append(forum)
+        i = forum['parent']
+    path.reverse()
+    return path
 
 @bp.route("/<int:forum_id>")
 def view_forum(forum_id):
@@ -46,8 +55,24 @@ def view_forum(forum_id):
             """SELECT * FROM posts WHERE thread = ?
             ORDER BY created DESC;
             """,(thread['id'],)).fetchone()
+
+    subforums = db.execute("""
+            SELECT * FROM forums WHERE parent = ? ORDER BY name ASC
+            """,(forum_id,)).fetchall()
+    
+    forum_last_activity = {}
+    for subforum in subforums:
+        result = db.execute(
+                """SELECT updated FROM threads
+                WHERE forum = ?
+                ORDER BY updated DESC;
+                """,(subforum['id'],)).fetchone()
+        forum_last_activity[subforum['id']] = result[0] if result != None else None
+
     return render_template("view_forum.html",
             forum=forum,
+            subforums=subforums,
+            forum_last_activity=forum_last_activity,
             threads=threads,
             thread_tags=thread_tags,
             preview_post=preview_post
