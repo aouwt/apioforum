@@ -104,7 +104,6 @@ nav#navbar .links { display: flex; }
 }
 .thread-listing-title { 
 	overflow: hidden;
-	font-size: larger; 
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	flex-grow: 1;
@@ -137,7 +136,9 @@ nav#navbar .links { display: flex; }
 .thread-preview-ts { font-weight: bold; }
 
 /* wide screens */
-@media all and (min-width: 600px) { }
+@media all and (min-width: 600px) { 
+	.thread-listing-title { font-size: larger; }
+}
 
 /* small screens */
 @media not all and (min-width: 600px) {
