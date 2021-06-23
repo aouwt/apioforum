@@ -9,8 +9,9 @@
 
 {%block nmcontent%}
 <main class="widemain">
+{% if forum.description %}
 {{forum.description|md|safe}}
-
+{% endif %}
 
 {% if subforums %}
 <h2>subforae</h2>

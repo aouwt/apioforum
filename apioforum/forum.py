@@ -20,14 +20,15 @@ def not_actual_index():
 
 def forum_path(forum_id):
     db = get_db()
-    i = forum_id
-    path = []
-    while i != None:
-        forum = db.execute("SELECT * FROM forums WHERE id = ?",(i,)).fetchone()
-        path.append(forum)
-        i = forum['parent']
-    path.reverse()
-    return path
+    ancestors = db.execute("""
+        WITH RECURSIVE fs AS
+            (SELECT * FROM forums WHERE id = ?
+             UNION ALL
+             SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
+        SELECT * FROM fs;
+        """,(forum_id,)).fetchall()
+    ancestors.reverse()
+    return ancestors
 
 @bp.route("/<int:forum_id>")
 def view_forum(forum_id):
@@ -59,7 +60,7 @@ def view_forum(forum_id):
 
     subforums_rows = db.execute("""
             SELECT max(threads.updated) as updated, forums.* FROM forums
-            JOIN threads ON threads.forum=forums.id 
+            LEFT OUTER JOIN threads ON threads.forum=forums.id 
             WHERE parent = ?
             GROUP BY forums.id
             ORDER BY name ASC
@@ -68,8 +69,10 @@ def view_forum(forum_id):
     for s in subforums_rows:
         a={}
         a.update(s)
-        a['updated'] = datetime.datetime.fromisoformat(a['updated'])
+        if a['updated'] is not None:
+            a['updated'] = datetime.datetime.fromisoformat(a['updated'])
         subforums.append(a)
+        
 
     return render_template("view_forum.html",
             forum=forum,
