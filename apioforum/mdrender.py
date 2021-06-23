@@ -1,4 +1,5 @@
 import bleach
+from .csscolors import csscolors
 
 allowed_tags = [
     'p',
@@ -12,8 +13,12 @@ allowed_tags = [
     'del',
     'mark',
     'img',
-    'marquee'
+    'marquee',
+    'pulsate'
 ]
+
+allowed_tags += csscolors
+allowed_tags += ("mark" + c for c in csscolors)
 
 allowed_attributes = bleach.sanitizer.ALLOWED_ATTRIBUTES.copy()
 allowed_attributes.update(
