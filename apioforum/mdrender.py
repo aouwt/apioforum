@@ -14,7 +14,8 @@ allowed_tags = [
     'mark',
     'img',
     'marquee',
-    'pulsate'
+    'pulsate',
+    'color'
 ]
 
 allowed_tags += csscolors
@@ -23,6 +24,7 @@ allowed_tags += ("mark" + c for c in csscolors)
 allowed_attributes = bleach.sanitizer.ALLOWED_ATTRIBUTES.copy()
 allowed_attributes.update(
     img='src',
+    color='color'
 )
 
 allowed_tags.extend(bleach.sanitizer.ALLOWED_TAGS)
