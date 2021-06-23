@@ -7,8 +7,7 @@
 {% endif %}
 {%endblock%}
 
-{%block nmcontent%}
-<main class="widemain">
+{%block content%}
 {% if forum.description %}
 {{forum.description|md|safe}}
 {% endif %}
@@ -81,5 +80,4 @@
 	{%endfor%}
 </div>
 
-</main>
 {%endblock%}

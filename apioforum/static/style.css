@@ -174,9 +174,6 @@ main {
     max-width: 60ch;
     margin: auto;
 }
-main.widemain {
-    max-width: 120ch;
-}
 
 blockquote {
     margin-left: 10px;
