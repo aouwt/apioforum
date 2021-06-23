@@ -63,19 +63,19 @@
 					{{ ts(thread.created) }}
 				</div>
 			</div>
-			{% if preview_post[thread.id] %}
+			{#{% if thread.mrp_id %}#}
 				<div class="listing-caption">
-					{{ disp_user(preview_post[thread.id].author) }}
+					{{ disp_user(thread.mrp_author) }}
 					<span class="thread-preview-ts">
-						{{ ts(preview_post[thread.id].created) }}
+						{{ ts(thread.mrp_created) }}
 					</span>
 					<span class="thread-preview-post">
-						<a href="{{post_url(preview_post[thread.id])}}">
-							{{ preview_post[thread.id].content[:500]|e }}
+						<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+							{{ thread.mrp_content[:500]|e }}
 						</a>
 					</span>
 				</div>
-			{% endif %}
+			{#{% endif %}#}
 		</div>
 	{%endfor%}
 </div>

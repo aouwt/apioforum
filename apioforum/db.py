@@ -110,6 +110,13 @@ ALTER TABLE threads_new RENAME TO threads;
 COMMIT;
 PRAGMA foreign_keys = on;
 """,
+"""
+CREATE VIEW most_recent_posts AS
+    SELECT max(id), * FROM posts GROUP BY thread;
+
+CREATE VIEW number_of_posts AS
+    SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
+""",
     
 ]
 

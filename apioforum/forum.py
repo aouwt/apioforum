@@ -33,16 +33,20 @@ def view_forum(forum_id):
     db = get_db()
     forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
-        """SELECT threads.id, threads.title, threads.creator, threads.created,
-        threads.updated, count(posts.id) as num_replies, max(posts.id), posts.author as last_user
+        """SELECT
+            threads.id, threads.title, threads.creator, threads.created,
+            threads.updated, number_of_posts.num_replies,
+            most_recent_posts.created as mrp_created,
+            most_recent_posts.author as mrp_author,
+            most_recent_posts.id as mrp_id,
+            most_recent_posts.content as mrp_content
         FROM threads
-        INNER JOIN posts ON posts.thread = threads.id
+        INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
+        INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
         WHERE threads.forum = ?
-        GROUP BY threads.id
         ORDER BY threads.updated DESC;
         """,(forum_id,)).fetchall()
     thread_tags = {}
-    preview_post = {}
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -51,10 +55,6 @@ def view_forum(forum_id):
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
-        preview_post[thread['id']]  = db.execute(
-            """SELECT * FROM posts WHERE thread = ?
-            ORDER BY created DESC;
-            """,(thread['id'],)).fetchone()
 
     subforums = db.execute("""
             SELECT * FROM forums WHERE parent = ? ORDER BY name ASC
@@ -75,7 +75,6 @@ def view_forum(forum_id):
             forum_last_activity=forum_last_activity,
             threads=threads,
             thread_tags=thread_tags,
-            preview_post=preview_post
             )
 
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
