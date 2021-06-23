@@ -55,8 +55,24 @@ def view_forum(forum_id):
             """SELECT * FROM posts WHERE thread = ?
             ORDER BY created DESC;
             """,(thread['id'],)).fetchone()
+
+    subforums = db.execute("""
+            SELECT * FROM forums WHERE parent = ? ORDER BY name ASC
+            """,(forum_id,)).fetchall()
+    
+    forum_last_activity = {}
+    for subforum in subforums:
+        result = db.execute(
+                """SELECT updated FROM threads
+                WHERE forum = ?
+                ORDER BY updated DESC;
+                """,(subforum['id'],)).fetchone()
+        forum_last_activity[subforum['id']] = result[0] if result != None else None
+
     return render_template("view_forum.html",
             forum=forum,
+            subforums=subforums,
+            forum_last_activity=forum_last_activity,
             threads=threads,
             thread_tags=thread_tags,
             preview_post=preview_post

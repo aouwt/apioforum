@@ -10,6 +10,33 @@
 {%block nmcontent%}
 <main class="widemain">
 {{forum.description|md|safe}}
+
+
+{% if subforums %}
+<h2>subforae</h2>
+<div class="forum-list">
+	{% for subforum in subforums %}
+		<div class="listing">
+			<div class="listing-main">
+				<div class="listing-title">
+					<a href="{{url_for('forum.view_forum',forum_id=subforum.id)}}">
+						{{- subforum.name -}}
+					</a>
+				</div>
+			</div>
+			<div class="listing-caption">
+				{% if forum_last_activity[subforum.id] %}
+					last activity {{ts(forum_last_activity[subforum.id])}} ago
+				{% else %}
+					no threads
+				{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+</div>
+{% endif %}
+
+<h2>threads</h2>
 {% if g.user %}
 <p><a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a></p>
 {% else %}
@@ -17,9 +44,9 @@
 {% endif %}
 <div class="thread-list">
 	{%for thread in threads%}
-		<div class="thread-listing">
-			<div class="thread-listing-main">
-				<div class="thread-listing-title">
+		<div class="listing">
+			<div class="listing-main">
+				<div class="listing-title">
 					<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">
 						{{- thread.title -}}
 					</a>
@@ -37,7 +64,7 @@
 				</div>
 			</div>
 			{% if preview_post[thread.id] %}
-				<div class="thread-preview">
+				<div class="listing-caption">
 					{{ disp_user(preview_post[thread.id].author) }}
 					<span class="thread-preview-ts">
 						{{ ts(preview_post[thread.id].created) }}
@@ -52,5 +79,6 @@
 		</div>
 	{%endfor%}
 </div>
+
 </main>
 {%endblock%}
