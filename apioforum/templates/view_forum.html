@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url %}
-{% block header %}<h1>{% block title %}{{forum.name}}{%endblock%}</h1>{%endblock%}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb %}
+{% block header %}
+<h1>{% block title %}{{forum.name}}{%endblock%}</h1>
+{% if forum.id != 1 %}
+	{{ forum_breadcrumb(forum) }}
+{% endif %}
+{%endblock%}
+
 {%block nmcontent%}
 <main class="widemain">
 {{forum.description|md|safe}}
