@@ -54,6 +54,10 @@ def register():
             "SELECT 1 FROM users WHERE username = ?;", (username,)
         ).fetchone() is not None:
             err = f"User {username} is already registered."
+        elif len(username) > 20:
+            err = "username can't be longer than 20 characters"
+        elif not username.isalnum():
+            err = "username must be alphanumeric"
 
         if err is None:
             db.execute(
@@ -63,7 +67,6 @@ def register():
             db.commit()
             flash("successfully created account")
             session['user'] = username
-            flash("registered successfully")
             return redirect(get_next())
 
         flash(err)

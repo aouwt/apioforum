@@ -11,6 +11,8 @@ from .mdrender import render
 
 from sqlite3 import OperationalError
 
+from sqlite3 import OperationalError
+
 bp = Blueprint("forum", __name__, url_prefix="/")
 
 @bp.route("/")
@@ -31,6 +33,7 @@ def view_forum(forum_id):
         ORDER BY threads.updated DESC;
         """,(forum_id,)).fetchall()
     thread_tags = {}
+    preview_post = {}
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -39,12 +42,16 @@ def view_forum(forum_id):
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
-    return render_template(
-        "view_forum.html",
-        threads=threads,
-        thread_tags=thread_tags,
-        forum=forum
-    )
+        preview_post[thread['id']]  = db.execute(
+            """SELECT * FROM posts WHERE thread = ?
+            ORDER BY created DESC;
+            """,(thread['id'],)).fetchone()
+    return render_template("view_forum.html",
+            forum=forum,
+            threads=threads,
+            thread_tags=thread_tags,
+            preview_post=preview_post
+            )
 
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
 def create_thread(forum_id):
