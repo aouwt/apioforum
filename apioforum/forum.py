@@ -10,6 +10,7 @@ from .db import get_db
 from .mdrender import render
 
 from sqlite3 import OperationalError
+import datetime
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
@@ -56,23 +57,23 @@ def view_forum(forum_id):
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
 
-    subforums = db.execute("""
-            SELECT * FROM forums WHERE parent = ? ORDER BY name ASC
+    subforums_rows = db.execute("""
+            SELECT max(threads.updated) as updated, forums.* FROM forums
+            JOIN threads ON threads.forum=forums.id 
+            WHERE parent = ?
+            GROUP BY forums.id
+            ORDER BY name ASC
             """,(forum_id,)).fetchall()
-    
-    forum_last_activity = {}
-    for subforum in subforums:
-        result = db.execute(
-                """SELECT updated FROM threads
-                WHERE forum = ?
-                ORDER BY updated DESC;
-                """,(subforum['id'],)).fetchone()
-        forum_last_activity[subforum['id']] = result[0] if result != None else None
+    subforums = []
+    for s in subforums_rows:
+        a={}
+        a.update(s)
+        a['updated'] = datetime.datetime.fromisoformat(a['updated'])
+        subforums.append(a)
 
     return render_template("view_forum.html",
             forum=forum,
             subforums=subforums,
-            forum_last_activity=forum_last_activity,
             threads=threads,
             thread_tags=thread_tags,
             )

@@ -25,8 +25,8 @@
 				</div>
 			</div>
 			<div class="listing-caption">
-				{% if forum_last_activity[subforum.id] %}
-					last activity {{ts(forum_last_activity[subforum.id])}} ago
+				{% if subforum.updated %}
+					last activity {{ts(subforum.updated)}} ago
 				{% else %}
 					no threads
 				{% endif %}
