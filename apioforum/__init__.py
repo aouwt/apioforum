@@ -47,6 +47,8 @@ def create_app():
             p += "?" + request.query_string.decode("utf-8")
         return dict(path_for_next=p)
 
+    app.jinja_env.globals.update(forum_path=forum.forum_path)
+
     from .mdrender import render
     @app.template_filter('md')
     def md_render(s):

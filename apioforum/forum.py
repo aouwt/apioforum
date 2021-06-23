@@ -11,13 +11,22 @@ from .mdrender import render
 
 from sqlite3 import OperationalError
 
-from sqlite3 import OperationalError
-
 bp = Blueprint("forum", __name__, url_prefix="/")
 
 @bp.route("/")
 def not_actual_index():
     return redirect("/1")
+
+def forum_path(forum_id):
+    db = get_db()
+    i = forum_id
+    path = []
+    while i != None:
+        forum = db.execute("SELECT * FROM forums WHERE id = ?",(i,)).fetchone()
+        path.append(forum)
+        i = forum['parent']
+    path.reverse()
+    return path
 
 @bp.route("/<int:forum_id>")
 def view_forum(forum_id):
