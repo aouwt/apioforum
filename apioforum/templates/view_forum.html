@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% from 'common.html' import ts, tag, disp_user, post_url %}
 {% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
-{%block nmcontent%}
-<main class="widemain">
+{%block content%}
 <p>welcome to the apioforum</p>
 <p>forum rules: do not be a bad person. do not do bad things.</p>
 {% if g.user %}
@@ -47,5 +46,4 @@
 		</div>
 	{%endfor%}
 </div>
-</main>
 {%endblock%}
