@@ -11,6 +11,7 @@ allowed_tags = [
     'h6',
     'pre',
     'del',
+    'ins',
     'mark',
     'img',
     'marquee',
@@ -38,6 +39,7 @@ cleaner = bleach.sanitizer.Cleaner(tags=allowed_tags,attributes=allowed_attribut
 import markdown
 md = markdown.Markdown(extensions=[
     'pymdownx.tilde',
+    'pymdownx.caret',
     'fenced_code',
     'tables',
     'pymdownx.details',
