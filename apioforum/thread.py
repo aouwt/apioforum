@@ -46,6 +46,7 @@ def create_post(thread_id):
         db = get_db()
         content = request.form['content']
         thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
+        print(request.form.get('poll'))
         if len(content.strip()) == 0:
             flash("you cannot post an empty message")
         elif not thread:
@@ -63,7 +64,8 @@ def create_post(thread_id):
             )
             db.commit()
             flash("post posted postfully")
-    return redirect(post_jump(thread_id, post_id))
+            return redirect(post_jump(thread_id, post_id))
+    return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
 def delete_post(post_id):

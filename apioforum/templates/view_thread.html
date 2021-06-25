@@ -45,7 +45,7 @@
         {% for opt in poll.options %}
             <br>
             <input type="radio" id="option_{{opt.option_idx}}" name="poll" value="{{opt.option_idx}}">
-            <label for="option_{{opt.option_idx}}">#{{opt.option_idx}} - {{opt.text}}</label>
+            <label for="option_{{opt.option_idx}}">submit a vote for #{{opt.option_idx}} - {{opt.text}}</label>
         {% endfor %}
     </fieldset>
     {% endif %}
