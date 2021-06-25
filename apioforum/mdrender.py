@@ -14,7 +14,11 @@ allowed_tags = [
     'mark',
     'img',
     'marquee',
-    'pulsate'
+    'pulsate',
+    'sup','sub',
+    'table','thead','tbody','tr','th','td',
+    'details','summary',
+
 ]
 
 allowed_tags += csscolors
@@ -22,7 +26,9 @@ allowed_tags += ("mark" + c for c in csscolors)
 
 allowed_attributes = bleach.sanitizer.ALLOWED_ATTRIBUTES.copy()
 allowed_attributes.update(
-    img='src'
+    img=['src','alt','title'],
+    ol=['start'],
+    details=['open'],
 )
 
 allowed_tags.extend(bleach.sanitizer.ALLOWED_TAGS)
@@ -30,7 +36,12 @@ allowed_tags.extend(bleach.sanitizer.ALLOWED_TAGS)
 cleaner = bleach.sanitizer.Cleaner(tags=allowed_tags,attributes=allowed_attributes)
 
 import markdown
-md = markdown.Markdown(extensions=['pymdownx.tilde','fenced_code'])
+md = markdown.Markdown(extensions=[
+    'pymdownx.tilde',
+    'fenced_code',
+    'tables',
+    'pymdownx.details',
+])
 
 def render(text):
     text = md.reset().convert(text)

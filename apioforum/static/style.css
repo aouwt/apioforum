@@ -205,3 +205,12 @@ blockquote {
     padding: 1px 3px;
     border: 1px solid black;
 }
+
+.md table {
+    border: 1px solid grey;
+    border-collapse: collapse;
+}
+.md table td,.md table th {
+    border: 1px solid grey;
+    padding: 4px;
+}
