@@ -17,13 +17,18 @@
             {% endif %}
         </span>
         <span class="post-heading-b">
-        {% if buttons and post.author == g.user %}
+        {% if buttons %}
+            {% if post.author == g.user %}
+                <a class="actionbutton"
+                   href="{{url_for('thread.edit_post',post_id=post.id)}}">edit</a>
+                <a class="actionbutton"
+                   href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
+            {% endif %}
             <a class="actionbutton"
-               href="{{url_for('thread.edit_post',post_id=post.id)}}">edit</a>
-            <a class="actionbutton"
-               href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
+               href="{{url_for('thread.view_post',post_id=post.id)}}">src</a>
         {% endif %}
-		<a class="post-anchor-link" href="{{post_url(post)}}">#{{post.id}}</a>
+            
+	<a class="post-anchor-link" href="{{post_url(post)}}">#{{post.id}}</a>
         </span>
     </div>
     <div class="post-content md">

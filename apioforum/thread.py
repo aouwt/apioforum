@@ -84,8 +84,7 @@ def edit_post(post_id):
     post = db.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone()
     if post is None:
         flash("that post doesn't exist")
-        # todo: index route
-        return redirect("/")
+        return redirect(url_for('index'))
 
     if post['author'] != g.user:
         flash("you can only edit posts that you created")
@@ -107,6 +106,19 @@ def edit_post(post_id):
         else:
             flash(err)
     return render_template("edit_post.html",post=post)
+
+@bp.route("/view_post/<int:post_id>")
+def view_post(post_id):
+    db = get_db()
+    post = db.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone()
+    if post is None:
+        flash("that post doesn't exist")
+        return redirect(url_for('index'))
+
+    # when we have permissions, insert permissions check here
+    return render_template("view_post.html",post=post)
+    
+    
             
 @bp.route("/<int:thread_id>/config",methods=["GET","POST"])
 def config_thread(thread_id):
