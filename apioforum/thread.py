@@ -27,7 +27,15 @@ def view_thread(thread_id):
             INNER JOIN thread_tags ON thread_tags.tag = tags.id
             WHERE thread_tags.thread = ?
             ORDER BY tags.id""",(thread_id,)).fetchall()
-        return render_template("view_thread.html",posts=posts,thread=thread,tags=tags)
+        poll = None
+        if thread['poll'] is not None:
+            poll_row = db.execute("SELECT * FROM polls where id = ?",(thread['poll'],)).fetchone()
+            options = db.execute("SELECT * FROM poll_options WHERE poll = ?",(poll_row['id'],)).fetchall()
+            poll = {}
+            poll.update(poll_row)
+            poll['options'] = options
+            
+        return render_template("view_thread.html",posts=posts,thread=thread,tags=tags,poll=poll)
 
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):

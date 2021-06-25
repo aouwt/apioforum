@@ -5,6 +5,14 @@
 {% endblock %}
 
 {%block content%}
+{% if poll %}
+<p>{{poll.title}}</p>
+<ul>
+    {%for opt in poll.options%}
+    <li>#{{opt.option_idx}} - {{opt.text}}</li>
+    {%endfor%}
+</ul>
+{% endif %}
 <div class="thread-top-bar">
     <span class="thread-top-bar-a">
         {% if g.user == thread.creator %}
@@ -27,6 +35,20 @@
 {% if g.user %}
 <form class="new-post" action="{{url_for('thread.create_post',thread_id=thread.id)}}" method="POST">
     <textarea class="new-post-box" placeholder="your post here..." name="content"></textarea>
+    {% if poll %}
+    <fieldset>
+        <legend>poll: {{poll.title}}</legend>
+        <p>if you want, you can submit a vote along with this post. if you have previously voted
+           on this poll, your previous vote will be changed</p>
+        <input type="radio" id="dontvote" name="poll" value="dontvote" checked>
+        <label for="dontvote">do not submit any vote at the moment</label>
+        {% for opt in poll.options %}
+            <br>
+            <input type="radio" id="option_{{opt.option_idx}}" name="poll" value="{{opt.option_idx}}">
+            <label for="option_{{opt.option_idx}}">#{{opt.option_idx}} - {{opt.text}}</label>
+        {% endfor %}
+    </fieldset>
+    {% endif %}
     <input type="submit" value="yes">
 </form>
 {% else %}
