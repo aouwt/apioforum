@@ -55,7 +55,8 @@ def create_post(thread_id):
             )
             db.commit()
             flash("post posted postfully")
-    return redirect(post_jump(thread_id, post_id))
+            return redirect(post_jump(thread_id, post_id))
+    return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
 def delete_post(post_id):
