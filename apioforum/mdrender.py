@@ -19,6 +19,9 @@ allowed_tags = [
     'sup','sub',
     'table','thead','tbody','tr','th','td',
     'details','summary',
+    'hr'
+    
+
 
 ]
 
