@@ -117,7 +117,24 @@ CREATE VIEW most_recent_posts AS
 CREATE VIEW number_of_posts AS
     SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
 """,
-    
+"""
+CREATE TABLE role_config (
+    role TEXT NOT NULL,
+    forum NOT NULL REFERENCES forums(id),
+    id INTEGER PRIMARY KEY,
+
+    p_create_threads INT NOT NULL DEFAULT 1,
+    p_reply_threads INT NOT NULL DEFAULT 1,
+    p_view_threads INT NOT NULL DEFAULT 1,
+    p_delete_threads INT NOT NULL DEFAULT 0,
+    p_lock_threads INT NOT NULL DEFAULT 0,
+    p_approve INT NOT NULL DEFAULT 0,
+    p_create_subforum INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO role_config (role,forum) SELECT "approved",id FROM forums;
+INSERT INTO role_config (role,forum) SELECT "other",id FROM forums;
+""",
 ]
 
 def init_db():
