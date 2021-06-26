@@ -37,6 +37,29 @@ def view_thread(thread_id):
             
         return render_template("view_thread.html",posts=posts,thread=thread,tags=tags,poll=poll)
 
+
+
+
+def register_vote(thread,pollval):
+    if pollval is None or pollval == 'dontvote':
+        return
+    option_idx = int(pollval)
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("""
+        UPDATE votes
+        SET current = 0
+        WHERE poll = ? AND user = ?;
+    """,(thread['poll'],g.user))
+    cur.execute("""
+        INSERT INTO votes (user,poll,option_idx,time,current)
+        VALUES (?,?,?,current_timestamp,1);
+        """,(g.user,thread['poll'],option_idx))
+    vote_id = cur.lastrowid
+    return vote_id
+        
+    
+        
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):
     if g.user is None:
@@ -46,17 +69,25 @@ def create_post(thread_id):
         db = get_db()
         content = request.form['content']
         thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
-        print(request.form.get('poll'))
         if len(content.strip()) == 0:
             flash("you cannot post an empty message")
         elif not thread:
             flash("that thread does not exist")
         else:
+            vote_id = None
+            if thread['poll'] is not None:
+                pollval = request.form.get('poll')
+                try:
+                    vote_id = register_vote(thread,pollval)
+                except ValueError:
+                    flash("invalid poll form value")
+                    return redirect(url_for('thread.view_thread',thread_id=thread_id))
+
             cur = db.cursor()
-            cur.execute(
-                "INSERT INTO posts (thread,author,content,created) VALUES (?,?,?,current_timestamp);",
-                (thread_id,g.user,content)
-            )
+            cur.execute("""
+                INSERT INTO posts (thread,author,content,created,vote)
+                VALUES (?,?,?,current_timestamp,?);
+                """,(thread_id,g.user,content,vote_id))
             post_id = cur.lastrowid
             cur.execute(
                 "UPDATE threads SET updated = current_timestamp WHERE id = ?;",

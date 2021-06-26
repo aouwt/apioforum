@@ -104,6 +104,7 @@ CREATE TABLE votes (
     poll INTEGER NOT NULL,
     option_idx INTEGER NOT NULL,
     time TIMESTAMP NOT NULL,
+    current INTEGER NOT NULL,
     FOREIGN KEY ( poll, option_idx ) REFERENCES poll_options(poll, option_idx)
 );
 ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);
