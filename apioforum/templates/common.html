@@ -6,7 +6,7 @@
 	{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}
 {%- endmacro %}
 
-{% macro disp_post(post, buttons=False) %}
+{% macro disp_post(post, buttons=False, footer=None) %}
 <div class="post" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
@@ -34,6 +34,11 @@
     <div class="post-content md">
         {{ post.content|md|safe }}
     </div>
+    {% if footer %}
+    <div class="post-footer">
+        {{ footer }}
+    </div>
+    {% endif %}
 </div>
 {% endmacro %}
 

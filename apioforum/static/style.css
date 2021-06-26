@@ -16,8 +16,8 @@ body { font-family: sans-serif; word-wrap: break-word; }
 }
 .post:last-of-type { border-bottom: 1px solid black; }
 
-.post-heading { font-size: smaller; }
-.post-heading,a.username {
+.post-heading,.post-footer { font-size: smaller; }
+.post-heading,.post-footer,a.username {
 	color: hsl(0,0%,25%); 
 }
 a.username {
@@ -31,6 +31,8 @@ a.username {
 .post-content { padding: 4px }
 .post-heading-a { margin-left: 0.2em }
 .post-heading-b { float: right; margin-right: 0.5em }
+
+.post-footer { margin-left: 0.2em; font-style: italic; }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
 

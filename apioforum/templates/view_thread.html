@@ -29,7 +29,25 @@
 
 <div class="posts">
     {% for post in posts %}
-	{{ disp_post(post, True) }}
+        {% if votes[post.id] %}
+
+            {% set vote = votes[post.id] %}        
+            {% set option_idx = vote.option_idx %}
+            {% set option = poll.options[option_idx-1] %}
+            
+        	{% set footer %}
+        	    {% if vote.current %}
+           	    	{{post.author}} votes for {{option_idx}}: {{option.text}}
+           	    {% else %}
+           	    	{{post.author}} voted for {{option_idx}}: {{option.text}}, but later changed their vote
+           	    {% endif %}
+        	{% endset %}
+
+        	{{ disp_post(post, buttons=True, footer=footer) }}
+        	
+        {% else %}
+        	{{ disp_post(post, buttons=True) }}
+    	{% endif %}
     {% endfor %}
 </div>
 {% if g.user %}

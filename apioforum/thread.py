@@ -18,10 +18,11 @@ def view_thread(thread_id):
     if thread is None:
         abort(404)
     else:
-        posts = db.execute(
-            "SELECT * FROM posts WHERE thread = ? ORDER BY created ASC;",
-            (thread_id,)
-        ).fetchall()
+        posts = db.execute("""
+            SELECT * FROM posts
+            WHERE posts.thread = ?
+            ORDER BY created ASC;
+            """,(thread_id,)).fetchall()
         tags = db.execute(
             """SELECT tags.* FROM tags
             INNER JOIN thread_tags ON thread_tags.tag = tags.id
@@ -34,11 +35,20 @@ def view_thread(thread_id):
             poll = {}
             poll.update(poll_row)
             poll['options'] = options
+            votes = {}
+            # todo: optimise this somehow
+            for post in posts:
+                if post['vote'] is not None:
+                    votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
             
-        return render_template("view_thread.html",posts=posts,thread=thread,tags=tags,poll=poll)
-
-
-
+        return render_template(
+            "view_thread.html",
+            posts=posts,
+            thread=thread,
+            tags=tags,
+            poll=poll,
+            votes=votes
+        )
 
 def register_vote(thread,pollval):
     if pollval is None or pollval == 'dontvote':
