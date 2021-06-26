@@ -109,7 +109,10 @@ CREATE TABLE votes (
 );
 ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);
 """,
-
+"""
+CREATE VIEW vote_counts AS
+    SELECT poll, option_idx, count(*) AS num FROM votes WHERE current GROUP BY option_idx,poll; 
+""",
     
 ]
 

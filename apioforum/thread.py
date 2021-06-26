@@ -29,9 +29,16 @@ def view_thread(thread_id):
             WHERE thread_tags.thread = ?
             ORDER BY tags.id""",(thread_id,)).fetchall()
         poll = None
+        votes = None
         if thread['poll'] is not None:
             poll_row = db.execute("SELECT * FROM polls where id = ?",(thread['poll'],)).fetchone()
-            options = db.execute("SELECT * FROM poll_options WHERE poll = ?",(poll_row['id'],)).fetchall()
+            options = db.execute("""
+                SELECT poll_options.*, vote_counts.num
+                FROM poll_options
+                LEFT OUTER JOIN vote_counts  ON poll_options.poll = vote_counts.poll
+                                            AND poll_options.option_idx = vote_counts.option_idx 
+                WHERE poll_options.poll = ?;
+                """,(poll_row['id'],)).fetchall()
             poll = {}
             poll.update(poll_row)
             poll['options'] = options

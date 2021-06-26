@@ -9,7 +9,7 @@
 <p>{{poll.title}}</p>
 <ul>
     {%for opt in poll.options%}
-    <li>#{{opt.option_idx}} - {{opt.text}}</li>
+    <li>#{{opt.option_idx}} - {{opt.text}} - {{opt.num or 0}}</li>
     {%endfor%}
 </ul>
 {% endif %}
