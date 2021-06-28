@@ -102,9 +102,11 @@ CREATE TABLE votes (
     id INTEGER PRIMARY KEY,
     user TEXT NOT NULL REFERENCES users(username),
     poll INTEGER NOT NULL,
-    option_idx INTEGER NOT NULL,
+    option_idx INTEGER,
     time TIMESTAMP NOT NULL,
     current INTEGER NOT NULL,
+    is_retraction INTEGER,
+    CHECK (is_retraction OR (option_idx NOT NULL)),
     FOREIGN KEY ( poll, option_idx ) REFERENCES poll_options(poll, option_idx)
 );
 ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);

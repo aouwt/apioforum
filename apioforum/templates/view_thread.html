@@ -33,21 +33,27 @@
 
             {% set vote = votes[post.id] %}        
             {% set option_idx = vote.option_idx %}
-            {% set option = poll.options[option_idx-1] %}
             
-        	{% set footer %}
-        	    {% if vote.current %}
-           	    	{{post.author}} votes for {{option_idx}}: {{option.text}}
-           	    {% else %}
-           	    	{{post.author}} voted for {{option_idx}}: {{option.text}}, but later changed their vote
-           	    {% endif %}
-        	{% endset %}
+            {# this is bad but it's going to get refactored anyway #}
+            {% set footer %}
+                {% if vote.is_retraction %}
+                    {{post.author}} retracted their vote
+                {% else %}
+                    {% set option = poll.options[option_idx-1] %}
+                    {% if vote.current %}
+                        {{post.author}} votes for {{option_idx}}: {{option.text}}
+                    {% else %}
+                        {{post.author}} voted for {{option_idx}}: {{option.text}}, but later changed their vote
+                    {% endif %}
+                {% endif %}
 
-        	{{ disp_post(post, buttons=True, footer=footer) }}
-        	
+            {% endset %}
+
+            {{ disp_post(post, buttons=True, footer=footer) }}
+            
         {% else %}
-        	{{ disp_post(post, buttons=True) }}
-    	{% endif %}
+            {{ disp_post(post, buttons=True) }}
+        {% endif %}
     {% endfor %}
 </div>
 {% if g.user %}
