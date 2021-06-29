@@ -64,8 +64,16 @@
         <legend>poll: {{poll.title}}</legend>
         <p>if you want, you can submit a vote along with this post. if you have previously voted
            on this poll, your previous vote will be changed</p>
+
         <input type="radio" id="dontvote" name="poll" value="dontvote" checked>
         <label for="dontvote">do not submit any vote at the moment</label>
+
+        {% if has_voted %}
+        <br>
+        <input type="radio" id="retractvote" name="poll" value="retractvote">
+        <label for="retractvote">retract my vote, and go back to having no vote on this poll</label>
+        {% endif %}
+
         {% for opt in poll.options %}
             <br>
             <input type="radio" id="option_{{opt.option_idx}}" name="poll" value="{{opt.option_idx}}">

@@ -47,6 +47,12 @@ def view_thread(thread_id):
             for post in posts:
                 if post['vote'] is not None:
                     votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
+
+        if g.user is None:
+            has_voted = None
+        else:
+            v = db.execute("SELECT * FROM votes WHERE poll = ? AND user = ? AND current AND NOT is_retraction;",(poll['id'],g.user)).fetchone()
+            has_voted = v is not None
             
         return render_template(
             "view_thread.html",
@@ -54,13 +60,21 @@ def view_thread(thread_id):
             thread=thread,
             tags=tags,
             poll=poll,
-            votes=votes
+            votes=votes,
+            has_voted=has_voted,
         )
 
 def register_vote(thread,pollval):
     if pollval is None or pollval == 'dontvote':
         return
-    option_idx = int(pollval)
+        
+    is_retraction = pollval == 'retractvote'
+
+    if is_retraction:
+        option_idx = None
+    else:
+        option_idx = int(pollval)
+        
     db = get_db()
     cur = db.cursor()
     cur.execute("""
@@ -68,10 +82,11 @@ def register_vote(thread,pollval):
         SET current = 0
         WHERE poll = ? AND user = ?;
     """,(thread['poll'],g.user))
+
     cur.execute("""
-        INSERT INTO votes (user,poll,option_idx,time,current)
-        VALUES (?,?,?,current_timestamp,1);
-        """,(g.user,thread['poll'],option_idx))
+        INSERT INTO votes (user,poll,option_idx,time,current,is_retraction)
+        VALUES (?,?,?,current_timestamp,1,?);
+        """,(g.user,thread['poll'],option_idx,is_retraction))
     vote_id = cur.lastrowid
     return vote_id
         
