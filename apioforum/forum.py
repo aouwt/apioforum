@@ -8,6 +8,7 @@ from flask import (
 
 from .db import get_db
 from .mdrender import render
+from .roles import forum_perms, overridden_perms
 
 from sqlite3 import OperationalError
 import datetime
@@ -117,6 +118,28 @@ def create_thread(forum_id):
         
         
     return render_template("create_thread.html")
+
+@bp.route("/<int:forum_id>/roles",methods=("GET","POST"))
+def edit_roles(forum_id):
+    db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
+    role_configs = db.execute(
+        "SELECT * FROM role_config WHERE forum = ? ORDER BY ID ASC",
+        (forum_id,)).fetchall()
+    overridden = {}
+    for c in role_configs:
+        overridden[c['id']] = overridden_perms(forum_id,c['role'])
+
+    return render_template("edit_permissions.html",
+            forum=forum,
+            role_configs=role_configs,
+            other_roles=["the","test","placeholder"],
+            overridden=overridden
+            )
+
+@bp.route("/<int:forum_id>/roles/new/<role_name>",methods=["POST"])
+def add_role(forum_id,role_name):
+    db.execute
 
 @bp.route("/search")
 def search():

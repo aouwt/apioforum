@@ -181,6 +181,10 @@ blockquote {
     border-left: 3px solid grey;
 }
 
+label { user-select: none; }
+
+fieldset { margin-bottom: 15px; }
+
 .search-form {
     display: inline-block;
 }
