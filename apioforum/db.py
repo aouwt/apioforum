@@ -117,7 +117,32 @@ CREATE VIEW most_recent_posts AS
 CREATE VIEW number_of_posts AS
     SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
 """,
-    
+# 0 = inherit, 1 = allow, -1 = deny
+"""
+CREATE TABLE roles (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    forum INTEGER NOT NULL REFERENCES forums(id),
+
+    p_create_threads INT NOT NULL DEFAULT 0,
+    p_reply_threads INT NOT NULL DEFAULT 0,
+    p_view_threads INT NOT NULL DEFAULT 0,
+    p_manage_threads INT NOT NULL DEFAULT 0,
+    p_vote INT NOT NULL DEFAULT 0,
+    p_create_polls INT NOT NULL DEFAULT 0,
+    p_approve INT NOT NULL DEFAULT 0,
+    p_create_subforums INT NOT NULL DEFAULT 0,
+
+);
+
+INSERT INTO roles (name,forum) SELECT 'approved',id FROM forums;
+INSERT INTO roles (name,forum) SELECT 'other',id FROM forums;
+
+CREATE TRIGGER default_roles AFTER INSERT ON forums BEGIN
+    INSERT INTO roles (role,forum) VALUES ('approved',new.id);
+    INSERT INTO roles (role,forum) VALUES ('other',new.id);
+END;
+""",    
 ]
 
 def init_db():
