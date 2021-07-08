@@ -142,7 +142,15 @@ CREATE TRIGGER default_roles AFTER INSERT ON forums BEGIN
     INSERT INTO roles (role,forum) VALUES ('approved',new.id);
     INSERT INTO roles (role,forum) VALUES ('other',new.id);
 END;
-""",    
+""",
+"""
+CREATE TABLE user_roles (
+    user TEXT NOT NULL REFERENCES users(username),
+    forum INTEGER NOT NULL REFERENCS forums(id),
+    role_name TEXT NOT NULL,
+    FOREIGN KEY (forum,role_name) REFERENCES roles(forum,name)
+);
+""",
 ]
 
 def init_db():
