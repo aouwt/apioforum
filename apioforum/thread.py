@@ -127,7 +127,7 @@ def create_poll(thread_id):
         cur.execute("UPDATE threads SET poll = ? WHERE threads.id = ?",(pollid,thread_id))
         cur.executemany(
             "INSERT INTO poll_options (poll,option_idx,text) VALUES (?,?,?)",
-            zip(itertools.repeat(pollid),range(1,len(polloptions)+1),polloptions)
+            zip(itertools.repeat(pollid),itertools.count(1),polloptions)
         )
         db.commit()
         flash("poll created successfully")
