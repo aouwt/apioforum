@@ -39,7 +39,8 @@ def view_thread(thread_id):
                 FROM poll_options
                 LEFT OUTER JOIN vote_counts  ON poll_options.poll = vote_counts.poll
                                             AND poll_options.option_idx = vote_counts.option_idx 
-                WHERE poll_options.poll = ?;
+                WHERE poll_options.poll = ?
+                ORDER BY option_idx asc;
                 """,(poll_row['id'],)).fetchall()
             poll = {}
             poll.update(poll_row)
@@ -126,7 +127,7 @@ def create_poll(thread_id):
         cur.execute("UPDATE threads SET poll = ? WHERE threads.id = ?",(pollid,thread_id))
         cur.executemany(
             "INSERT INTO poll_options (poll,option_idx,text) VALUES (?,?,?)",
-            zip(itertools.repeat(pollid),range(len(polloptions)),polloptions)
+            zip(itertools.repeat(pollid),range(1,len(polloptions)+1),polloptions)
         )
         db.commit()
         flash("poll created successfully")
