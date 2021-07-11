@@ -49,3 +49,30 @@
 {% macro tag(the_tag) -%}
 <span class="tag" style="color: {{the_tag.text_colour}}; background-color: {{the_tag.bg_colour}}">{{the_tag.name}}</span>
 {%- endmacro %}
+
+{% macro breadcrumb() %}
+<nav aria-label="Breadcrumb">
+<ol class="breadcrumbs">
+	{{- caller() -}}
+</ol>
+</nav>
+{% endmacro %}
+
+{% macro forum_bc_entries(forum_id) -%}
+	{%- for f in forum_path(forum_id) -%}
+		<li><a href="{{url_for('forum.view_forum',forum_id=f.id)}}">{{ f.name }}</a></li>
+	{%- endfor %}
+{%- endmacro %}
+
+{% macro forum_breadcrumb(forum) %}
+	{%- call breadcrumb() %}
+		{{ forum_bc_entries(forum.id) }}
+	{% endcall -%}
+{% endmacro %}
+
+{% macro thread_breadcrumb(thread) %}
+	{%- call breadcrumb() %}
+		{{ forum_bc_entries(thread.forum) }}
+		<li>{{ thread.title }}</li>
+	{% endcall -%}
+{% endmacro %}

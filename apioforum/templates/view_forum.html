@@ -1,19 +1,52 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url %}
-{% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb %}
+{% block header %}
+<h1>{% block title %}{{forum.name}}{%endblock%}</h1>
+{% if forum.id != 1 %}
+	{{ forum_breadcrumb(forum) }}
+{% endif %}
+{%endblock%}
+
 {%block content%}
-<p>welcome to the apioforum</p>
-<p>forum rules: do not be a bad person. do not do bad things.</p>
+{% if forum.description %}
+{{forum.description|md|safe}}
+{% endif %}
+
+{% if subforums %}
+<h2>subforae</h2>
+<div class="forum-list">
+	{% for subforum in subforums %}
+		<div class="listing">
+			<div class="listing-main">
+				<div class="listing-title">
+					<a href="{{url_for('forum.view_forum',forum_id=subforum.id)}}">
+						{{- subforum.name -}}
+					</a>
+				</div>
+			</div>
+			<div class="listing-caption">
+				{% if subforum.updated %}
+					last activity {{ts(subforum.updated)}} ago
+				{% else %}
+					no threads
+				{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+</div>
+{% endif %}
+
+<h2>threads</h2>
 {% if g.user %}
-<p><a class="actionbutton" href="{{url_for('forum.create_thread')}}">create new thread</a></p>
+<p><a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a></p>
 {% else %}
 <p>please log in to create a new thread</p>
 {% endif %}
 <div class="thread-list">
 	{%for thread in threads%}
-		<div class="thread-listing">
-			<div class="thread-listing-main">
-				<div class="thread-listing-title">
+		<div class="listing">
+			<div class="listing-main">
+				<div class="listing-title">
 					<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">
 						{{- thread.title -}}
 					</a>
@@ -30,20 +63,21 @@
 					{{ ts(thread.created) }}
 				</div>
 			</div>
-			{% if preview_post[thread.id] %}
-				<div class="thread-preview">
-					{{ disp_user(preview_post[thread.id].author) }}
+			{#{% if thread.mrp_id %}#}
+				<div class="listing-caption">
+					{{ disp_user(thread.mrp_author) }}
 					<span class="thread-preview-ts">
-						{{ ts(preview_post[thread.id].created) }}
+						{{ ts(thread.mrp_created) }}
 					</span>
 					<span class="thread-preview-post">
-						<a href="{{post_url(preview_post[thread.id])}}">
-							{{ preview_post[thread.id].content[:500]|e }}
+						<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+							{{ thread.mrp_content[:500]|e }}
 						</a>
 					</span>
 				</div>
-			{% endif %}
+			{#{% endif %}#}
 		</div>
 	{%endfor%}
 </div>
+</main>
 {%endblock%}

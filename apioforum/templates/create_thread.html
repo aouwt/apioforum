@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block content %}
-<form action="{{url_for('forum.create_thread')}}", method="POST">
+<form method="POST">
     <label for="title">thread title</label>
     <input name="title" id="title">
     <br>

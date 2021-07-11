@@ -81,35 +81,36 @@ dt { font-weight: bold }
 img { max-width: 100% }
 
 
-nav { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
-nav p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
-nav p:first-of-type { margin-left:0.5em }
-nav a { color: blue; text-decoration: none }
-nav .links { display: flex; }
+nav#navbar { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
+nav#navbar p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
+nav#navbar p:first-of-type { margin-left:0.5em }
+nav#navbar a { color: blue; text-decoration: none }
+nav#navbar .links { display: flex; }
 
 /* todo: make the navbar less bad */
 .flashmsg { border: 1px solid black; background-color: yellow; max-width: max-content; padding: 5px; clear: both;}
 
-.thread-listing:nth-child(even) { background-color: var(--alternating-colour-even) }
-.thread-listing:nth-child(odd) { background-color: var(--alternating-colour-odd) }
+.listing:nth-child(even) { background-color: var(--alternating-colour-even) }
+.listing:nth-child(odd) { background-color: var(--alternating-colour-odd) }
 
-.thread-listing {
+.listing {
     border-left: 1px solid black;
     border-right: 1px solid black;
     border-top: 1px solid black;
 	padding: 10px;
 }
-.thread-listing:last-of-type { border-bottom: 1px solid black; }
-.thread-listing-main { 
+.listing:last-of-type { border-bottom: 1px solid black; }
+.listing-main { 
 	display: flex; 
 	align-items: center;
 }
-.thread-listing-title { 
+.listing-title { 
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	flex-grow: 1;
 }
+
 .thread-listing-tags { 
 	display: flex;
 	align-items: center;
@@ -123,7 +124,7 @@ nav .links { display: flex; }
 	flex-wrap: nowrap; 
 }
 .thread-listing-creator { margin-right: 5px; }
-.thread-preview { 
+.listing-caption { 
 	overflow: hidden;
 	font-size: smaller; 
 	white-space: nowrap;
@@ -139,7 +140,7 @@ nav .links { display: flex; }
 
 /* wide screens */
 @media all and (min-width: 600px) { 
-	.thread-listing-title { font-size: larger; }
+	.listing-title { font-size: larger; }
 }
 
 /* small screens */
@@ -152,22 +153,6 @@ nav .links { display: flex; }
 		text-overflow: ellipsis;
 	}
 }
-
-
-.threadlisting-part {
-    background-color: inherit;
-    display: table-cell;
-    vertical-align: middle;
-    padding: 3px;
-    text-align: center;
-}
-
-.threadlisting-part-title {
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.threadlisting-header { font-weight: bold }
 
 .actionbutton::before {
     content: "[";
@@ -216,3 +201,17 @@ blockquote {
     border: 1px solid grey;
     padding: 4px;
 }
+
+.breadcrumbs {
+    list-style: none;
+}
+
+.breadcrumbs li {
+    display: inline;
+}
+
+.breadcrumbs li+li::before {
+    content: "/\00a0";
+    padding: 8px;
+}
+    

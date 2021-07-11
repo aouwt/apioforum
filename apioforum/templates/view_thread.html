@@ -1,7 +1,8 @@
-{% from 'common.html' import disp_post,tag %}
+{% from 'common.html' import disp_post,tag,thread_breadcrumb %}
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %}</h1>
+{{ thread_breadcrumb(thread) }}
 {% endblock %}
 
 {%block content%}

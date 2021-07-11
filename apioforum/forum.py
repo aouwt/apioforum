@@ -10,23 +10,45 @@ from .db import get_db
 from .mdrender import render
 
 from sqlite3 import OperationalError
+import datetime
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
-
 @bp.route("/")
-def view_forum():
+def not_actual_index():
+    return redirect("/1")
+
+def forum_path(forum_id):
     db = get_db()
+    ancestors = db.execute("""
+        WITH RECURSIVE fs AS
+            (SELECT * FROM forums WHERE id = ?
+             UNION ALL
+             SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
+        SELECT * FROM fs;
+        """,(forum_id,)).fetchall()
+    ancestors.reverse()
+    return ancestors
+
+@bp.route("/<int:forum_id>")
+def view_forum(forum_id):
+    db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
-        """SELECT threads.id, threads.title, threads.creator, threads.created,
-        threads.updated, count(posts.id) as num_replies, max(posts.id), posts.author as last_user
+        """SELECT
+            threads.id, threads.title, threads.creator, threads.created,
+            threads.updated, number_of_posts.num_replies,
+            most_recent_posts.created as mrp_created,
+            most_recent_posts.author as mrp_author,
+            most_recent_posts.id as mrp_id,
+            most_recent_posts.content as mrp_content
         FROM threads
-        INNER JOIN posts ON posts.thread = threads.id
-        GROUP BY threads.id
+        INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
+        INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
+        WHERE threads.forum = ?
         ORDER BY threads.updated DESC;
-        """).fetchall()
+        """,(forum_id,)).fetchall()
     thread_tags = {}
-    preview_post = {}
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -35,19 +57,37 @@ def view_forum():
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
-        preview_post[thread['id']]  = db.execute(
-            """SELECT * FROM posts WHERE thread = ?
-            ORDER BY created DESC;
-            """,(thread['id'],)).fetchone()
+
+    subforums_rows = db.execute("""
+            SELECT max(threads.updated) as updated, forums.* FROM forums
+            LEFT OUTER JOIN threads ON threads.forum=forums.id 
+            WHERE parent = ?
+            GROUP BY forums.id
+            ORDER BY name ASC
+            """,(forum_id,)).fetchall()
+    subforums = []
+    for s in subforums_rows:
+        a={}
+        a.update(s)
+        if a['updated'] is not None:
+            a['updated'] = datetime.datetime.fromisoformat(a['updated'])
+        subforums.append(a)
+        
+
     return render_template("view_forum.html",
+            forum=forum,
+            subforums=subforums,
             threads=threads,
             thread_tags=thread_tags,
-            preview_post=preview_post
             )
 
-@bp.route("/create_thread",methods=("GET","POST"))
-def create_thread():
+@bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
+def create_thread(forum_id):
     db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
+    if forum is None:
+        flash("that forum doesn't exist")
+        return redirect(url_for('index'))
     
     if g.user is None:
         flash("you need to be logged in to create a thread")
@@ -63,8 +103,8 @@ def create_thread():
         if err is None:
             cur = db.cursor()
             cur.execute(
-                "INSERT INTO threads (title,creator,created,updated) VALUES (?,?,current_timestamp,current_timestamp);",
-                (title,g.user)
+                "INSERT INTO threads (title,creator,created,updated,forum) VALUES (?,?,current_timestamp,current_timestamp,?);",
+                (title,g.user,forum_id)
             )
             thread_id = cur.lastrowid
             cur.execute(
@@ -96,7 +136,7 @@ def search():
         """, (query,)).fetchall()
     except OperationalError:
         flash('your search query was malformed.')
-        return redirect(url_for("forum.view_forum"))
+        return redirect(url_for("forum.not_actual_index"))
 
     display_thread_id = [ True ] * len(results)
     last_thread = None

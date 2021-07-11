@@ -115,7 +115,42 @@ ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);
 CREATE VIEW vote_counts AS
     SELECT poll, option_idx, count(*) AS num FROM votes WHERE current GROUP BY option_idx,poll; 
 """,
-    
+"""
+CREATE TABLE forums (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    parent INTEGER REFERENCES forums(id),
+    description TEXT
+);
+INSERT INTO forums (name,parent,description) values ('apioforum',null,
+        'welcome to the apioforum\n\n' ||
+        'forum rules: do not be a bad person. do not do bad things.');
+
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+CREATE TABLE threads_new (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    created TIMESTAMP NOT NULL,
+    updated TIMESTAMP NOT NULL,
+    forum NOT NULL REFERENCES forums(id),
+    poll INTEGER REFERENCES polls(id)
+);
+INSERT INTO threads_new (id,title,creator,created,updated,forum)
+    SELECT id,title,creator,created,updated,1 FROM threads;
+DROP TABLE threads;
+ALTER TABLE threads_new RENAME TO threads;
+COMMIT;
+PRAGMA foreign_keys = on;
+""",
+"""
+CREATE VIEW most_recent_posts AS
+    SELECT max(id), * FROM posts GROUP BY thread;
+
+CREATE VIEW number_of_posts AS
+    SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
+""",
 ]
 
 def init_db():
