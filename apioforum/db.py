@@ -84,6 +84,38 @@ CREATE TABLE thread_tags (
 ALTER TABLE users ADD COLUMN bio TEXT;
 ALTER TABLE users ADD COLUMN joined TIMESTAMP;
 """,
+"""
+CREATE TABLE polls (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+ALTER TABLE threads ADD COLUMN poll INTEGER REFERENCES polls(id);
+
+CREATE TABLE poll_options (
+    poll INTEGER NOT NULL REFERENCES polls(id),
+    text TEXT NOT NULL,
+    option_idx INTEGER NOT NULL,
+    PRIMARY KEY ( poll, option_idx )
+);
+
+CREATE TABLE votes (
+    id INTEGER PRIMARY KEY,
+    user TEXT NOT NULL REFERENCES users(username),
+    poll INTEGER NOT NULL,
+    option_idx INTEGER,
+    time TIMESTAMP NOT NULL,
+    current INTEGER NOT NULL,
+    is_retraction INTEGER,
+    CHECK (is_retraction OR (option_idx NOT NULL)),
+    FOREIGN KEY ( poll, option_idx ) REFERENCES poll_options(poll, option_idx)
+);
+ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);
+""",
+"""
+CREATE VIEW vote_counts AS
+    SELECT poll, option_idx, count(*) AS num FROM votes WHERE current GROUP BY option_idx,poll; 
+""",
+    
 ]
 
 def init_db():
