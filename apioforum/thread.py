@@ -1,8 +1,10 @@
 # view posts in thread
 
+import itertools
+
 from flask import (
     Blueprint, render_template, abort, request, g, redirect,
-    url_for, flash
+    url_for, flash, jsonify
 )
 from .db import get_db
 
@@ -48,7 +50,7 @@ def view_thread(thread_id):
                 if post['vote'] is not None:
                     votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
 
-        if g.user is None:
+        if g.user is None or poll is None:
             has_voted = None
         else:
             v = db.execute("SELECT * FROM votes WHERE poll = ? AND user = ? AND current AND NOT is_retraction;",(poll['id'],g.user)).fetchone()
@@ -89,8 +91,78 @@ def register_vote(thread,pollval):
         """,(g.user,thread['poll'],option_idx,is_retraction))
     vote_id = cur.lastrowid
     return vote_id
-        
-    
+
+@bp.route("/<int:thread_id>/create_poll",methods=["POST"])
+def create_poll(thread_id):
+    fail = redirect(url_for('thread.config_thread',thread_id=thread_id))
+    success = redirect(url_for('thread.view_thread',thread_id=thread_id))
+    err = None
+    db = get_db()
+    thread = db.execute('select * from threads where id = ?',(thread_id,)).fetchone()
+
+    polltitle = request.form.get('polltitle','').strip()
+    polloptions = [q.strip() for q in request.form.get('polloptions','').split("\n") if len(q.strip()) > 0]
+
+    if thread is None:
+        err = "that thread does not exist"
+    elif g.user is None:
+        err = "you need to be logged in to do that"
+    elif g.user != thread['creator']:
+        err = "you can only create polls on threads that you own"
+    elif thread['poll'] is not None:
+        err = "a poll already exists for that thread"
+    elif not len(polltitle) > 0:
+        err = "poll title can't be empty"
+    elif len(polloptions) < 2:
+        err = "you must provide at least 2 options"
+
+    if err is not None:
+        flash(err)
+        return fail
+    else:
+        cur = db.cursor()
+        cur.execute("INSERT INTO polls (title) VALUES (?)",(polltitle,))
+        pollid = cur.lastrowid
+        cur.execute("UPDATE threads SET poll = ? WHERE threads.id = ?",(pollid,thread_id))
+        cur.executemany(
+            "INSERT INTO poll_options (poll,option_idx,text) VALUES (?,?,?)",
+            zip(itertools.repeat(pollid),range(len(polloptions)),polloptions)
+        )
+        db.commit()
+        flash("poll created successfully")
+        return success
+
+@bp.route("/<int:thread_id>/delete_poll",methods=["POST"])
+def delete_poll(thread_id):
+    fail = redirect(url_for('thread.config_thread',thread_id=thread_id))
+    success = redirect(url_for('thread.view_thread',thread_id=thread_id))
+    err = None
+    db = get_db()
+    thread = db.execute('select * from threads where id = ?',(thread_id,)).fetchone()
+
+    if thread is None:
+        err = "that thread does not exist"
+    elif g.user is None:
+        err = "you need to be logged in to do that"
+    elif g.user != thread['creator']:
+        err = "you can only delete polls on threads that you own"
+    elif thread['poll'] is None:
+        err = "there is no poll to delete on this thread"
+
+    if err is not None:
+        flash(err)
+        return fail
+    else:
+        pollid = thread['poll']
+
+        db.execute("UPDATE posts SET vote = NULL WHERE thread = ?",(thread_id,)) # this assumes only max one poll per thread 
+        db.execute("DELETE FROM votes WHERE poll = ?",(pollid,))
+        db.execute("DELETE FROM poll_options WHERE poll = ?",(pollid,))
+        db.execute("UPDATE THREADS set poll = NULL WHERE id = ?",(thread_id,))
+        db.execute("DELETE FROM polls WHERE id = ?",(pollid,))
+        db.commit()
+        flash("poll deleted successfully")
+        return success
         
 @bp.route("/<int:thread_id>/create_post", methods=("POST",))
 def create_post(thread_id):
