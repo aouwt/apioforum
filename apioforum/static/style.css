@@ -195,6 +195,8 @@ fieldset { margin-bottom: 15px; }
     border: 1px solid black;
 }
 
+.role-input { width: 12ch; }
+
 .breadcrumbs {
     list-style: none;
 }

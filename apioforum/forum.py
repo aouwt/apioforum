@@ -126,20 +126,16 @@ def edit_roles(forum_id):
     role_configs = db.execute(
         "SELECT * FROM role_config WHERE forum = ? ORDER BY ID ASC",
         (forum_id,)).fetchall()
-    overridden = {}
-    for c in role_configs:
-        overridden[c['id']] = overridden_perms(forum_id,c['role'])
 
     return render_template("edit_permissions.html",
             forum=forum,
             role_configs=role_configs,
             other_roles=["the","test","placeholder"],
-            overridden=overridden
             )
 
-@bp.route("/<int:forum_id>/roles/new/<role_name>",methods=["POST"])
-def add_role(forum_id,role_name):
-    db.execute
+@bp.route("/<int:forum_id>/roles/new",methods=["POST"])
+def add_role(forum_id):
+    return "placeholder"
 
 @bp.route("/search")
 def search():

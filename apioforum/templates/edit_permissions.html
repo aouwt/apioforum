@@ -3,22 +3,20 @@
 {% block header %}<h1>{% block title %}role permissions for '{{forum.name}}'{% endblock %}</h1>{% endblock %}
 {% block content %}
 <p>
-	each user has a role in this forum. 
-	the permissions associated with different roles can be configured here.
+	each user has a role in the forum.
+	a user may be assigned a role in the forum.
+	otherwise, the user's role is the same as the parent forum.
+	everyone's role is "other" by default.
 </p>
 <p>
-	there are three special roles: "bureaucrat", "approved", and "other".
-	bureaucrats are automatically granted every permission.
-	everyone by default has the "other" role.
-	an assigned role is inherited by all subforæ unless overridden.
-</p>
-<p>
-	if a role's permissions are set to inherit, 
-	permissions disabled for a role are disabled for that role in all subforæ.
+	here a set of permissions may be associated with any role.
+	if a role does not have any permissions configured for this forum,
+	the permissions set for the role in closest ancestor forum are used.
+	if no permissions are set for the role in any ancestor forum,
+	the permissions for the role "other" are used.
 </p>
 <form method="post" id="role_config">
 
-{% set show_footnote = False %}
 {% for role_config in role_configs %}
 	<fieldset>
 	<legend id="config_{{role_config.role}}">{{role_config.role}}</legend>
@@ -31,10 +29,6 @@
 			/>
 			<label for="{{role_config.role}}_{{p}}" title="{{tooltip}}">
 				{{- description -}}
-				{%- if overridden[role_config.id][p] -%}
-					*
-					{%- set show_footnote = True -%}
-				{%- endif -%}
 			</label>
 			<br/>
 		{% endmacro %}
@@ -51,41 +45,36 @@
 		{{perm("p_vote","vote",
 				"allow users with the role to vote on poll threads")}}
 		{{perm("p_create_subforum","create subforæ",
-				"allow users with the role to create subforæ in this forum. they will automatically become a bureaucrat in this subforum.")}}
+				"allow users with the role to create subforæ in this forum. " +
+				"they will automatically become a bureaucrat in this subforum.")}}
 		{% if role_config.role != "other" %}
 			{{perm("p_approve","approve others",
 					"allow users with the role to assign the 'approved' role to those with the 'other' role")}}
 		{% endif %}
-		<hr/>
-		<input 
-			type="checkbox" 
-			id="{{role_config.role}}_inherit"
-			name="{{role_config.role}}_inherit"
-			{% if role_config.inherit %}checked{% endif %}
-		/>
-		<label for="{{role_config.role}}_inherit">inherit</label>
 	</fieldset>
 {% endfor %}
 
-{% if show_footnote %}
-	<p>* disabled in inherited permissions from parent forum</p>
-{% endif %}
 </form>
 
-{% if other_roles %}
-	<fieldset>
-		<legend>roles from parent foræ</legend>
-		<ul>
-			{% for role in other_roles %}
-			<li>{{role}} 
-				<form action="{{url_for('forum.add_role',forum_id=forum.id,role_name=role)}}" method="POST" style="display:inline">
-					<input type="submit" value="add" />
-				</form>
-			</li>
-			{% endfor %}
-		</ul>
-	</fieldset>
-{% endif %}
+<fieldset>
+	<legend>add role</legend>
+	<ul>
+		{% for role in other_roles %}
+		<li>{{role}} 
+			<form action="{{url_for('forum.add_role',forum_id=forum.id)}}" method="POST" style="display:inline">
+				<input type="hidden" value="{{role}}" name="role" />
+				<input type="submit" value="add" />
+			</form>
+		</li>
+		{% endfor %}
+		<li>
+			<form action="{{url_for('forum.add_role',forum_id=forum.id,role_name=role)}}" method="POST" style="display:inline">
+				<input type="text" name="role" class="role-input" placeholder="role name"/>
+				<input type="submit" value="add" />
+			</form>
+		</li>
+	</ul>
+</fieldset>
 
 <p>confirm changes?</p>
 <input type="submit" value="confirm" form="role_config">

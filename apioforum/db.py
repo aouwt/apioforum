@@ -123,8 +123,6 @@ CREATE TABLE role_config (
     forum NOT NULL REFERENCES forums(id),
     id INTEGER PRIMARY KEY,
 
-    inherit INT NOT NULL DEFAULT 0,
-
     p_create_threads INT NOT NULL DEFAULT 1,
     p_reply_threads INT NOT NULL DEFAULT 1,
     p_view_threads INT NOT NULL DEFAULT 1,
@@ -135,14 +133,8 @@ CREATE TABLE role_config (
     p_create_subforum INT NOT NULL DEFAULT 0
 );
 
-INSERT INTO role_config (role,forum) SELECT "approved",id FROM forums;
-INSERT INTO role_config (role,forum) SELECT "other",id FROM forums;
-""",
-"""
-CREATE TRIGGER default_role_config AFTER INSERT ON forums BEGIN
-    INSERT INTO role_config (role,forum) VALUES ("approved",new.id);
-    INSERT INTO role_config (role,forum) VALUES ("other",new.id);
-END;
+INSERT INTO role_config (role,forum) VALUES ("approved",1);
+INSERT INTO role_config (role,forum) VALUES ("other",1);
 """
 ]
 
