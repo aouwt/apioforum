@@ -40,6 +40,9 @@ def create_app():
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
 
+    from .util import gen_colour
+    app.jinja_env.filters['gen_colour']=gen_colour
+
     @app.context_processor
     def path_for_next():
         p = request.path
