@@ -87,7 +87,7 @@
 	{% else %}
 		{% for opt in poll.options %}
 		    {% set opt_count = opt.num or 0 %}
-		    {% set colour = (loop.count|string + opt.text)|gen_colour %}
+		    {% set colour = (loop.index|string + opt.text)|gen_colour %}
 		    {% if opt_count != 0 %}
 				{% set percentage = 100*(opt_count/total_votes) %}
 				{# todo: do this in css somehow #}
