@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url %}
+{% from 'common.html' import ts, tag, disp_user, post_url, vote_meter %}
 {% block header %}<h1>{% block title %}apioforum{%endblock%}</h1>{%endblock%}
 {%block content%}
 <p>welcome to the apioforum</p>
@@ -44,43 +44,8 @@
 				</div>
 			{% endif %}
 			{% if thread_polls[thread.id] %}
-				{% set poll = thread_polls[thread.id] %}
-				{% set total_votes = poll.total_votes %}
-				{% set n = namespace() %}
-				{% set n.runningtotal = 0 %}
-
 				<div class="thread-vote-summary">
-				<svg width="100%" height="15px" xmlns="http://www.w3.org/2000/svg">
-				{% if total_votes == 0 %}
-					<text text-anchor="middle" dominant-baseline="middle" x="11%" y="55%" fill="black" style="font-size:15px">no votes</text>
-				{% else %}
-					{% for opt in poll.options %}
-					    {% set opt_count = opt.num or 0 %}
-					    {% set colour = (loop.count|string + opt.text)|gen_colour %}
-					    {% if opt_count != 0 %}
-							{% set percentage = 100*(opt_count/total_votes) %}
-							{# todo: do this in css somehow #}
-							{% if opt.text|length > 10 %}
-								{% set opt_text = opt.text[:7] + "..." %}
-							{% else %}
-								{% set opt_text = opt.text %}
-							{% endif %}
-							<rect y="0" height="100%" x="{{n.runningtotal}}%" width="{{percentage}}%" stroke="black" fill="{{colour}}" />
-							<text text-anchor="middle" dominant-baseline="middle" y="55%" fill="black" style="font-size:15px" x="{{n.runningtotal+(percentage/2)}}%">
-								{{opt_text}}: {{opt_count}}
-							</text>
-							{% set n.runningtotal = n.runningtotal + percentage %}
-						{% endif %}
-					{%  endfor %}
-				{% endif %}
-				<desc>
-					poll: {{poll.title}}
-					{% for opt in poll.options %}
-					option "{{opt.text}}": {{opt.num or 0}} votes
-					{% endfor %}
-					total votes: {{total_votes}}
-				</desc>
-				</svg>
+					{{ vote_meter(thread_polls[thread.id]) }}
 				</div>
 			{% endif %}
 		</div>

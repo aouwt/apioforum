@@ -45,7 +45,7 @@ def view_forum():
             # todo: make this not be duplicated from thread.py
             poll_row= db.execute("""
                 SELECT polls.*,total_vote_counts.total_votes FROM polls
-                LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll                
+                LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
                 WHERE polls.id = ?;                
                 """,(thread['poll'],)).fetchone()
             options = db.execute("""

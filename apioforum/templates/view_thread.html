@@ -1,4 +1,4 @@
-{% from 'common.html' import disp_post,tag %}
+{% from 'common.html' import disp_post,tag,vote_meter %}
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %}</h1>
@@ -12,6 +12,7 @@
     <li>#{{opt.option_idx}} - {{opt.text}} - {{opt.num or 0}}</li>
     {%endfor%}
 </ul>
+{{ vote_meter(poll) }}
 {% endif %}
 <div class="thread-top-bar">
     <span class="thread-top-bar-a">
