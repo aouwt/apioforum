@@ -1,4 +1,4 @@
-{% from 'common.html' import disp_post,tag,thread_breadcrumb %}
+{% from 'common.html' import disp_post,tag,thread_breadcrumb,vote_meter %}
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %}</h1>
@@ -8,11 +8,12 @@
 {%block content%}
 {% if poll %}
 <p>{{poll.title}}</p>
-<ul>
+<ol>
     {%for opt in poll.options%}
-    <li>#{{opt.option_idx}} - {{opt.text}} - {{opt.num or 0}}</li>
+    <li value="{{opt.option_idx}}"><i>{{opt.text}}</i>: {{opt.num or 0}} votes</li>
     {%endfor%}
-</ul>
+</ol>
+{{ vote_meter(poll) }}
 {% endif %}
 <div class="thread-top-bar">
     <span class="thread-top-bar-a">

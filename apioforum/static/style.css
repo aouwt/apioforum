@@ -138,6 +138,11 @@ nav#navbar .links { display: flex; }
 .thread-preview-post { font-style: italic; }
 .thread-preview-ts { font-weight: bold; }
 
+.thread-vote-summary {
+	margin-top: 4px;
+	margin-bottom: -8px;
+}
+
 /* wide screens */
 @media all and (min-width: 600px) { 
 	.listing-title { font-size: larger; }

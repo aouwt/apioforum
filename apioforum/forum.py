@@ -37,7 +37,7 @@ def view_forum(forum_id):
     threads = db.execute(
         """SELECT
             threads.id, threads.title, threads.creator, threads.created,
-            threads.updated, number_of_posts.num_replies,
+            threads.updated, threads.poll, number_of_posts.num_replies,
             most_recent_posts.created as mrp_created,
             most_recent_posts.author as mrp_author,
             most_recent_posts.id as mrp_id,
@@ -49,6 +49,7 @@ def view_forum(forum_id):
         ORDER BY threads.updated DESC;
         """,(forum_id,)).fetchall()
     thread_tags = {}
+    thread_polls = {}
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -57,6 +58,29 @@ def view_forum(forum_id):
             WHERE thread_tags.thread = ?
             ORDER BY tags.id;
             """,(thread['id'],)).fetchall()
+
+        if thread['poll'] is not None:
+            # todo: make this not be duplicated from thread.py
+            poll_row= db.execute("""
+                SELECT polls.*,total_vote_counts.total_votes FROM polls
+                LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
+                WHERE polls.id = ?;                
+                """,(thread['poll'],)).fetchone()
+            options = db.execute("""
+                SELECT poll_options.*, vote_counts.num
+                FROM poll_options
+                LEFT OUTER JOIN vote_counts  ON poll_options.poll = vote_counts.poll
+                                            AND poll_options.option_idx = vote_counts.option_idx
+                WHERE poll_options.poll = ?
+                ORDER BY option_idx asc;
+                """,(poll_row['id'],)).fetchall()
+
+            poll = {}
+            poll.update(poll_row)
+            poll['options'] = options
+            poll['total_votes']=poll['total_votes'] or 0
+            thread_polls[thread['id']]=poll
+
 
     subforums_rows = db.execute("""
             SELECT max(threads.updated) as updated, forums.* FROM forums
@@ -74,11 +98,16 @@ def view_forum(forum_id):
         subforums.append(a)
         
 
+
+
+
+    print(thread_polls)
     return render_template("view_forum.html",
             forum=forum,
             subforums=subforums,
             threads=threads,
             thread_tags=thread_tags,
+            thread_polls=thread_polls,
             )
 
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))

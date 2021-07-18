@@ -151,6 +151,10 @@ CREATE VIEW most_recent_posts AS
 CREATE VIEW number_of_posts AS
     SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
 """,
+"""
+CREATE VIEW total_vote_counts AS
+    SELECT poll, count(*) AS total_votes FROM votes WHERE current AND NOT is_retraction GROUP BY poll;
+""",
 ]
 
 def init_db():

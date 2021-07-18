@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb %}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, vote_meter %}
 {% block header %}
 <h1>{% block title %}{{forum.name}}{%endblock%}</h1>
 {% if forum.id != 1 %}
@@ -76,6 +76,11 @@
 					</span>
 				</div>
 			{#{% endif %}#}
+			{% if thread_polls[thread.id] %}
+				<div class="thread-vote-summary">
+					{{ vote_meter(thread_polls[thread.id]) }}
+				</div>
+			{% endif %}
 		</div>
 	{%endfor%}
 </div>

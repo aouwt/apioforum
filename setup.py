@@ -10,5 +10,6 @@ setup(
         'markdown',
         'bleach',
         'pymdown-extensions',
+        'hsluv',
     ],
 )

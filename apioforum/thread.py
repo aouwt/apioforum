@@ -33,7 +33,11 @@ def view_thread(thread_id):
         poll = None
         votes = None
         if thread['poll'] is not None:
-            poll_row = db.execute("SELECT * FROM polls where id = ?",(thread['poll'],)).fetchone()
+            poll_row= db.execute("""
+                SELECT polls.*,total_vote_counts.total_votes FROM polls
+                LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
+                WHERE polls.id = ?;                
+                """,(thread['poll'],)).fetchone()
             options = db.execute("""
                 SELECT poll_options.*, vote_counts.num
                 FROM poll_options
