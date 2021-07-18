@@ -7,11 +7,11 @@
 {%block content%}
 {% if poll %}
 <p>{{poll.title}}</p>
-<ul>
+<ol>
     {%for opt in poll.options%}
-    <li>#{{opt.option_idx}} - {{opt.text}} - {{opt.num or 0}}</li>
+    <li value="{{opt.option_idx}}"><i>{{opt.text}}</i>: {{opt.num or 0}} votes</li>
     {%endfor%}
-</ul>
+</ol>
 {{ vote_meter(poll) }}
 {% endif %}
 <div class="thread-top-bar">
