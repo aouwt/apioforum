@@ -76,7 +76,7 @@
 				<desc>
 					poll: {{poll.title}}
 					{% for opt in poll.options %}
-					option "{{opt.text}}": {{opt.num}} votes
+					option "{{opt.text}}": {{opt.num or 0}} votes
 					{% endfor %}
 					total votes: {{total_votes}}
 				</desc>
