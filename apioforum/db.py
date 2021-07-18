@@ -117,7 +117,7 @@ CREATE VIEW vote_counts AS
 """,
 """
 CREATE VIEW total_vote_counts AS
-    SELECT poll, count(*) AS total_votes FROM votes WHERE current GROUP BY poll;
+    SELECT poll, count(*) AS total_votes FROM votes WHERE current AND NOT is_retraction GROUP BY poll;
 """,
     
 ]
