@@ -97,11 +97,6 @@ def view_forum(forum_id):
             a['updated'] = datetime.datetime.fromisoformat(a['updated'])
         subforums.append(a)
         
-
-
-
-
-    print(thread_polls)
     return render_template("view_forum.html",
             forum=forum,
             subforums=subforums,
