@@ -9,11 +9,9 @@
 	everyone's role is "other" by default.
 </p>
 <p>
-	here a set of permissions may be associated with any role.
+	here, a set of permissions may be associated with any role.
 	if a role does not have any permissions configured for this forum,
 	the permissions set for the role in closest ancestor forum are used.
-	if no permissions are set for the role in any ancestor forum,
-	the permissions for the role "other" are used.
 </p>
 <form method="post" id="role_config">
 
@@ -23,11 +21,11 @@
 		{% macro perm(p, description, tooltip) %}
 			<input 
 				type="checkbox" 
-				id="{{role_config.role}}_{{p}}" 
-				name="{{role_config.role}}_{{p}}" 
+				id="perm_{{role_config.role}}_{{p}}" 
+				name="perm_{{role_config.role}}_{{p}}" 
 				{% if role_config[p] %}checked{% endif %}
 			/>
-			<label for="{{role_config.role}}_{{p}}" title="{{tooltip}}">
+			<label for="perm_{{role_config.role}}_{{p}}" title="{{tooltip}}">
 				{{- description -}}
 			</label>
 			<br/>
@@ -47,14 +45,22 @@
 		{{perm("p_create_subforum","create subforæ",
 				"allow users with the role to create subforæ in this forum. " +
 				"they will automatically become a bureaucrat in this subforum.")}}
+		<input type="hidden" name="roleconfig_{{role_config.role}}" value="present"/>
 		{% if role_config.role != "other" %}
 			{{perm("p_approve","approve others",
 					"allow users with the role to assign the 'approved' role to those with the 'other' role")}}
 		{% endif %}
 	</fieldset>
 {% endfor %}
-
+{% if role_configs %}
+	<p>confirm changes?</p>
+	<p>
+		<input type="submit" value="confirm">
+		<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+	</p>
+{% endif %}
 </form>
+
 
 <fieldset>
 	<legend>add role</legend>
@@ -68,16 +74,12 @@
 		</li>
 		{% endfor %}
 		<li>
-			<form action="{{url_for('forum.add_role',forum_id=forum.id,role_name=role)}}" method="POST" style="display:inline">
-				<input type="text" name="role" class="role-input" placeholder="role name"/>
+			<form action="{{url_for('forum.add_role',forum_id=forum.id)}}" method="POST" style="display:inline">
+				<input type="text" name="role" class="role-input" placeholder="role name" maxlength="32"/>
 				<input type="submit" value="add" />
 			</form>
 		</li>
 	</ul>
 </fieldset>
-
-<p>confirm changes?</p>
-<input type="submit" value="confirm" form="role_config">
-<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
 
 {% endblock %}

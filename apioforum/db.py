@@ -135,6 +135,12 @@ CREATE TABLE role_config (
 
 INSERT INTO role_config (role,forum) VALUES ("approved",1);
 INSERT INTO role_config (role,forum) VALUES ("other",1);
+""",
+"""
+CREATE TABLE role_assignments (
+    user NOT NULL REFERENCES users(username),
+    forum NOT NULL REFERENCES forums(id)
+);
 """
 ]
 

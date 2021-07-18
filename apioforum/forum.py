@@ -8,7 +8,8 @@ from flask import (
 
 from .db import get_db
 from .mdrender import render
-from .roles import forum_perms, overridden_perms
+from .roles import get_forum_roles
+from .roles import permissions as role_permissions
 
 from sqlite3 import OperationalError
 import datetime
@@ -127,15 +128,51 @@ def edit_roles(forum_id):
         "SELECT * FROM role_config WHERE forum = ? ORDER BY ID ASC",
         (forum_id,)).fetchall()
 
+    if request.method == "POST":
+        for config in role_configs:
+            if 'roleconfig_' + config['role'] in request.form:
+                for p in role_permissions:
+                    permission_setting =\
+                        f"perm_{config['role']}_{p}" in request.form 
+                    db.execute(f"""
+                        UPDATE role_config SET {p} = ?
+                            WHERE forum = ? AND role = ?;
+                        """, 
+                        (permission_setting,forum_id, config['role']))
+        db.commit()
+        flash('roles sucessfully enroled')
+        return redirect(url_for('forum.view_forum',forum_id=forum_id))
+
+    role_config_roles = [c['role'] for c in role_configs]
+    other_roles = [role for role in get_forum_roles(forum_id) if not role in role_config_roles]
+
     return render_template("edit_permissions.html",
             forum=forum,
             role_configs=role_configs,
-            other_roles=["the","test","placeholder"],
+            other_roles=other_roles
             )
 
 @bp.route("/<int:forum_id>/roles/new",methods=["POST"])
 def add_role(forum_id):
-    return "placeholder"
+    name = request.form['role'].strip()
+    if not all(c in (" ","-","_") or c.isalnum() for c in name) \
+            or len(name) > 32:
+        flash("role name must contain no special characters")
+        return redirect(url_for('forum.edit_roles',forum_id=forum_id))
+    if name == "bureaucrat":
+        flash("cannot configure permissions for bureaucrat")
+        return redirect(url_for('forum.edit_roles',forum_id=forum_id))
+
+    db = get_db()
+
+    existing_config = db.execute("""
+        SELECT * FROM role_config WHERE forum = ? AND role = ?
+        """,(forum_id,name)).fetchone()
+    if not existing_config:
+        db.execute("INSERT INTO role_config (forum,role) VALUES (?,?)",
+                (forum_id,name))
+        db.commit()
+    return redirect(url_for('forum.edit_roles',forum_id=forum_id))
 
 @bp.route("/search")
 def search():
