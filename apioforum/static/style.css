@@ -80,6 +80,7 @@ dt { font-weight: bold }
 
 img { max-width: 100% }
 
+.avail_tags { margin-top: 30px }
 
 nav#navbar { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
 nav#navbar p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }

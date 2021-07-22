@@ -11,8 +11,11 @@
 {% if forum.description %}
 {{forum.description|md|safe}}
 {% endif %}
+<p class="avail_tags">available tags:
 {% for the_tag in avail_tags %}
 {{tag(the_tag)}}
+{% else %}
+<em>(none available)</em>
 {% endfor %}
 
 {% if subforums %}
