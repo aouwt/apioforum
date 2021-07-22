@@ -49,6 +49,16 @@
 {% else %}
 please log in to create a new thread
 {% endif %}
+<form class="inline-form small-form" method="get">
+	<label for="sortby">sort threads by</label>
+	<select name="sortby" name="sortby">
+		<option selected value="ad">last activity (newest first)</option>
+		<option value="aa">last activity (oldest first)</option>
+		<option value="cd">creation time (newest first)</option>
+		<option value="ca">creation time (oldest first)</option>
+	</select>
+	<input type="submit" value="go">
+</form>
 </p>
 <div class="thread-list">
 	{%for thread in threads%}

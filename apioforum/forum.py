@@ -3,7 +3,7 @@
 
 from flask import (
     Blueprint, render_template, request,
-    g, redirect, url_for, flash
+    g, redirect, url_for, flash, abort
 )
 
 from .db import get_db
@@ -46,9 +46,15 @@ def forum_path(forum_id):
 @bp.route("/<int:forum_id>")
 def view_forum(forum_id):
     db = get_db()
+    sortby = request.args.get("sortby","ad")
+    try:
+        sortby_dir = {'d':'DESC','a':'ASC'}[sortby[1]]
+        sortby_by  = {'a':'threads.updated','c':'threads.created'}[sortby[0]]
+    except KeyError:
+        return redirect(url_for('forum.view_forum',forum_id=forum_id))
     forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
-        """SELECT
+        f"""SELECT
             threads.id, threads.title, threads.creator, threads.created,
             threads.updated, threads.poll, number_of_posts.num_replies,
             most_recent_posts.created as mrp_created,
@@ -59,7 +65,7 @@ def view_forum(forum_id):
         INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
         INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
         WHERE threads.forum = ?
-        ORDER BY threads.updated DESC;
+        ORDER BY {sortby_by} {sortby_dir};
         """,(forum_id,)).fetchall()
     thread_tags = {}
     thread_polls = {}
