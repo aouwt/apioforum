@@ -18,6 +18,19 @@ bp = Blueprint("forum", __name__, url_prefix="/")
 def not_actual_index():
     return redirect("/1")
 
+def get_avail_tags(forum_id):
+    db = get_db()
+    tags = db.execute("""
+    	WITH RECURSIVE fs AS
+    		(SELECT * FROM forums WHERE id = ?
+    		 UNION ALL
+    		 SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
+    	SELECT * FROM tags
+    	WHERE tags.forum in (SELECT id FROM fs)
+    	ORDER BY id;    	
+    	""",(forum_id,)).fetchall()
+    return tags 
+
 def forum_path(forum_id):
     db = get_db()
     ancestors = db.execute("""
@@ -50,6 +63,9 @@ def view_forum(forum_id):
         """,(forum_id,)).fetchall()
     thread_tags = {}
     thread_polls = {}
+
+    avail_tags = get_avail_tags(forum_id)
+
     #todo: somehow optimise this
     for thread in threads:
         thread_tags[thread['id']] = db.execute(
@@ -103,6 +119,7 @@ def view_forum(forum_id):
             threads=threads,
             thread_tags=thread_tags,
             thread_polls=thread_polls,
+            avail_tags=avail_tags,
             )
 
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))

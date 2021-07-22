@@ -155,6 +155,22 @@ CREATE VIEW number_of_posts AS
 CREATE VIEW total_vote_counts AS
     SELECT poll, count(*) AS total_votes FROM votes WHERE current AND NOT is_retraction GROUP BY poll;
 """,
+"""
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+CREATE TABLE tags_new (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	text_colour TEXT NOT NULL,
+	bg_colour TEXT NOT NULL,
+	forum INTEGER NOT NULL REFERENCES forums(id)
+);
+INSERT INTO tags_new (id,name,text_colour,bg_colour,forum)
+	SELECT id,name,text_colour,bg_colour,1 FROM tags;
+DROP TABLE tags;
+ALTER TABLE tags_new RENAME TO tags;
+PRAGMA foreign_keys = on;
+""",
 ]
 
 def init_db():
