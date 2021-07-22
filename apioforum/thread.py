@@ -7,6 +7,7 @@ from flask import (
     url_for, flash, jsonify
 )
 from .db import get_db
+from .forum import get_avail_tags
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
@@ -275,7 +276,7 @@ def config_thread(thread_id):
     db = get_db()
     thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
     thread_tags = [r['tag'] for r in db.execute("select tag from thread_tags where thread = ?",(thread_id,)).fetchall()]
-    avail_tags = db.execute("select * from tags order by id").fetchall()
+    avail_tags = get_avail_tags(thread['forum'])
     err = None
     if g.user is None:
         err = "you need to be logged in to do that"
@@ -297,8 +298,8 @@ def config_thread(thread_id):
                 flash("title updated successfully")
                 db.commit()
         changed = False
-        wanted_tags = []
-        for tagid in range(1,len(avail_tags)+1):
+        for avail_tag in avail_tags:
+            tagid = avail_tag['id']
             current = tagid in thread_tags
             wanted  = f'tag_{tagid}' in request.form
             if wanted and not current:

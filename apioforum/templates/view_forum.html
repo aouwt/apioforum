@@ -11,6 +11,9 @@
 {% if forum.description %}
 {{forum.description|md|safe}}
 {% endif %}
+{% for the_tag in avail_tags %}
+{{tag(the_tag)}}
+{% endfor %}
 
 {% if subforums %}
 <h2>subforae</h2>
