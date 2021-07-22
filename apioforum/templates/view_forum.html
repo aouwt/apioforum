@@ -43,11 +43,13 @@
 {% endif %}
 
 <h2>threads</h2>
+<p>
 {% if g.user %}
-<p><a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a></p>
+<a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a>
 {% else %}
-<p>please log in to create a new thread</p>
+please log in to create a new thread
 {% endif %}
+</p>
 <div class="thread-list">
 	{%for thread in threads%}
 		<div class="listing">

@@ -189,7 +189,7 @@ blockquote {
     border-left: 3px solid grey;
 }
 
-.search-form {
+.inline-form {
     display: inline-block;
 }
 
