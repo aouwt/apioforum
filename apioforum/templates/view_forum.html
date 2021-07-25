@@ -92,7 +92,7 @@ please log in to create a new thread
 		</div>
 	{%endfor%}
 </div>
-<nav id="pages">
+<nav aria-label="pagination" id="pages">
 	{% if page > 1 %}
 	<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}" aria-label="first page">&lt;&lt;</a>
 	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=page-1)}}" aria-label="previous page">&lt;</a>
