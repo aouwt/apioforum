@@ -3,7 +3,7 @@
 
 from flask import (
     Blueprint, render_template, request,
-    g, redirect, url_for, flash
+    g, redirect, url_for, flash, abort
 )
 
 from .db import get_db
@@ -11,6 +11,9 @@ from .mdrender import render
 
 from sqlite3 import OperationalError
 import datetime
+import math
+
+THREADS_PER_PAGE = 20
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
@@ -44,7 +47,10 @@ def forum_path(forum_id):
     return ancestors
 
 @bp.route("/<int:forum_id>")
-def view_forum(forum_id):
+@bp.route("/<int:forum_id>/page/<int:page>")
+def view_forum(forum_id,page=1):
+    if page < 1:
+        abort(400)
     db = get_db()
     forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
@@ -59,8 +65,19 @@ def view_forum(forum_id):
         INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
         INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
         WHERE threads.forum = ?
-        ORDER BY threads.updated DESC;
-        """,(forum_id,)).fetchall()
+        ORDER BY threads.updated DESC
+        LIMIT ? OFFSET ?;
+        """,(
+            forum_id,
+            THREADS_PER_PAGE,
+            (page-1)*THREADS_PER_PAGE,
+        )).fetchall()
+
+    # XXX: update this when thread filtering happens
+    num_threads = db.execute("SELECT count(*) AS count FROM threads WHERE threads.forum = ?",(forum_id,)).fetchone()['count']
+    num_pages = math.ceil(num_threads/THREADS_PER_PAGE)
+    
+    
     thread_tags = {}
     thread_polls = {}
 
