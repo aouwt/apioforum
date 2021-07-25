@@ -75,8 +75,7 @@ def view_forum(forum_id,page=1):
 
     # XXX: update this when thread filtering happens
     num_threads = db.execute("SELECT count(*) AS count FROM threads WHERE threads.forum = ?",(forum_id,)).fetchone()['count']
-    num_pages = math.ceil(num_threads/THREADS_PER_PAGE)
-    
+    max_pageno = math.ceil(num_threads/THREADS_PER_PAGE)
     
     thread_tags = {}
     thread_polls = {}
@@ -137,6 +136,8 @@ def view_forum(forum_id,page=1):
             thread_tags=thread_tags,
             thread_polls=thread_polls,
             avail_tags=avail_tags,
+            max_pageno=max_pageno,
+            page=page,
             )
 
 @bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))

@@ -92,5 +92,19 @@ please log in to create a new thread
 		</div>
 	{%endfor%}
 </div>
+<nav id="pages">
+	{% if page > 1 %}
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}" aria-label="first page">&lt;&lt;</a>
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=page-1)}}" aria-label="previous page">&lt;</a>
+	{% endif %}
+	page {{page}} of {{max_pageno}}
+	{% if page < max_pageno %} {# > #}
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=page+1)}}" aria-label="next page">&gt;</a>
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=max_pageno)}}" aria-label="last page">&gt;&gt;</a>
+	{% endif %}
+</nav>
+	
+	
+</nav>
 </main>
 {%endblock%}
