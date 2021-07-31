@@ -139,7 +139,8 @@ INSERT INTO role_config (role,forum) VALUES ("other",1);
 """
 CREATE TABLE role_assignments (
     user NOT NULL REFERENCES users(username),
-    forum NOT NULL REFERENCES forums(id)
+    forum NOT NULL REFERENCES forums(id),
+    role TEXT NOT NULL
 );
 """
 ]

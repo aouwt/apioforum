@@ -8,10 +8,10 @@ from flask import (
 
 from .db import get_db
 from .mdrender import render
-from .roles import get_forum_roles,has_permission,is_bureaucrat
-
+from .roles import get_forum_roles,has_permission,is_bureaucrat, permissions as role_permissions
 from sqlite3 import OperationalError
 import datetime
+import functools
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
@@ -38,6 +38,7 @@ def forum_route(relative_path, **kwargs):
             path += "/" + relative_path
 
         @bp.route(path, **kwargs)
+        @functools.wraps(f)
         def wrapper(forum_id, *args, **kwargs):
             db = get_db()
             forum = db.execute("SELECT * FROM forums WHERE id = ?",
@@ -46,8 +47,11 @@ def forum_route(relative_path, **kwargs):
                 abort(404)
             return f(forum, *args, **kwargs)
 
+    return decorator
+
 def requires_permission(permission):
     def decorator(f):
+        @functools.wraps(f)
         def wrapper(forum, *args, **kwargs):
             if not has_permission(forum['id'], g.user, permission):
                 abort(403)

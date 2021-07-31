@@ -24,7 +24,7 @@ def get_role_config(forum_id, role):
             """, (fid,role)).fetchone()
         fid = db.execute("""
             SELECT * FROM forums WHERE id = ?
-            """(fid,)).fetchone()['parent']
+            """,(fid,)).fetchone()['parent']
     if the == None:
         if role == "other":
             raise(RuntimeError(
@@ -43,10 +43,10 @@ def get_user_role(forum_id, user):
         the = db.execute("""
             SELECT * FROM role_assignments
             WHERE forum = ? AND user = ?;
-            """, (fid,role)).fetchone()
+            """,(fid,user)).fetchone()
         fid = db.execute("""
             SELECT * FROM forums WHERE id = ?
-            """).fetchone()['parent']
+            """,(fid,)).fetchone()['parent']
     return the['role'] if the != None else 'other'
 
 def get_forum_roles(forum_id):

@@ -10,7 +10,7 @@
 {%block content%}
 {{forum.description|md|safe}}
 {% if is_bureaucrat(forum.id, g.user) %}
-	<p><a class="actionbutton" href="{{url_for('forum.edit_roles')}}">role/permission settings</a></p>
+	<p><a class="actionbutton" href="{{url_for('forum.edit_roles',forum_id=forum.id)}}">role/permission settings</a></p>
 {% endif %}
 <hr/>
 
