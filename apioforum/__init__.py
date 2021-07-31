@@ -48,6 +48,8 @@ def create_app():
         return dict(path_for_next=p)
 
     app.jinja_env.globals.update(forum_path=forum.forum_path)
+    from .roles import has_permission, is_bureaucrat, 
+    app.jinja_env.globals.update(has_permission=has_permission,is_bureaucrat=is_bureaucrat)
 
     from .mdrender import render
     @app.template_filter('md')

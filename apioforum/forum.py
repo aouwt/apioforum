@@ -8,8 +8,7 @@ from flask import (
 
 from .db import get_db
 from .mdrender import render
-from .roles import get_forum_roles
-from .roles import permissions as role_permissions
+from .roles import get_forum_roles,has_permission,is_bureaucrat
 
 from sqlite3 import OperationalError
 import datetime
@@ -32,10 +31,30 @@ def forum_path(forum_id):
     ancestors.reverse()
     return ancestors
 
-@bp.route("/<int:forum_id>")
-def view_forum(forum_id):
+def forum_route(relative_path, **kwargs):
+    def decorator(f):
+        path = "/<int:forum_id>"
+        if relative_path != "":
+            path += "/" + relative_path
+
+        @bp.route(path, **kwargs)
+        def wrapper(forum_id, *args, **kwargs):
+            db = get_db()
+            forum = db.execute("SELECT * FROM forums WHERE id = ?",
+                    (forum_id,)).fetchone()
+            if forum == None:
+                abort(404)
+            return f(forum, *args, **kwargs)
+
+def requires_permission(permission):
+    def decorator(f):
+        def wrapper(forum, *args, **kwargs):
+            if not has_permission(forum['id'], g.user, permission):
+                abort(403)
+
+@forum_route("")
+def view_forum(forum):
     db = get_db()
-    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     threads = db.execute(
         """SELECT
             threads.id, threads.title, threads.creator, threads.created,
@@ -49,7 +68,7 @@ def view_forum(forum_id):
         INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
         WHERE threads.forum = ?
         ORDER BY threads.updated DESC;
-        """,(forum_id,)).fetchall()
+        """,(forum['id'],)).fetchall()
     thread_tags = {}
     #todo: somehow optimise this
     for thread in threads:
@@ -66,7 +85,7 @@ def view_forum(forum_id):
             WHERE parent = ?
             GROUP BY forums.id
             ORDER BY name ASC
-            """,(forum_id,)).fetchall()
+            """,(forum['id'],)).fetchall()
     subforums = []
     for s in subforums_rows:
         a={}
@@ -75,7 +94,6 @@ def view_forum(forum_id):
             a['updated'] = datetime.datetime.fromisoformat(a['updated'])
         subforums.append(a)
         
-
     return render_template("view_forum.html",
             forum=forum,
             subforums=subforums,
@@ -83,10 +101,10 @@ def view_forum(forum_id):
             thread_tags=thread_tags,
             )
 
-@bp.route("/<int:forum_id>/create_thread",methods=("GET","POST"))
-def create_thread(forum_id):
+@forum_route("create_thread",methods=("GET","POST"))
+def create_thread(forum):
     db = get_db()
-    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum['id'],)).fetchone()
     if forum is None:
         flash("that forum doesn't exist")
         return redirect(url_for('index'))
@@ -106,7 +124,7 @@ def create_thread(forum_id):
             cur = db.cursor()
             cur.execute(
                 "INSERT INTO threads (title,creator,created,updated,forum) VALUES (?,?,current_timestamp,current_timestamp,?);",
-                (title,g.user,forum_id)
+                (title,g.user,forum['id'])
             )
             thread_id = cur.lastrowid
             cur.execute(

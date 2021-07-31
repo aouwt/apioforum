@@ -65,3 +65,12 @@ def get_forum_roles(forum_id):
             SELECT * FROM role_config WHERE forum = ?
             """,(a['id'],)).fetchall()
     return set(r['role'] for r in configs)
+
+def has_permission(forum_id, user, permission):
+    role = get_user_role(forum_id, user) if user != None else "other"
+    config = get_role_config(forum_id, role)
+    return config[permission]
+
+def is_bureaucrat(forum_id, user):
+    if user == None: return False
+    return get_user_role(forum_id, user) == "bureaucrat"

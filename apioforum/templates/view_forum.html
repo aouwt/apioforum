@@ -8,10 +8,11 @@
 {%endblock%}
 
 {%block content%}
-{% if forum.description %}
 {{forum.description|md|safe}}
-<hr/>
+{% if is_bureaucrat(forum.id, g.user) %}
+	<p><a class="actionbutton" href="{{url_for('forum.edit_roles')}}">role/permission settings</a></p>
 {% endif %}
+<hr/>
 
 {% if subforums %}
 <h2>subforæ</h2>
@@ -43,6 +44,8 @@
 {% else %}
 <p>please log in to create a new thread</p>
 {% endif %}
+
+{% if has_permission(forum.id, g.user, "p_view_threads") %}
 <div class="thread-list">
 	{%for thread in threads%}
 		<div class="listing">
@@ -80,5 +83,8 @@
 		</div>
 	{%endfor%}
 </div>
+{% else %}
+<p>you do not have permission to view threads in this forum</p>
+{% endif %}
 
 {%endblock%}
