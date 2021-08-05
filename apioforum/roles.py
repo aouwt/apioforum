@@ -5,6 +5,7 @@ permissions = [
     "p_create_threads",
     "p_reply_threads",
     "p_manage_threads",
+    "p_delete_posts",
     "p_view_threads",
     "p_vote",
     "p_create_polls",
@@ -68,6 +69,7 @@ def get_forum_roles(forum_id):
 
 def has_permission(forum_id, user, permission):
     role = get_user_role(forum_id, user) if user != None else "other"
+    if role == "bureaucrat": return True
     config = get_role_config(forum_id, role)
     return config[permission]
 

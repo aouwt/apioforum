@@ -127,6 +127,7 @@ CREATE TABLE role_config (
     p_reply_threads INT NOT NULL DEFAULT 1,
     p_view_threads INT NOT NULL DEFAULT 1,
     p_manage_threads INT NOT NULL DEFAULT 0,
+    p_delete_posts INT NOT NULL DEFAULT 0,
     p_vote INT NOT NULL DEFAULT 1,
     p_create_polls INT NOT NULL DEFAULT 1,
     p_approve INT NOT NULL DEFAULT 0,
@@ -142,6 +143,9 @@ CREATE TABLE role_assignments (
     forum NOT NULL REFERENCES forums(id),
     role TEXT NOT NULL
 );
+""",
+"""
+ALTER TABLE posts ADD COLUMN deleted NOT NULL DEFAULT 0;
 """
 ]
 

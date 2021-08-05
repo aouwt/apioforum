@@ -3,12 +3,12 @@
 
 from flask import (
     Blueprint, render_template, request,
-    g, redirect, url_for, flash
+    g, redirect, url_for, flash, abort
 )
 
 from .db import get_db
 from .mdrender import render
-from .roles import get_forum_roles,has_permission,is_bureaucrat, permissions as role_permissions
+from .roles import get_forum_roles,has_permission,is_bureaucrat,get_user_role, permissions as role_permissions
 from sqlite3 import OperationalError
 import datetime
 import functools
@@ -55,6 +55,17 @@ def requires_permission(permission):
         def wrapper(forum, *args, **kwargs):
             if not has_permission(forum['id'], g.user, permission):
                 abort(403)
+            return f(forum, *args, **kwargs)
+        return wrapper
+    return decorator
+
+def requires_bureaucrat(f):
+    @functools.wraps(f)
+    def wrapper(forum, *args, **kwargs):
+        if not is_bureaucrat(forum['id'], g.user):
+            abort(403)
+        return f(forum, *args, **kwargs)
+    return wrapper
 
 @forum_route("")
 def view_forum(forum):
@@ -66,7 +77,8 @@ def view_forum(forum):
             most_recent_posts.created as mrp_created,
             most_recent_posts.author as mrp_author,
             most_recent_posts.id as mrp_id,
-            most_recent_posts.content as mrp_content
+            most_recent_posts.content as mrp_content,
+            most_recent_posts.deleted as mrp_deleted
         FROM threads
         INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
         INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
@@ -142,13 +154,13 @@ def create_thread(forum):
         
     return render_template("create_thread.html")
 
-@bp.route("/<int:forum_id>/roles",methods=("GET","POST"))
-def edit_roles(forum_id):
+@forum_route("roles",methods=("GET","POST"))
+@requires_bureaucrat
+def edit_roles(forum):
     db = get_db()
-    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
     role_configs = db.execute(
         "SELECT * FROM role_config WHERE forum = ? ORDER BY ID ASC",
-        (forum_id,)).fetchall()
+        (forum['id'],)).fetchall()
 
     if request.method == "POST":
         for config in role_configs:
@@ -160,13 +172,13 @@ def edit_roles(forum_id):
                         UPDATE role_config SET {p} = ?
                             WHERE forum = ? AND role = ?;
                         """, 
-                        (permission_setting,forum_id, config['role']))
+                        (permission_setting,forum['id'], config['role']))
         db.commit()
         flash('roles sucessfully enroled')
-        return redirect(url_for('forum.view_forum',forum_id=forum_id))
+        return redirect(url_for('forum.view_forum',forum_id=forum['id']))
 
     role_config_roles = [c['role'] for c in role_configs]
-    other_roles = [role for role in get_forum_roles(forum_id) if not role in role_config_roles]
+    other_roles = [role for role in get_forum_roles(forum['id']) if not role in role_config_roles]
 
     return render_template("edit_permissions.html",
             forum=forum,
@@ -174,27 +186,79 @@ def edit_roles(forum_id):
             other_roles=other_roles
             )
 
-@bp.route("/<int:forum_id>/roles/new",methods=["POST"])
-def add_role(forum_id):
+@forum_route("roles/new",methods=["POST"])
+def add_role(forum):
     name = request.form['role'].strip()
     if not all(c in (" ","-","_") or c.isalnum() for c in name) \
             or len(name) > 32:
         flash("role name must contain no special characters")
-        return redirect(url_for('forum.edit_roles',forum_id=forum_id))
+        return redirect(url_for('forum.edit_roles',forum_id=forum['id']))
     if name == "bureaucrat":
         flash("cannot configure permissions for bureaucrat")
-        return redirect(url_for('forum.edit_roles',forum_id=forum_id))
+        return redirect(url_for('forum.edit_roles',forum_id=forum['id']))
 
     db = get_db()
 
     existing_config = db.execute("""
         SELECT * FROM role_config WHERE forum = ? AND role = ?
-        """,(forum_id,name)).fetchone()
+        """,(forum['id'],name)).fetchone()
     if not existing_config:
         db.execute("INSERT INTO role_config (forum,role) VALUES (?,?)",
-                (forum_id,name))
+                (forum['id'],name))
         db.commit()
-    return redirect(url_for('forum.edit_roles',forum_id=forum_id))
+    return redirect(url_for('forum.edit_roles',forum_id=forum['id']))
+
+@forum_route("role",methods=["GET","POST"])
+@requires_permission("p_approve")
+def view_user_role(forum):
+    if request.method == "POST":
+        return redirect(url_for( 'forum.edit_user_role',
+            username=request.form['user'],forum_id=forum['id']))
+    else:
+        return render_template("role_assignment.html",forum=forum)
+
+@forum_route("role/<username>",methods=["GET","POST"])
+@requires_permission("p_approve")
+def edit_user_role(forum, username):
+    db = get_db()
+    if request.method == "POST":
+        user = db.execute("SELECT * FROM users WHERE username = ?;",(username,)).fetchone()
+        if user == None:
+            return redirect(url_for('forum.edit_user_role',
+                username=username,forum_id=forum['id']))
+        role = request.form['role']
+        if role not in get_forum_roles(forum['id']) and role != "" and role != "bureaucrat":
+            flash("no such role")
+            return redirect(url_for('forum.edit_user_role',
+                username=username,forum_id=forum['id']))
+        if not is_bureaucrat(forum['id'],g.user) and role != "approved" and role != "":
+            abort(403)
+        existing = db.execute("SELECT * FROM role_assignments WHERE user = ?;",(username,)).fetchone()
+        if existing:
+            if role == "":
+                db.execute("DELETE FROM role_assignments WHERE user = ?;",(username,))
+            else:
+                db.execute("UPDATE role_assignments SET role = ? WHERE user = ?;",(role,username))
+            db.commit()
+        elif role != "":
+            db.execute("INSERT INTO role_assignments (user,role) VALUES (?,?);",(username,role))
+            db.commit()
+        flash("role assigned assignedly")
+        return redirect(url_for('forum.view_forum',forum_id=forum['id']))
+    else:
+        user = db.execute("SELECT * FROM users WHERE username = ?;",(username,)).fetchone()
+        if user == None:
+            return render_template("role_assignment.html",
+                    forum=forum,user=username,invalid_user=True)
+        role = get_user_role(forum['id'], username)
+        if is_bureaucrat(forum['id'], g.user):
+            roles = get_forum_roles(forum['id'])
+            roles.remove("other")
+            roles.add("bureaucrat")
+        else:
+            roles = ["approved"]
+        return render_template("role_assignment.html",
+                forum=forum,user=username,role=role,forum_roles=roles)
 
 @bp.route("/search")
 def search():

@@ -17,10 +17,10 @@ body { font-family: sans-serif; word-wrap: break-word; }
 .post:last-of-type { border-bottom: 1px solid black; }
 
 .post-heading { font-size: smaller; }
-.post-heading,a.username {
+.post-heading,.username {
 	color: hsl(0,0%,25%); 
 }
-a.username {
+.username {
     font-weight: bold;
     text-decoration: underline;
 }
@@ -33,6 +33,23 @@ a.username {
 .post-heading-b { float: right; margin-right: 0.5em }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
+
+.deleted-post { 
+	color:white; 
+	background-color: hsl(0,0%,15%) !important; 
+    border-left: 1px solid darkgray;
+    border-right: 1px solid darkgray;
+    border-top: 1px solid darkgray;
+}
+.deleted-post > .post-heading > * { 
+	color: hsl(0,0%,85%); 
+}
+.deleted-post > .post-heading > .post-heading-b > .post-anchor-link { 
+	color: hsl(0,0%,60%); 
+}
+.deleted-post > .post-heading > .post-heading-a > .username { 
+	color: hsl(0,0%,80%); 
+}
 
 .thread-top-bar, .user-top-bar {
     margin-bottom: 4px;
@@ -79,7 +96,16 @@ dt { font-weight: bold }
 img { max-width: 100% }
 
 
-nav#navbar { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
+nav#navbar { 
+	float: right;
+	padding: 5px;
+	margin: 2px;
+	margin-bottom: 20px;
+	border: 1px solid black;
+	display:flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
 nav#navbar p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
 nav#navbar p:first-of-type { margin-left:0.5em }
 nav#navbar a { color: blue; text-decoration: none }
@@ -185,6 +211,8 @@ label { user-select: none; }
 
 fieldset { margin-bottom: 15px; }
 
+.warning { color: red; font-weight: bold }
+
 .search-form {
     display: inline-block;
 }
@@ -195,7 +223,9 @@ fieldset { margin-bottom: 15px; }
     border: 1px solid black;
 }
 
-.role-input { width: 12ch; }
+.role-input, .name-input { width: 12ch; }
+
+.thing-id { color: darkgray; font-size: smaller; font-weight: normal; }
 
 .breadcrumbs {
     list-style: none;

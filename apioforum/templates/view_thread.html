@@ -1,16 +1,19 @@
 {% from 'common.html' import disp_post,tag,thread_breadcrumb %}
 {% extends 'base.html' %}
 {% block header %}
-<h1>{%block title %}{{thread.title}}{% endblock %}</h1>
+<h1>{%block title %}{{thread.title}}{% endblock %} <span class="thing-id">#{{thread.id}}</span></h1>
 {{ thread_breadcrumb(thread) }}
 {% endblock %}
 
 {%block content%}
 <div class="thread-top-bar">
     <span class="thread-top-bar-a">
-        {% if g.user == thread.creator %}
+        {% if g.user == thread.creator or has_permission(thread.forum, g.user, "p_manage_threads")  %}
         <a class="actionbutton" href="{{url_for('thread.config_thread',thread_id=thread.id)}}">configure thread</a>
         {% endif %}
+		{% if has_permission(thread.forum, g.user, "p_delete_posts") %}
+        <a class="actionbutton" href="{{url_for('thread.delete_thread',thread_id=thread.id)}}">delete thread</a>
+		{% endif %}
     </span>
     &nbsp;
     <span class="thread-top-bar-b">
@@ -22,7 +25,7 @@
 
 <div class="posts">
     {% for post in posts %}
-	{{ disp_post(post, True) }}
+	{{ disp_post(post, buttons=True, forum=thread.forum) }}
     {% endfor %}
 </div>
 {% if g.user %}

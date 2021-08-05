@@ -6,28 +6,55 @@
 	{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}
 {%- endmacro %}
 
-{% macro disp_post(post, buttons=False) %}
-<div class="post" id="post_{{post.id}}">
+{% macro disp_post(post, buttons=False, forum=None) %}
+<div class="post {% if post.deleted %}deleted-post{% endif %}" id="post_{{post.id}}">
     <div class="post-heading">
         <span class="post-heading-a">
-			{{disp_user(post.author)}}
+			{% if not post.deleted %}
+				{{disp_user(post.author)}}
+			{% else %}
+				<span class="username">big brother</span>
+			{% endif %}
+
+			{% if forum != None %}
+				{% set role = get_user_role(forum, post.author) %}
+				{% if post.deleted %}
+					<span class="user-role">
+						(bureaucrat)
+					</span>
+				{% elif role != "other" %}
+					<span class="user-role">
+						({{ role }})
+					</span>
+				{% endif %}
+			{% endif %}
+
 			{{ts(post.created)}}
+
             {% if post.edited %}
                 (edited {{ts(post.updated)}})
             {% endif %}
         </span>
         <span class="post-heading-b">
-        {% if buttons and post.author == g.user %}
-            <a class="actionbutton"
-               href="{{url_for('thread.edit_post',post_id=post.id)}}">edit</a>
-            <a class="actionbutton"
-               href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
+        {% if buttons and not post.deleted %}
+			{% if post.author == g.user %}
+				<a class="actionbutton"
+				   href="{{url_for('thread.edit_post',post_id=post.id)}}">edit</a>
+			{% endif %}
+			{% if post.author == g.user or (forum and has_permission(forum, g.user, "p_delete_posts")) %}
+				<a class="actionbutton"
+				   href="{{url_for('thread.delete_post',post_id=post.id)}}">delete</a>
+			{% endif %}
         {% endif %}
 		<a class="post-anchor-link" href="{{post_url(post)}}">#{{post.id}}</a>
         </span>
     </div>
     <div class="post-content">
-        {{ post.content|md|safe }}
+		{% if not post.deleted %}
+			{{ post.content|md|safe }}
+		{% else %}
+			this post never existed.
+		{% endif %}
     </div>
 </div>
 {% endmacro %}

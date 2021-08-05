@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% from 'common.html' import tag %}
 {% block header %}<h1>{% block title %}role permissions for '{{forum.name}}'{% endblock %}</h1>{% endblock %}
 {% block content %}
 <p>
@@ -37,11 +36,13 @@
 		{{perm("p_view_threads","view threads",
 				"allow users with the role to view threads in the forum")}}
 		{{perm("p_manage_threads","configure others' threads",
-				"allow users with the role to delete, lock, or modify the title/tags for others' threads")}}
+				"allow users with the role to modify the title/tags for others' threads or lock it to prevent new posts")}}
+		{{perm("p_delete_posts","delete others' posts and threads",
+				"allow users with the role to delete others' posts and threads")}}
 		{{perm("p_create_polls","create polls",
-				"allow users with the role to create poll threads")}}
+				"allow users with the role to add a poll to a thread")}}
 		{{perm("p_vote","vote",
-				"allow users with the role to vote on poll threads")}}
+				"allow users with the role to vote in polls")}}
 		{{perm("p_create_subforum","create subforæ",
 				"allow users with the role to create subforæ in this forum. " +
 				"they will automatically become a bureaucrat in this subforum.")}}

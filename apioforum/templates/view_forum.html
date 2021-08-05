@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb %}
 {% block header %}
-<h1>{% block title %}{{forum.name}}{%endblock%}</h1>
+<h1>{% block title %}{{forum.name}}{% endblock %} <span class="thing-id">#{{forum.id}}</span></h1>
 {% if forum.id != 1 %}
 	{{ forum_breadcrumb(forum) }}
 {% endif %}
@@ -9,11 +9,15 @@
 
 {%block content%}
 {{forum.description|md|safe}}
-{% if is_bureaucrat(forum.id, g.user) %}
-	<p><a class="actionbutton" href="{{url_for('forum.edit_roles',forum_id=forum.id)}}">role/permission settings</a></p>
-{% endif %}
-<hr/>
-
+<p>
+	{% if is_bureaucrat(forum.id, g.user) %}
+		<a class="actionbutton" href="{{url_for('forum.edit_roles',forum_id=forum.id)}}">role/permission settings</a>
+		<a class="actionbutton" href="{{url_for('forum.view_user_role',forum_id=forum.id)}}">assign roles</a>
+	{% endif %}
+	{% if not is_bureaucrat(forum.id, g.user) and has_permission(forum.id, g.user, "p_approve") %}
+		<a class="actionbutton" href="{{url_for('forum.view_user_role',forum_id=forum.id)}}">approve users</a>
+	{% endif %}
+</p>
 {% if subforums %}
 <h2>subforæ</h2>
 <div class="forum-list">
@@ -67,7 +71,7 @@
 					{{ ts(thread.created) }}
 				</div>
 			</div>
-			{#{% if thread.mrp_id %}#}
+			{% if not thread.mrp_deleted %}
 				<div class="listing-caption">
 					{{ disp_user(thread.mrp_author) }}
 					<span class="thread-preview-ts">
@@ -79,7 +83,14 @@
 						</a>
 					</span>
 				</div>
-			{#{% endif %}#}
+			{% else %}
+				<div class="listing-caption">
+					<a class="thread-preview-post" 
+					   href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+						latest post
+					</a>
+				</div>
+			{% endif %}
 		</div>
 	{%endfor%}
 </div>

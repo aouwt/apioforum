@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block header %}<h1>{% block title %}configure user role in '{{forum.name}}'{% endblock %}</h1>{% endblock %}
+{% block content %}
+<p>
+	each user has a role in the forum.
+	here, a user may be assigned a role in the forum.
+	otherwise, the user's role is the same as the parent forum.
+	everyone's role is "other" by default.
+</p>
+{% if not is_bureaucrat(forum.id, g.user) %}
+	<p>
+		you are only allowed to approve members in this forum.
+	</p>
+{% endif %}
+<form method="post" action="{{url_for('forum.view_user_role',forum_id=forum.id)}}">
+	<label for="user">role settings for user: </label>
+	<input type="text" class="name-input" id="user" name="user" value="{{user}}"/>
+	<input type="submit" value="view"/>
+</form>
+
+{% if invalid_user %}
+	<p>requested user does not exist.</p>
+	<p>
+		<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+	</p>
+{% elif user %}
+<hr/>
+<form method="post">
+	<p>{{user}}'s role in this forum is "{{role}}"</p>
+	{% if role == "other" or is_bureaucrat(forum.id, g.user) %}
+		<label for="role">assign role: </label>
+		<select name="role" id="role" value="">
+			<option value="">(no assigned role)</option>
+			{% for role in forum_roles %}
+				<option value="{{role}}">{{role}}</option>
+			{% endfor %}
+		</select>
+	{% else %}
+		<p>you do not have permission to change the role of this user</p>
+	{% endif %}
+	<p>confirm changes?</p>
+	<p>
+		<input type="submit" value="confirm">
+		<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+	</p>
+</form>
+{% else %}
+<p>
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+</p>
+{% endif %}
+
+{% endblock %}
