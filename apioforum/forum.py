@@ -235,13 +235,11 @@ def edit_user_role(forum, username):
             abort(403)
         existing = db.execute("SELECT * FROM role_assignments WHERE user = ?;",(username,)).fetchone()
         if existing:
-            if role == "":
-                db.execute("DELETE FROM role_assignments WHERE user = ?;",(username,))
-            else:
-                db.execute("UPDATE role_assignments SET role = ? WHERE user = ?;",(role,username))
-            db.commit()
-        elif role != "":
-            db.execute("INSERT INTO role_assignments (user,role) VALUES (?,?);",(username,role))
+            db.execute("DELETE FROM role_assignments WHERE user = ?;",(username,))
+        if role != "":
+            db.execute(
+                "INSERT INTO role_assignments (user,role,forum) VALUES (?,?,?);",
+                (username,role,forum['id']))
             db.commit()
         flash("role assigned assignedly")
         return redirect(url_for('forum.view_forum',forum_id=forum['id']))
@@ -250,6 +248,12 @@ def edit_user_role(forum, username):
         if user == None:
             return render_template("role_assignment.html",
                     forum=forum,user=username,invalid_user=True)
+        r = db.execute(
+                "SELECT role FROM role_assignments WHERE user = ?;",(username,)).fetchone()
+        if not r:
+            assigned_role = ""
+        else:
+            assigned_role = r[0]
         role = get_user_role(forum['id'], username)
         if is_bureaucrat(forum['id'], g.user):
             roles = get_forum_roles(forum['id'])
@@ -258,7 +262,8 @@ def edit_user_role(forum, username):
         else:
             roles = ["approved"]
         return render_template("role_assignment.html",
-                forum=forum,user=username,role=role,forum_roles=roles)
+                forum=forum,user=username,role=role,
+                assigned_role=assigned_role,forum_roles=roles)
 
 @bp.route("/search")
 def search():
