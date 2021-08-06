@@ -40,11 +40,16 @@ def get_user_role(forum_id, user):
     
     fid = forum_id
     the = None
-    while the == None and fid != None:
-        the = db.execute("""
+    while fid != None:
+        r = db.execute("""
             SELECT * FROM role_assignments
             WHERE forum = ? AND user = ?;
             """,(fid,user)).fetchone()
+        # the user's role is equal to the role assignnment of the closest 
+        # ancestor unless the user's role is "bureaucrat" in any ancestor
+        # in which case, the users role is "bureaucrat"
+        if the == None or (r and r['role'] == "bureaucrat"):
+            the = r
         fid = db.execute("""
             SELECT * FROM forums WHERE id = ?
             """,(fid,)).fetchone()['parent']

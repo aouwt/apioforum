@@ -146,6 +146,9 @@ CREATE TABLE role_assignments (
 """,
 """
 ALTER TABLE posts ADD COLUMN deleted NOT NULL DEFAULT 0;
+""",
+"""
+ALTER TABLE forums ADD COLUMN unlisted NOT NULL DEFAULT 0;
 """
 ]
 

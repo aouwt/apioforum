@@ -29,7 +29,7 @@
 	{% if can_change %}
 		<label for="role">assigned role: </label>
 		<select name="role" id="role" autocomplete="off">
-			<option value="">(no assigned role)</option>
+			<option value="" {% if not assigned_role %}selected{% endif %}>(no assigned role)</option>
 			{% for role in forum_roles %}
 				<option value="{{role}}" 
 						{% if role == assigned_role %}selected{% endif %}>

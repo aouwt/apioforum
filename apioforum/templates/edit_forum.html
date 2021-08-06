@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>{% block title %}{%if create %}create{% else %}edit{%endif%} forum{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+    <label for="name">forum name</label>
+	<input name="name" id="name" value="{{name}}" placeholder="apioforum" required maxlength="100"/>
+    <br>
+    <label for="description">forum description (markdown enabled)</label>
+	<textarea 
+		name="description" 
+		id="description" 
+		class="forum-desc-box" 
+		placeholder="this is a forum for discussing bees"
+		maxlength="6000"
+		required
+	>{{description}}</textarea>
+	<input type="checkbox" id="unlisted" name="unlisted"/>
+	<label for="unlisted">unlisted?</label>
+	<p>
+		<input type="submit" value="confirm">
+		<a href="{{cancel_link}}">cancel</a>
+	</p>
+</form>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb %}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab %}
 {% block header %}
 <h1>{% block title %}{{forum.name}}{% endblock %} <span class="thing-id">#{{forum.id}}</span></h1>
 {% if forum.id != 1 %}
@@ -9,13 +9,25 @@
 
 {%block content%}
 {{forum.description|md|safe}}
+{% if bureaucrats|length > 0 %}
+	<p>
+		bureaucrats in this forum:
+		{% for b in bureaucrats %}
+			{{disp_user(b)}}
+		{% endfor %}
+	</p>
+{% endif %}
 <p>
 	{% if is_bureaucrat(forum.id, g.user) %}
-		<a class="actionbutton" href="{{url_for('forum.edit_roles',forum_id=forum.id)}}">role/permission settings</a>
-		<a class="actionbutton" href="{{url_for('forum.view_user_role',forum_id=forum.id)}}">assign roles</a>
+		{{ab("forum settings",url_for('forum.edit_forum',forum_id=forum.id))}}
+		{{ab("role/permission settings",url_for('forum.edit_roles',forum_id=forum.id))}}
+		{{ab("assign roles",url_for('forum.view_user_role',forum_id=forum.id))}}
+	{% endif %}
+	{% if has_permission(forum.id, g.user, "p_create_subforum") %}
+		{{ab("create subforum",url_for('forum.create_forum',forum_id=forum.id))}}
 	{% endif %}
 	{% if not is_bureaucrat(forum.id, g.user) and has_permission(forum.id, g.user, "p_approve") %}
-		<a class="actionbutton" href="{{url_for('forum.view_user_role',forum_id=forum.id)}}">approve users</a>
+		{{ab("approve users",url_for('forum.view_user_role',forum_id=forum.id))}}
 	{% endif %}
 </p>
 {% if subforums %}

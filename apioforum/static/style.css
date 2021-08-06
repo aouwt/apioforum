@@ -188,7 +188,7 @@ nav#navbar .links { display: flex; }
 }
 .actionbutton { color:blue }
 
-.new-post-box {
+.new-post-box, .forum-desc-box {
     height:20em;
     resize:vertical;
     width:100%;

@@ -98,7 +98,7 @@ def view_forum(forum):
     subforums_rows = db.execute("""
             SELECT max(threads.updated) as updated, forums.* FROM forums
             LEFT OUTER JOIN threads ON threads.forum=forums.id 
-            WHERE parent = ?
+            WHERE parent = ? AND unlisted = 0
             GROUP BY forums.id
             ORDER BY name ASC
             """,(forum['id'],)).fetchall()
@@ -109,12 +109,19 @@ def view_forum(forum):
         if a['updated'] is not None:
             a['updated'] = datetime.datetime.fromisoformat(a['updated'])
         subforums.append(a)
+
+    bureaucrats = db.execute("""
+            SELECT user FROM role_assignments
+            WHERE role = 'bureaucrat' AND forum = ?
+            """,(forum['id'],)).fetchall()
+    bureaucrats = [b[0] for b in bureaucrats]
         
     return render_template("view_forum.html",
             forum=forum,
             subforums=subforums,
             threads=threads,
             thread_tags=thread_tags,
+            bureaucrats=bureaucrats
             )
 
 @forum_route("create_thread",methods=("GET","POST"))
@@ -232,15 +239,18 @@ def edit_user_role(forum, username):
             return redirect(url_for('forum.edit_user_role',
                 username=username,forum_id=forum['id']))
         if not is_bureaucrat(forum['id'],g.user) and role != "approved" and role != "":
+            # only bureaucrats can assign arbitrary roles
             abort(403)
-        existing = db.execute("SELECT * FROM role_assignments WHERE user = ?;",(username,)).fetchone()
+        existing = db.execute(
+            "SELECT * FROM role_assignments WHERE user = ? AND forum = ?;",
+                (username,forum['id'])).fetchone()
         if existing:
-            db.execute("DELETE FROM role_assignments WHERE user = ?;",(username,))
+            db.execute("DELETE FROM role_assignments WHERE user = ? AND forum = ?;",(username,forum['id']))
         if role != "":
             db.execute(
                 "INSERT INTO role_assignments (user,role,forum) VALUES (?,?,?);",
                 (username,role,forum['id']))
-            db.commit()
+        db.commit()
         flash("role assigned assignedly")
         return redirect(url_for('forum.view_forum',forum_id=forum['id']))
     else:
@@ -249,7 +259,8 @@ def edit_user_role(forum, username):
             return render_template("role_assignment.html",
                     forum=forum,user=username,invalid_user=True)
         r = db.execute(
-                "SELECT role FROM role_assignments WHERE user = ?;",(username,)).fetchone()
+                "SELECT role FROM role_assignments WHERE user = ? AND forum = ?;",
+                    (username,forum['id'])).fetchone()
         if not r:
             assigned_role = ""
         else:
@@ -264,6 +275,63 @@ def edit_user_role(forum, username):
         return render_template("role_assignment.html",
                 forum=forum,user=username,role=role,
                 assigned_role=assigned_role,forum_roles=roles)
+
+def forum_config_page(forum, create=False):
+    db = get_db()
+    if request.method == "POST":
+        name = request.form["name"]
+        desc = request.form["description"]
+        unlisted = "unlisted" in request.form
+        if len(name) > 100 or len(name.strip()) == 0:
+            flash("invalid name")
+            return redirect(url_for('forum.edit_forum',forum_id=forum['id']))
+        elif len(desc) > 6000:
+            flash("invalid description")
+            return redirect(url_for('forum.edit_forum',forum_id=forum['id']))
+        if not create:
+            db.execute("UPDATE forums SET name = ?, description = ?, unlisted = ? WHERE id = ?",
+                    (name,desc,forum['id']))
+            fid = forum['id']
+        else:
+            cur = db.cursor()
+            cur.execute(
+                "INSERT INTO forums (name,description,parent,unlisted) VALUES (?,?,?,?)",
+                    (name,desc,forum['id'],unlisted))
+            new = cur.lastrowid
+            # creator becomes bureaucrat of new forum
+            db.execute("INSERT INTO role_assignments (role,user,forum) VALUES (?,?,?)",
+                    ("bureaucrat",g.user,new))
+            fid = new
+        db.commit()
+        return redirect(url_for('forum.view_forum',forum_id=fid))
+    else:
+        if create:
+            name = ""
+            desc = ""
+        else:
+            name = forum['name']
+            desc = forum['description']
+        cancel_link = url_for('forum.view_forum',forum_id=forum['id'])
+        return render_template("edit_forum.html",create=create,
+                name=name,description=desc,cancel_link=cancel_link)
+
+@forum_route("edit",methods=["GET","POST"])
+@requires_bureaucrat
+def edit_forum(forum):
+    return forum_config_page(forum)
+
+@forum_route("create",methods=["GET","POST"])
+@requires_permission("p_create_subforum")
+def create_forum(forum):
+    return forum_config_page(forum,create=True)
+
+@forum_route("unlisted")
+@requires_bureaucrat
+def view_unlisted(forum):
+    db = get_db()
+    unlisted = db.execute(
+        "SELECT * FROM forums WHERE unlisted = 1 AND parent = ?",(forum['id'],))
+    return render_template('view_unlisted.html',forum=forum,unlisted=unlisted)
 
 @bp.route("/search")
 def search():

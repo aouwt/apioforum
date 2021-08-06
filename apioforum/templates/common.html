@@ -67,6 +67,10 @@
 <span class="tag" style="color: {{the_tag.text_colour}}; background-color: {{the_tag.bg_colour}}">{{the_tag.name}}</span>
 {%- endmacro %}
 
+{% macro ab(name,href) -%}
+<a class="actionbutton" href="{{href}}">{{name}}</a>
+{%- endmacro %}
+
 {% macro breadcrumb() %}
 <nav aria-label="Breadcrumb">
 <ol class="breadcrumbs">

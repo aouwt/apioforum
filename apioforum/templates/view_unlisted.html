@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% from 'common.html' import forum_breadcrumb %}
+{% block header %}
+<h1>{% block title %}unlisted subforæ in '{{forum.name}}'{% endblock %}</h1>
+{% if forum.id != 1 %}
+	{{ forum_breadcrumb(forum) }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+	{% if unlisted %}
+	<ul>
+		{% for f in unlisted %}
+		<li>
+		<a href="{{url_for('forum.view_forum',forum_id=f.id)}}">{{f.name}}</a>
+		</li>
+		{% endfor %}
+	</ul>
+	{% else %}
+	<p>there are no unlisted subforæ in '{{forum.name}}'</p>
+	{% endif %}
+</form>
+{% endblock %}
