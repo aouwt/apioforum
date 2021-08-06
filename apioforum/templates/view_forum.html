@@ -76,7 +76,7 @@
 please log in to create a new thread
 {% endif %}
 
-{% if has_permission(forum.id, g.user, "p_view_threads") %}
+{% if has_permission(forum.id, g.user, "p_view_threads", login_required=False) %}
 <div class="thread-list">
 	{%for thread in threads%}
 		<div class="listing">

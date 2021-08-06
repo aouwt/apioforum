@@ -21,7 +21,7 @@ def view_thread(thread_id):
     thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
     if thread is None:
         abort(404)
-    if not has_permission(thread['forum'], g.user, "p_view_threads"):
+    if not has_permission(thread['forum'], g.user, "p_view_threads", False):
         abort(403)
     posts = db.execute("""
         SELECT * FROM posts

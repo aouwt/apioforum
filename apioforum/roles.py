@@ -72,8 +72,9 @@ def get_forum_roles(forum_id):
             """,(a['id'],)).fetchall()
     return set(r['role'] for r in configs)
 
-def has_permission(forum_id, user, permission):
-    role = get_user_role(forum_id, user) if user != None else "other"
+def has_permission(forum_id, user, permission, login_required=True):
+    if user == None and login_required: return False
+    role = get_user_role(forum_id, user) if user else "other"
     if role == "bureaucrat": return True
     config = get_role_config(forum_id, role)
     return config[permission]
