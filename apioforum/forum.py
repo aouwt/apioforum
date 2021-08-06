@@ -332,7 +332,7 @@ def forum_config_page(forum, create=False):
             return redirect(url_for('forum.edit_forum',forum_id=forum['id']))
         if not create:
             db.execute("UPDATE forums SET name = ?, description = ?, unlisted = ? WHERE id = ?",
-                    (name,desc,forum['id']))
+                    (name,desc,unlisted,forum['id']))
             fid = forum['id']
         else:
             cur = db.cursor()
