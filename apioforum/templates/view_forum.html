@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab %}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab, vote_meter %}
 {% block header %}
 <h1>{% block title %}{{forum.name}}{% endblock %} <span class="thing-id">#{{forum.id}}</span></h1>
 {% if forum.id != 1 %}
@@ -8,15 +8,28 @@
 {%endblock%}
 
 {%block content%}
-{{forum.description|md|safe}}
-{% if bureaucrats|length > 0 %}
-	<p>
-		bureaucrats in this forum:
-		{% for b in bureaucrats %}
-			{{disp_user(b)}}
-		{% endfor %}
+{{forum.description|md|safe}} 
+
+<hr/>
+<div class="forum-info">
+	{% if bureaucrats|length > 0 %}
+		<p>
+			bureaucrats in this forum:
+			{% for b in bureaucrats %}
+				{{disp_user(b)}}
+			{% endfor %}
+		</p>
+	{% endif %}
+
+	<p>available tags:
+	{% for the_tag in avail_tags %}
+	{{tag(the_tag)}}
+	{% else %}
+	<em>(none available)</em>
+	{% endfor %}
 	</p>
-{% endif %}
+</div>
+
 <p>
 	{% if is_bureaucrat(forum.id, g.user) %}
 		{{ab("forum settings",url_for('forum.edit_forum',forum_id=forum.id))}}
@@ -30,6 +43,7 @@
 		{{ab("approve users",url_for('forum.view_user_role',forum_id=forum.id))}}
 	{% endif %}
 </p>
+
 {% if subforums %}
 <h2>subforæ</h2>
 <div class="forum-list">
@@ -55,10 +69,11 @@
 {% endif %}
 
 <h2>threads</h2>
+<p>
 {% if g.user %}
-<p><a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a></p>
+<a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a>
 {% else %}
-<p>please log in to create a new thread</p>
+please log in to create a new thread
 {% endif %}
 
 {% if has_permission(forum.id, g.user, "p_view_threads") %}
@@ -103,11 +118,15 @@
 					</a>
 				</div>
 			{% endif %}
+			{% if thread_polls[thread.id] %}
+				<div class="thread-vote-summary">
+					{{ vote_meter(thread_polls[thread.id]) }}
+				</div>
+			{% endif %}
 		</div>
 	{%endfor%}
 </div>
 {% else %}
 <p>you do not have permission to view threads in this forum</p>
 {% endif %}
-
 {%endblock%}

@@ -16,8 +16,8 @@ body { font-family: sans-serif; word-wrap: break-word; }
 }
 .post:last-of-type { border-bottom: 1px solid black; }
 
-.post-heading { font-size: smaller; }
-.post-heading,.username {
+.post-heading,.post-footer { font-size: smaller; }
+.post-heading,.post-footer,.username {
 	color: hsl(0,0%,25%); 
 }
 .username {
@@ -31,6 +31,8 @@ body { font-family: sans-serif; word-wrap: break-word; }
 .post-content { padding: 4px }
 .post-heading-a { margin-left: 0.2em }
 .post-heading-b { float: right; margin-right: 0.5em }
+
+.post-footer { margin-left: 0.2em; font-style: italic; }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
 
@@ -48,6 +50,10 @@ body { font-family: sans-serif; word-wrap: break-word; }
 	color: hsl(0,0%,60%); 
 }
 .deleted-post > .post-heading > .post-heading-a > .username { 
+	color: hsl(0,0%,80%); 
+}
+
+.deleted-post > .post-footer {
 	color: hsl(0,0%,80%); 
 }
 
@@ -94,7 +100,6 @@ dt { font-weight: bold }
 .un-col-16 { color: hsl(337.5, 100%, 30%) }
 
 img { max-width: 100% }
-
 
 nav#navbar { 
 	float: right;
@@ -162,6 +167,11 @@ nav#navbar .links { display: flex; }
 .thread-preview-post { font-style: italic; }
 .thread-preview-ts { font-weight: bold; }
 
+.thread-vote-summary {
+	margin-top: 4px;
+	margin-bottom: -8px;
+}
+
 /* wide screens */
 @media all and (min-width: 600px) { 
 	.listing-title { font-size: larger; }
@@ -196,6 +206,16 @@ nav#navbar .links { display: flex; }
     margin-top: 5px;
 }
 
+#polloptions {
+	display: block;
+	resize: vertical;
+    border:1px solid black;
+    margin-top: 5px;
+	height: 5em;
+	width: 100%;
+	font-family: sans-serif;
+}
+
 main {
     max-width: 60ch;
     margin: auto;
@@ -213,7 +233,7 @@ fieldset { margin-bottom: 15px; }
 
 .warning { color: red; font-weight: bold }
 
-.search-form {
+.inline-form {
     display: inline-block;
 }
 
@@ -221,6 +241,15 @@ fieldset { margin-bottom: 15px; }
     font-size: .75rem;
     padding: 1px 3px;
     border: 1px solid black;
+}
+
+.md table {
+    border: 1px solid grey;
+    border-collapse: collapse;
+}
+.md table td,.md table th {
+    border: 1px solid grey;
+    padding: 4px;
 }
 
 .role-input, .name-input { width: 12ch; }

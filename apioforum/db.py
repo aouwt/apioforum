@@ -85,13 +85,46 @@ ALTER TABLE users ADD COLUMN bio TEXT;
 ALTER TABLE users ADD COLUMN joined TIMESTAMP;
 """,
 """
+CREATE TABLE polls (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+ALTER TABLE threads ADD COLUMN poll INTEGER REFERENCES polls(id);
+
+CREATE TABLE poll_options (
+    poll INTEGER NOT NULL REFERENCES polls(id),
+    text TEXT NOT NULL,
+    option_idx INTEGER NOT NULL,
+    PRIMARY KEY ( poll, option_idx )
+);
+
+CREATE TABLE votes (
+    id INTEGER PRIMARY KEY,
+    user TEXT NOT NULL REFERENCES users(username),
+    poll INTEGER NOT NULL,
+    option_idx INTEGER,
+    time TIMESTAMP NOT NULL,
+    current INTEGER NOT NULL,
+    is_retraction INTEGER,
+    CHECK (is_retraction OR (option_idx NOT NULL)),
+    FOREIGN KEY ( poll, option_idx ) REFERENCES poll_options(poll, option_idx)
+);
+ALTER TABLE posts ADD COLUMN vote INTEGER REFERENCES votes(id);
+""",
+"""
+CREATE VIEW vote_counts AS
+    SELECT poll, option_idx, count(*) AS num FROM votes WHERE current GROUP BY option_idx,poll; 
+""",
+"""
 CREATE TABLE forums (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     parent INTEGER REFERENCES forums(id),
     description TEXT
 );
-INSERT INTO forums (name,parent,description) values ('apioforum',null,'the default root forum');
+INSERT INTO forums (name,parent,description) values ('apioforum',null,
+        'welcome to the apioforum\n\n' ||
+        'forum rules: do not be a bad person. do not do bad things.');
 
 PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;
@@ -101,7 +134,8 @@ CREATE TABLE threads_new (
     creator TEXT NOT NULL,
     created TIMESTAMP NOT NULL,
     updated TIMESTAMP NOT NULL,
-    forum NOT NULL REFERENCES forums(id)
+    forum NOT NULL REFERENCES forums(id),
+    poll INTEGER REFERENCES polls(id)
 );
 INSERT INTO threads_new (id,title,creator,created,updated,forum)
     SELECT id,title,creator,created,updated,1 FROM threads;
@@ -116,6 +150,26 @@ CREATE VIEW most_recent_posts AS
 
 CREATE VIEW number_of_posts AS
     SELECT thread, count(*) AS num_replies FROM posts GROUP BY thread;
+""",
+"""
+CREATE VIEW total_vote_counts AS
+    SELECT poll, count(*) AS total_votes FROM votes WHERE current AND NOT is_retraction GROUP BY poll;
+""",
+"""
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+CREATE TABLE tags_new (
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	text_colour TEXT NOT NULL,
+	bg_colour TEXT NOT NULL,
+	forum INTEGER NOT NULL REFERENCES forums(id)
+);
+INSERT INTO tags_new (id,name,text_colour,bg_colour,forum)
+	SELECT id,name,text_colour,bg_colour,1 FROM tags;
+DROP TABLE tags;
+ALTER TABLE tags_new RENAME TO tags;
+PRAGMA foreign_keys = on;
 """,
 """
 CREATE TABLE role_config (
@@ -149,7 +203,7 @@ ALTER TABLE posts ADD COLUMN deleted NOT NULL DEFAULT 0;
 """,
 """
 ALTER TABLE forums ADD COLUMN unlisted NOT NULL DEFAULT 0;
-"""
+""",
 ]
 
 def init_db():

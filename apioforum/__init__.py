@@ -17,6 +17,9 @@ def create_app():
     except OSError:
         pass
 
+    app.jinja_env.trim_blocks = True
+    app.jinja_env.lstrip_blocks = True
+
     from . import db
     db.init_app(app)
     from . import permissions
@@ -39,6 +42,9 @@ def create_app():
 
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
+
+    from .util import gen_colour
+    app.jinja_env.filters['gen_colour']=gen_colour
 
     @app.context_processor
     def path_for_next():

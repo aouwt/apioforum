@@ -1,0 +1,12 @@
+{% from 'common.html' import disp_post %}
+{% extends 'base.html' %}
+{% block header %}
+<h1>{%block title%}viewing post{%endblock%}</h1>
+{% endblock %}
+
+{% block content %}
+{{disp_post(post,False)}}
+<p>post source:</p>
+<textarea readonly class="new-post-box" name="newcontent">{{post.content}}</textarea>
+<a href="{{url_for('thread.view_thread',thread_id=post.thread)}}">i am satisfied</a>
+{% endblock %}

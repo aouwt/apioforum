@@ -2,6 +2,7 @@
 {% from 'common.html' import tag %}
 {% block header %}<h1>{% block title %}configure thread '{{thread.title}}'{% endblock %}</h1>{% endblock %}
 {% block content %}
+<h2>thread options</h2>
 <form method="post">
 <fieldset>
 <legend>title</legend>
@@ -27,4 +28,28 @@
 <input type="submit" value="confirm">
 <a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">cancel</a>
 </form>
+
+{% if thread.poll is none and has_permission(thread.forum, g.user, "p_create_polls" %}
+<h2>create poll</h2>
+<form method="post" action="{{url_for('thread.create_poll',thread_id=thread.id)}}">
+    <fieldset>
+        <legend>create poll</legend>
+        <label for="polltitle">question title</label>
+        <input type="title" id="polltitle" name="polltitle">
+        <br>
+        <label for="polloptions">options (one per line)</label>
+        <textarea name="polloptions" id="polloptions"></textarea>
+    </fieldset>
+    <p>important: once a poll is created, you will not be able to modify it except to delete it entirely</p>
+    <input type="submit" value="create">
+</form>
+{% else %}
+<h2>delete poll</h2>
+<p>there is already a poll attached to this thread. you can delete it, which will allow you to create a new one, but this will erase all existing votes and data for the current poll.</p>
+<form action="{{url_for('thread.delete_poll',thread_id=thread.id)}}" method="post">
+    <input type="submit" value="confirm: delete poll">
+</form>
+
+{% endif %}
+
 {% endblock %}

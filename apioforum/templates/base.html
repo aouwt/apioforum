@@ -6,12 +6,13 @@
         <title>{%block title %}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/md-colors.css">
         <link rel="icon" href="//gh0.pw/favicon.ico">
     </head>
     <body>
         <nav id="navbar">
 			<p style="font-family: monospace;"><b>apio</b><i>forum</i>&trade;</p>
-			<form class="search-form" action="/search">
+			<form class="inline-form" action="/search">
 				<input type="search" placeholder="query" name="q">
 				<input type="submit" value="search">
 			</form>
