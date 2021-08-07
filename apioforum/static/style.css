@@ -196,7 +196,10 @@ nav#navbar .links { display: flex; }
     content: "]";
     color: grey;
 }
-.actionbutton { color:blue }
+.actionbutton { 
+	color:blue;
+	white-space: nowrap;
+}
 
 .new-post-box, .forum-desc-box {
     height:20em;
@@ -241,6 +244,7 @@ fieldset { margin-bottom: 15px; }
     font-size: .75rem;
     padding: 1px 3px;
     border: 1px solid black;
+	white-space: nowrap;
 }
 
 .md table {

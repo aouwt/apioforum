@@ -17,7 +17,7 @@
 		maxlength="6000"
 		required
 	>{{description}}</textarea>
-	<input type="checkbox" id="unlisted" name="unlisted"/>
+	<input type="checkbox" id="unlisted" name="unlisted" {% if unlisted %}checked{% endif %}/>
 	<label for="unlisted">unlisted?</label>
 	<p>
 		<input type="submit" value="confirm">
