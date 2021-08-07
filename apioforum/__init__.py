@@ -40,6 +40,9 @@ def create_app():
     from . import user
     app.register_blueprint(user.bp)
 
+    from . import auth_api
+    app.register_blueprint(auth_api.bp)
+
     from .fuzzy import fuzzy
     app.jinja_env.filters['fuzzy']=fuzzy
 

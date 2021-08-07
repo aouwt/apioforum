@@ -119,3 +119,8 @@ def cool():
 def cooler():
     return "bee"
 
+@bp.route("/coolest")
+@login_required
+def coolest():
+    return "apioform"
+
