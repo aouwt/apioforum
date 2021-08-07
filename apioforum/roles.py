@@ -35,10 +35,10 @@ def get_role_config(forum_id, role):
             return get_role_config(forum_id, "other")
     return the
 
-def get_user_role(forum_id, user):
+def get_user_role(forum_id, username):
     db = get_db()
     user = db.execute('SELECT * FROM users WHERE username = ?',
-            (user,)).fetchone()
+            (username,)).fetchone()
     if user == None: return "other"
     if user['admin']: return "bureaucrat"
     
@@ -48,7 +48,7 @@ def get_user_role(forum_id, user):
         r = db.execute("""
             SELECT * FROM role_assignments
             WHERE forum = ? AND user = ?;
-            """,(fid,user)).fetchone()
+            """,(fid,username)).fetchone()
         # the user's role is equal to the role assignnment of the closest 
         # ancestor unless the user's role is "bureaucrat" in any ancestor
         # in which case, the users role is "bureaucrat"
