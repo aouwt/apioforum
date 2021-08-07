@@ -16,7 +16,7 @@
 
 {% for role_config in role_configs %}
 	<fieldset>
-	<legend id="config_{{role_config.role}}">{{role_config.role}}</legend>
+		<legend id="config_{{role_config.role}}">{{role_config.role}}</legend>
 		{% macro perm(p, description, tooltip) %}
 			<input 
 				type="checkbox" 
@@ -46,10 +46,16 @@
 		{{perm("p_create_subforum","create subforæ",
 				"allow users with the role to create subforæ in this forum. " +
 				"they will automatically become a bureaucrat in this subforum.")}}
-		<input type="hidden" name="roleconfig_{{role_config.role}}" value="present"/>
 		{% if role_config.role != "other" %}
 			{{perm("p_approve","approve others",
 					"allow users with the role to assign the 'approved' role to those with the 'other' role")}}
+		{% endif %}
+		<input type="hidden" name="roleconfig_{{role_config.role}}" value="present"/>
+
+		{% if forum.id != 1 or role_config.role != "other" %}
+			<hr/>
+			<input type="checkbox" name="delete_{{role_config.role}}" id="delete_{{role_config.role}}"/>
+			<label for="delete_{{role_config.role}}">remove</label>
 		{% endif %}
 	</fieldset>
 {% endfor %}

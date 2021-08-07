@@ -214,7 +214,11 @@ def edit_roles(forum):
 
     if request.method == "POST":
         for config in role_configs:
-            if 'roleconfig_' + config['role'] in request.form:
+            if 'delete_' + config['role'] in request.form:
+                db.execute(
+                    "DELETE FROM role_config WHERE forum = ? AND role = ?",
+                    (forum['id'],config['role']))
+            elif 'roleconfig_' + config['role'] in request.form:
                 for p in role_permissions:
                     permission_setting =\
                         f"perm_{config['role']}_{p}" in request.form 
