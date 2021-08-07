@@ -37,6 +37,10 @@ def get_role_config(forum_id, role):
 
 def get_user_role(forum_id, user):
     db = get_db()
+    user = db.execute('SELECT * FROM users WHERE username = ?',
+            (user,)).fetchone()
+    if user == None: return "other"
+    if user['admin']: return "bureaucrat"
     
     fid = forum_id
     the = None

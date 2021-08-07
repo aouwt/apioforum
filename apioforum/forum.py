@@ -1,5 +1,6 @@
 # view threads in a forum
 # currently there is only ever one forum however
+# ^ aha we never removed this. we should keep it. it is funny.
 
 from flask import (
     Blueprint, render_template, request,
