@@ -70,7 +70,7 @@
 
 <h2>threads</h2>
 <p>
-{% if g.user %}
+{% if has_permission(forum.id, g.user, "p_create_threads") %}
 <a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a>
 {% else %}
 please log in to create a new thread
