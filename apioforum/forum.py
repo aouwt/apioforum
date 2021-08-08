@@ -83,6 +83,11 @@ def requires_bureaucrat(f):
 
 @forum_route("")
 def view_forum(forum):
+    # user should not be able to see anything about the forum if it is unlisted
+    # and the user does not have permission to see things
+    if forum['unlisted'] and not has_permission(forum['id'], g.user, "p_view_threads"):
+        abort(403)
+
     db = get_db()
     threads = db.execute(
         """SELECT
