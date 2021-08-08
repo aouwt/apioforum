@@ -168,6 +168,7 @@ def view_forum(forum):
             )
 
 @forum_route("create_thread",methods=("GET","POST"))
+@requires_permission("p_create_threads")
 def create_thread(forum):
     db = get_db()
     forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum['id'],)).fetchone()
