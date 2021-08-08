@@ -314,7 +314,7 @@ def config_thread(thread_id):
     err = None
     if g.user is None:
         err = "you need to be logged in to do that"
-    elif g.user != thread['creator'] and not has_permission(thread['forum'], g.user, "g_manage_threads"):
+    elif g.user != thread['creator'] and not has_permission(thread['forum'], g.user, "p_manage_threads"):
         err = "you can only configure threads that you own"
 
     if err is not None:
