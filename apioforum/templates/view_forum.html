@@ -21,6 +21,11 @@
 		</p>
 	{% endif %}
 
+	{% set role = get_user_role(forum.id, g.user) %}
+	{% if role != "other" %}
+	<p>your role in this forum: {{role}}</p>
+	{% endif %}
+
 	<p>available tags:
 	{% for the_tag in avail_tags %}
 	{{tag(the_tag)}}
