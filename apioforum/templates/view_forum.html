@@ -72,8 +72,10 @@
 <p>
 {% if has_permission(forum.id, g.user, "p_create_threads") %}
 <a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a>
-{% else %}
+{% elif has_permission(forum.id, g.user "p_create_threads", login_required=False) %}
 please log in to create a new thread
+{% else %}
+you do not have permission to create threads in this forum
 {% endif %}
 
 {% if has_permission(forum.id, g.user, "p_view_threads", login_required=False) %}
