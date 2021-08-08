@@ -29,7 +29,8 @@
 <a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">cancel</a>
 </form>
 
-{% if thread.poll is none and has_permission(thread.forum, g.user, "p_create_polls") %}
+{% if has_permission(thread.forum, g.user, "p_create_polls") %}
+{% if thread.poll is none %}
 <h2>create poll</h2>
 <form method="post" action="{{url_for('thread.create_poll',thread_id=thread.id)}}">
     <fieldset>
@@ -49,7 +50,7 @@
 <form action="{{url_for('thread.delete_poll',thread_id=thread.id)}}" method="post">
     <input type="submit" value="confirm: delete poll">
 </form>
-
+{% endif %}
 {% endif %}
 
 {% endblock %}
