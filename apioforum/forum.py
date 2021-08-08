@@ -361,12 +361,14 @@ def forum_config_page(forum, create=False):
         if create:
             name = ""
             desc = ""
+            unlisted = False
         else:
             name = forum['name']
             desc = forum['description']
+            unlisted = forum['unlisted']
         cancel_link = url_for('forum.view_forum',forum_id=forum['id'])
         return render_template("edit_forum.html",create=create,
-                name=name,description=desc,cancel_link=cancel_link)
+                name=name,description=desc,unlisted=unlisted,cancel_link=cancel_link)
 
 @forum_route("edit",methods=["GET","POST"])
 @requires_bureaucrat
