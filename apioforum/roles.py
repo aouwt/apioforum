@@ -1,5 +1,6 @@
 
 from .db import get_db
+from .permissions import is_admin
 
 permissions = [
     "p_create_threads",
@@ -10,7 +11,8 @@ permissions = [
     "p_vote",
     "p_create_polls",
     "p_approve",
-    "p_create_subforum"
+    "p_create_subforum",
+    "p_view_forum"
 ]
 
 def get_role_config(forum_id, role):
@@ -76,9 +78,16 @@ def get_forum_roles(forum_id):
             """,(a['id'],)).fetchall()
     return set(r['role'] for r in configs)
 
-def has_permission(forum_id, user, permission, login_required=True):
-    if user == None and login_required: return False
-    role = get_user_role(forum_id, user) if user else "other"
+def has_permission(forum_id, username, permission, login_required=True):
+    db = get_db()
+    forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum_id,)).fetchone()
+    user = db.execute('SELECT * FROM users WHERE username = ?',
+            (username,)).fetchone() if username else None
+
+    if forum['unlisted'] and not (user and user['admin']): return False
+    if username == None and login_required: return False
+
+    role = get_user_role(forum_id, username) if username else "other"
     if role == "bureaucrat": return True
     config = get_role_config(forum_id, role)
     return config[permission]

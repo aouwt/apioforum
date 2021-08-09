@@ -29,6 +29,8 @@
 			</label>
 			<br/>
 		{% endmacro %}
+		{{perm("p_view_forum","view the forum",
+				"allow users with the role to see the forum in listings and view information about it")}}
 		{{perm("p_create_threads","create threads",
 				"allow users with the role to create a thread in the forum")}}
 		{{perm("p_reply_threads","reply to threads",

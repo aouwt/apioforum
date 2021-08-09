@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'common.html' import ab %}
 {% block header %}<h1>{% block title %}configure user role in '{{forum.name}}'{% endblock %}</h1>{% endblock %}
 {% block content %}
 <p>
@@ -12,6 +13,9 @@
 		you are only allowed to approve members in this forum.
 	</p>
 {% endif %}
+
+{# <p>{{ab("role assignment list",url_for("forum.role_list_select",forum_id=forum.id))}}</p> #}
+
 <form method="post" action="{{url_for('forum.view_user_role',forum_id=forum.id)}}">
 	<label for="user">role settings for user: </label>
 	<input type="text" class="name-input" id="user" name="user" value="{{user}}"/>

@@ -204,6 +204,9 @@ ALTER TABLE posts ADD COLUMN deleted NOT NULL DEFAULT 0;
 """
 ALTER TABLE forums ADD COLUMN unlisted NOT NULL DEFAULT 0;
 """,
+"""
+ALTER TABLE role_config ADD COLUMN p_view_forum INT NOT NULL DEFAULT 1;
+"""
 ]
 
 def init_db():

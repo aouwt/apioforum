@@ -10,6 +10,7 @@ from flask import (
 from .db import get_db
 from .mdrender import render
 from .roles import get_forum_roles,has_permission,is_bureaucrat,get_user_role, permissions as role_permissions
+from .permissions import is_admin
 from sqlite3 import OperationalError
 import datetime
 import functools
@@ -63,11 +64,11 @@ def forum_route(relative_path, **kwargs):
 
     return decorator
 
-def requires_permission(permission):
+def requires_permission(permission, login_required=True):
     def decorator(f):
         @functools.wraps(f)
         def wrapper(forum, *args, **kwargs):
-            if not has_permission(forum['id'], g.user, permission):
+            if not has_permission(forum['id'],g.user,permission,login_required):
                 abort(403)
             return f(forum, *args, **kwargs)
         return wrapper
@@ -75,6 +76,7 @@ def requires_permission(permission):
 
 def requires_bureaucrat(f):
     @functools.wraps(f)
+    @requires_permission("p_view_forum")
     def wrapper(forum, *args, **kwargs):
         if not is_bureaucrat(forum['id'], g.user):
             abort(403)
@@ -82,12 +84,8 @@ def requires_bureaucrat(f):
     return wrapper
 
 @forum_route("")
+@requires_permission("p_view_forum", login_required=False)
 def view_forum(forum):
-    # user should not be able to see anything about the forum if it is unlisted
-    # and the user does not have permission to see things
-    if forum['unlisted'] and not has_permission(forum['id'], g.user, "p_view_threads"):
-        abort(403)
-
     db = get_db()
     threads = db.execute(
         """SELECT
@@ -154,7 +152,8 @@ def view_forum(forum):
         a.update(s)
         if a['updated'] is not None:
             a['updated'] = datetime.datetime.fromisoformat(a['updated'])
-        subforums.append(a)
+        if has_permission(a['id'],g.user,"p_view_forum",login_required=False):
+            subforums.append(a)
 
     bureaucrats = db.execute("""
             SELECT user FROM role_assignments
@@ -174,6 +173,7 @@ def view_forum(forum):
 
 @forum_route("create_thread",methods=("GET","POST"))
 @requires_permission("p_create_threads")
+@requires_permission("p_view_forum")
 def create_thread(forum):
     db = get_db()
     forum = db.execute("SELECT * FROM forums WHERE id = ?",(forum['id'],)).fetchone()
@@ -247,6 +247,7 @@ def edit_roles(forum):
             )
 
 @forum_route("roles/new",methods=["POST"])
+@requires_bureaucrat
 def add_role(forum):
     name = request.form['role'].strip()
     if not all(c in (" ","-","_") or c.isalnum() for c in name) \
@@ -334,7 +335,6 @@ def forum_config_page(forum, create=False):
     if request.method == "POST":
         name = request.form["name"]
         desc = request.form["description"]
-        unlisted = "unlisted" in request.form
         if len(name) > 100 or len(name.strip()) == 0:
             flash("invalid name")
             return redirect(url_for('forum.edit_forum',forum_id=forum['id']))
@@ -342,14 +342,14 @@ def forum_config_page(forum, create=False):
             flash("invalid description")
             return redirect(url_for('forum.edit_forum',forum_id=forum['id']))
         if not create:
-            db.execute("UPDATE forums SET name = ?, description = ?, unlisted = ? WHERE id = ?",
-                    (name,desc,unlisted,forum['id']))
+            db.execute("UPDATE forums SET name = ?, description = ? WHERE id = ?",
+                    (name,desc,forum['id']))
             fid = forum['id']
         else:
             cur = db.cursor()
             cur.execute(
-                "INSERT INTO forums (name,description,parent,unlisted) VALUES (?,?,?,?)",
-                    (name,desc,forum['id'],unlisted))
+                "INSERT INTO forums (name,description,parent) VALUES (?,?,?)",
+                    (name,desc,forum['id']))
             new = cur.lastrowid
             # creator becomes bureaucrat of new forum
             db.execute("INSERT INTO role_assignments (role,user,forum) VALUES (?,?,?)",
@@ -361,14 +361,12 @@ def forum_config_page(forum, create=False):
         if create:
             name = ""
             desc = ""
-            unlisted = False
         else:
             name = forum['name']
             desc = forum['description']
-            unlisted = forum['unlisted']
         cancel_link = url_for('forum.view_forum',forum_id=forum['id'])
         return render_template("edit_forum.html",create=create,
-                name=name,description=desc,unlisted=unlisted,cancel_link=cancel_link)
+                name=name,description=desc,cancel_link=cancel_link)
 
 @forum_route("edit",methods=["GET","POST"])
 @requires_bureaucrat
@@ -380,13 +378,13 @@ def edit_forum(forum):
 def create_forum(forum):
     return forum_config_page(forum,create=True)
 
-@forum_route("unlisted")
-@requires_bureaucrat
-def view_unlisted(forum):
-    db = get_db()
-    unlisted = db.execute(
-        "SELECT * FROM forums WHERE unlisted = 1 AND parent = ?",(forum['id'],))
-    return render_template('view_unlisted.html',forum=forum,unlisted=unlisted)
+#@forum_route("unlisted")
+#def view_unlisted(forum):
+#    if not is_admin: abort(403) # why doesn't this fucking work
+#    db = get_db()
+#    unlisted = db.execute(
+#        "SELECT * FROM forums WHERE unlisted = 1 AND parent = ?",(forum['id'],))
+#    return render_template('view_unlisted.html',forum=forum,unlisted=unlisted)
 
 @bp.route("/search")
 def search():
