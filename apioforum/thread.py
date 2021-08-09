@@ -250,7 +250,7 @@ def delete_thread(thread_id):
         return redirect("/")
     if not has_permission(thread['forum'], g.user, "p_delete_posts"):
         flash("you do not have permission to do that")
-        return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
+        return redirect(url_for("thread.view_thread",thread_id=thread_id))
     if request.method == "POST":
         db.execute("DELETE FROM posts WHERE thread = ?",(thread_id,))
         db.execute("DELETE FROM threads WHERE id = ?",(thread_id,))
