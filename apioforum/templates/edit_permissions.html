@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block header %}<h1>{% block title %}role permissions for '{{forum.name}}'{% endblock %}</h1>{% endblock %}
+{% block content %}
+<p>
+	each user has a role in the forum.
+	a user may be assigned a role in the forum.
+	otherwise, the user's role is the same as the parent forum.
+	everyone's role is "other" by default.
+</p>
+<p>
+	here, a set of permissions may be associated with any role.
+	if a role does not have any permissions configured for this forum,
+	the permissions set for the role in closest ancestor forum are used.
+</p>
+<form method="post" id="role_config">
+
+{% for role_config in role_configs %}
+	<fieldset>
+		<legend id="config_{{role_config.role}}">{{role_config.role}}</legend>
+		{% macro perm(p, description, tooltip) %}
+			<input 
+				type="checkbox" 
+				id="perm_{{role_config.role}}_{{p}}" 
+				name="perm_{{role_config.role}}_{{p}}" 
+				{% if role_config[p] %}checked{% endif %}
+			/>
+			<label for="perm_{{role_config.role}}_{{p}}" title="{{tooltip}}">
+				{{- description -}}
+			</label>
+			<br/>
+		{% endmacro %}
+		{{perm("p_view_forum","view the forum",
+				"allow users with the role to see the forum in listings and view information about it")}}
+		{{perm("p_create_threads","create threads",
+				"allow users with the role to create a thread in the forum")}}
+		{{perm("p_reply_threads","reply to threads",
+				"allow users with the role to create a post within a thread")}}
+		{{perm("p_view_threads","view threads",
+				"allow users with the role to view threads in the forum")}}
+		{{perm("p_manage_threads","configure others' threads",
+				"allow users with the role to modify the title/tags for others' threads or lock it to prevent new posts")}}
+		{{perm("p_delete_posts","delete others' posts and threads",
+				"allow users with the role to delete others' posts and threads")}}
+		{{perm("p_create_polls","create polls",
+				"allow users with the role to add a poll to a thread")}}
+		{{perm("p_vote","vote",
+				"allow users with the role to vote in polls")}}
+		{{perm("p_create_subforum","create subforæ",
+				"allow users with the role to create subforæ in this forum. " +
+				"they will automatically become a bureaucrat in this subforum.")}}
+		{% if role_config.role != "other" %}
+			{{perm("p_approve","approve others",
+					"allow users with the role to assign the 'approved' role to those with the 'other' role")}}
+		{% endif %}
+		<input type="hidden" name="roleconfig_{{role_config.role}}" value="present"/>
+
+		{% if forum.id != 1 or role_config.role != "other" %}
+			<hr/>
+			<input type="checkbox" name="delete_{{role_config.role}}" id="delete_{{role_config.role}}"/>
+			<label for="delete_{{role_config.role}}">remove</label>
+		{% endif %}
+	</fieldset>
+{% endfor %}
+{% if role_configs %}
+	<p>confirm changes?</p>
+	<p>
+		<input type="submit" value="confirm">
+		<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+	</p>
+{% endif %}
+</form>
+
+
+<fieldset>
+	<legend>add role</legend>
+	<ul>
+		{% for role in other_roles %}
+		<li>{{role}} 
+			<form action="{{url_for('forum.add_role',forum_id=forum.id)}}" method="POST" style="display:inline">
+				<input type="hidden" value="{{role}}" name="role" />
+				<input type="submit" value="add" />
+			</form>
+		</li>
+		{% endfor %}
+		<li>
+			<form action="{{url_for('forum.add_role',forum_id=forum.id)}}" method="POST" style="display:inline">
+				<input type="text" name="role" class="role-input" placeholder="role name" maxlength="32"/>
+				<input type="submit" value="add" />
+			</form>
+		</li>
+	</ul>
+</fieldset>
+
+{% endblock %}

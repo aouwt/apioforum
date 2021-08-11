@@ -17,10 +17,10 @@ body { font-family: sans-serif; word-wrap: break-word; }
 .post:last-of-type { border-bottom: 1px solid black; }
 
 .post-heading,.post-footer { font-size: smaller; }
-.post-heading,.post-footer,a.username {
+.post-heading,.post-footer,.username {
 	color: hsl(0,0%,25%); 
 }
-a.username {
+.username {
     font-weight: bold;
     text-decoration: underline;
 }
@@ -35,6 +35,27 @@ a.username {
 .post-footer { margin-left: 0.2em; font-style: italic; }
 
 .post-anchor-link { color: hsl(0,0%,25%); }
+
+.deleted-post { 
+	color:white; 
+	background-color: hsl(0,0%,15%) !important; 
+    border-left: 1px solid darkgray;
+    border-right: 1px solid darkgray;
+    border-top: 1px solid darkgray;
+}
+.deleted-post > .post-heading > * { 
+	color: hsl(0,0%,85%); 
+}
+.deleted-post > .post-heading > .post-heading-b > .post-anchor-link { 
+	color: hsl(0,0%,60%); 
+}
+.deleted-post > .post-heading > .post-heading-a > .username { 
+	color: hsl(0,0%,80%); 
+}
+
+.deleted-post > .post-footer {
+	color: hsl(0,0%,80%); 
+}
 
 .thread-top-bar, .user-top-bar {
     margin-bottom: 4px;
@@ -80,9 +101,16 @@ dt { font-weight: bold }
 
 img { max-width: 100% }
 
-.avail_tags { margin-top: 30px }
-
-nav#navbar { float: right; padding: 5px; margin: 2px; border: 1px solid black; display:flex; align-items: center; flex-wrap: wrap }
+nav#navbar { 
+	float: right;
+	padding: 5px;
+	margin: 2px;
+	margin-bottom: 20px;
+	border: 1px solid black;
+	display:flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
 nav#navbar p { margin-left: 15px; margin-top: 0; margin-bottom: 0; margin-right: 10px; padding: 0 }
 nav#navbar p:first-of-type { margin-left:0.5em }
 nav#navbar a { color: blue; text-decoration: none }
@@ -168,14 +196,27 @@ nav#navbar .links { display: flex; }
     content: "]";
     color: grey;
 }
-.actionbutton { color:blue }
+.actionbutton { 
+	color:blue;
+	white-space: nowrap;
+}
 
-.new-post-box {
+.new-post-box, .forum-desc-box {
     height:20em;
     resize:vertical;
     width:100%;
     border:1px solid black;
     margin-top: 5px;
+}
+
+#polloptions {
+	display: block;
+	resize: vertical;
+    border:1px solid black;
+    margin-top: 5px;
+	height: 5em;
+	width: 100%;
+	font-family: sans-serif;
 }
 
 main {
@@ -189,6 +230,12 @@ blockquote {
     border-left: 3px solid grey;
 }
 
+label { user-select: none; }
+
+fieldset { margin-bottom: 15px; }
+
+.warning { color: red; font-weight: bold }
+
 .inline-form {
     display: inline-block;
 }
@@ -197,6 +244,7 @@ blockquote {
     font-size: .75rem;
     padding: 1px 3px;
     border: 1px solid black;
+	white-space: nowrap;
 }
 
 .md table {
@@ -207,6 +255,10 @@ blockquote {
     border: 1px solid grey;
     padding: 4px;
 }
+
+.role-input, .name-input { width: 12ch; }
+
+.thing-id { color: darkgray; font-size: smaller; font-weight: normal; }
 
 .breadcrumbs {
     list-style: none;

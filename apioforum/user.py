@@ -16,8 +16,11 @@ def view_user(username):
     user = db.execute("SELECT * FROM users WHERE username = ?;",(username,)).fetchone()
     if user is None:
         abort(404)
-    posts = db.execute(
-            "SELECT * FROM posts WHERE author = ? ORDER BY created DESC LIMIT 25;",(username,)).fetchall()
+    posts = db.execute("""
+        SELECT * FROM posts
+        WHERE author = ? AND deleted = 0
+        ORDER BY created DESC 
+        LIMIT 25;""",(username,)).fetchall()
     return render_template("view_user.html", user=user, posts=posts)
 
 @bp.route("/<username>/edit", methods=["GET","POST"])

@@ -171,6 +171,42 @@ DROP TABLE tags;
 ALTER TABLE tags_new RENAME TO tags;
 PRAGMA foreign_keys = on;
 """,
+"""
+CREATE TABLE role_config (
+    role TEXT NOT NULL,
+    forum NOT NULL REFERENCES forums(id),
+    id INTEGER PRIMARY KEY,
+
+    p_create_threads INT NOT NULL DEFAULT 1,
+    p_reply_threads INT NOT NULL DEFAULT 1,
+    p_view_threads INT NOT NULL DEFAULT 1,
+    p_manage_threads INT NOT NULL DEFAULT 0,
+    p_delete_posts INT NOT NULL DEFAULT 0,
+    p_vote INT NOT NULL DEFAULT 1,
+    p_create_polls INT NOT NULL DEFAULT 1,
+    p_approve INT NOT NULL DEFAULT 0,
+    p_create_subforum INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO role_config (role,forum) VALUES ("approved",1);
+INSERT INTO role_config (role,forum) VALUES ("other",1);
+""",
+"""
+CREATE TABLE role_assignments (
+    user NOT NULL REFERENCES users(username),
+    forum NOT NULL REFERENCES forums(id),
+    role TEXT NOT NULL
+);
+""",
+"""
+ALTER TABLE posts ADD COLUMN deleted NOT NULL DEFAULT 0;
+""",
+"""
+ALTER TABLE forums ADD COLUMN unlisted NOT NULL DEFAULT 0;
+""",
+"""
+ALTER TABLE role_config ADD COLUMN p_view_forum INT NOT NULL DEFAULT 1;
+"""
 ]
 
 def init_db():

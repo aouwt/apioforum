@@ -29,6 +29,7 @@
 <a href="{{url_for('thread.view_thread',thread_id=thread.id)}}">cancel</a>
 </form>
 
+{% if has_permission(thread.forum, g.user, "p_create_polls") %}
 {% if thread.poll is none %}
 <h2>create poll</h2>
 <form method="post" action="{{url_for('thread.create_poll',thread_id=thread.id)}}">
@@ -37,7 +38,7 @@
         <label for="polltitle">question title</label>
         <input type="title" id="polltitle" name="polltitle">
         <br>
-        <label for="polloptions">potential options (one per line)</label>
+        <label for="polloptions">options (one per line)</label>
         <textarea name="polloptions" id="polloptions"></textarea>
     </fieldset>
     <p>important: once a poll is created, you will not be able to modify it except to delete it entirely</p>
@@ -49,7 +50,7 @@
 <form action="{{url_for('thread.delete_poll',thread_id=thread.id)}}" method="post">
     <input type="submit" value="confirm: delete poll">
 </form>
-
+{% endif %}
 {% endif %}
 
 {% endblock %}

@@ -7,6 +7,7 @@ from flask import (
     url_for, flash, jsonify
 )
 from .db import get_db
+from .roles import has_permission
 from .forum import get_avail_tags
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
@@ -20,57 +21,58 @@ def view_thread(thread_id):
     thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
     if thread is None:
         abort(404)
-    else:
-        posts = db.execute("""
-            SELECT * FROM posts
-            WHERE posts.thread = ?
-            ORDER BY created ASC;
-            """,(thread_id,)).fetchall()
-        tags = db.execute(
-            """SELECT tags.* FROM tags
-            INNER JOIN thread_tags ON thread_tags.tag = tags.id
-            WHERE thread_tags.thread = ?
-            ORDER BY tags.id""",(thread_id,)).fetchall()
-        poll = None
-        votes = None
-        if thread['poll'] is not None:
-            poll_row= db.execute("""
-                SELECT polls.*,total_vote_counts.total_votes FROM polls
-                LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
-                WHERE polls.id = ?;                
-                """,(thread['poll'],)).fetchone()
-            options = db.execute("""
-                SELECT poll_options.*, vote_counts.num
-                FROM poll_options
-                LEFT OUTER JOIN vote_counts  ON poll_options.poll = vote_counts.poll
-                                            AND poll_options.option_idx = vote_counts.option_idx 
-                WHERE poll_options.poll = ?
-                ORDER BY option_idx asc;
-                """,(poll_row['id'],)).fetchall()
-            poll = {}
-            poll.update(poll_row)
-            poll['options'] = options
-            votes = {}
-            # todo: optimise this somehow
-            for post in posts:
-                if post['vote'] is not None:
-                    votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
+    if not has_permission(thread['forum'], g.user, "p_view_threads", False):
+        abort(403)
+    posts = db.execute("""
+        SELECT * FROM posts
+        WHERE posts.thread = ?
+        ORDER BY created ASC;
+        """,(thread_id,)).fetchall()
+    tags = db.execute(
+        """SELECT tags.* FROM tags
+        INNER JOIN thread_tags ON thread_tags.tag = tags.id
+        WHERE thread_tags.thread = ?
+        ORDER BY tags.id""",(thread_id,)).fetchall()
+    poll = None
+    votes = None
+    if thread['poll'] is not None:
+        poll_row= db.execute("""
+            SELECT polls.*,total_vote_counts.total_votes FROM polls
+            LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
+            WHERE polls.id = ?;                
+            """,(thread['poll'],)).fetchone()
+        options = db.execute("""
+            SELECT poll_options.*, vote_counts.num
+            FROM poll_options
+            LEFT OUTER JOIN vote_counts  ON poll_options.poll = vote_counts.poll
+                                        AND poll_options.option_idx = vote_counts.option_idx 
+            WHERE poll_options.poll = ?
+            ORDER BY option_idx asc;
+            """,(poll_row['id'],)).fetchall()
+        poll = {}
+        poll.update(poll_row)
+        poll['options'] = options
+        votes = {}
+        # todo: optimise this somehow
+        for post in posts:
+            if post['vote'] is not None:
+                votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
 
-        if g.user is None or poll is None:
-            has_voted = None
-        else:
-            v = db.execute("SELECT * FROM votes WHERE poll = ? AND user = ? AND current AND NOT is_retraction;",(poll['id'],g.user)).fetchone()
-            has_voted = v is not None
-            
-        return render_template(
-            "view_thread.html",
-            posts=posts,
-            thread=thread,
-            tags=tags,
-            poll=poll,
-            votes=votes,
-            has_voted=has_voted,
-        )
+    if g.user is None or poll is None:
+        has_voted = None
+    else:
+        v = db.execute("SELECT * FROM votes WHERE poll = ? AND user = ? AND current AND NOT is_retraction;",(poll['id'],g.user)).fetchone()
+        has_voted = v is not None
+        
+    return render_template(
+        "view_thread.html",
+        posts=posts,
+        thread=thread,
+        tags=tags,
+        poll=poll,
+        votes=votes,
+        has_voted=has_voted,
+    )
 
 def register_vote(thread,pollval):
     if pollval is None or pollval == 'dontvote':
@@ -113,7 +115,8 @@ def create_poll(thread_id):
         err = "that thread does not exist"
     elif g.user is None:
         err = "you need to be logged in to do that"
-    elif g.user != thread['creator']:
+    elif g.user != thread['creator'] and \
+            not has_permission(thread['forum'],g.user,"p_manage_threads"):
         err = "you can only create polls on threads that you own"
     elif thread['poll'] is not None:
         err = "a poll already exists for that thread"
@@ -121,6 +124,8 @@ def create_poll(thread_id):
         err = "poll title can't be empty"
     elif len(polloptions) < 2:
         err = "you must provide at least 2 options"
+    elif not has_permission(thread['forum'], g.user, "p_create_polls"):
+        err = "you do not have permission to do that"
 
     if err is not None:
         flash(err)
@@ -150,7 +155,8 @@ def delete_poll(thread_id):
         err = "that thread does not exist"
     elif g.user is None:
         err = "you need to be logged in to do that"
-    elif g.user != thread['creator']:
+    elif g.user != thread['creator'] and not \
+            has_permission(thread['forum'], g.user, "p_manage_threads"):
         err = "you can only delete polls on threads that you own"
     elif thread['poll'] is None:
         err = "there is no poll to delete on this thread"
@@ -160,7 +166,6 @@ def delete_poll(thread_id):
         return fail
     else:
         pollid = thread['poll']
-
         db.execute("UPDATE posts SET vote = NULL WHERE thread = ?",(thread_id,)) # this assumes only max one poll per thread 
         db.execute("DELETE FROM votes WHERE poll = ?",(pollid,))
         db.execute("DELETE FROM poll_options WHERE poll = ?",(pollid,))
@@ -174,59 +179,88 @@ def delete_poll(thread_id):
 def create_post(thread_id):
     if g.user is None:
         flash("you need to log in before you can post")
-        return redirect(url_for('thread.view_thread',thread_id=thread_id))
+    db = get_db()
+    content = request.form['content']
+    thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
+    if len(content.strip()) == 0:
+        flash("you cannot post an empty message")
+    elif not thread:
+        flash("that thread does not exist")
+    elif not has_permission(thread['forum'], g.user, "p_reply_threads"):
+        flash("you do not have permission to do this")
+    elif not has_permission(thread['forum'], g.user, "p_view_threads"):
+        flash("you do not have permission to do this")
+    elif not has_permission(thread['forum'], g.user, "p_vote") \
+            and 'poll' in request.form:
+        flash("you do not have permission to do this")
     else:
-        db = get_db()
-        content = request.form['content']
-        thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
-        if len(content.strip()) == 0:
-            flash("you cannot post an empty message")
-        elif not thread:
-            flash("that thread does not exist")
-        else:
-            vote_id = None
-            if thread['poll'] is not None:
-                pollval = request.form.get('poll')
-                try:
-                    vote_id = register_vote(thread,pollval)
-                except ValueError:
-                    flash("invalid poll form value")
-                    return redirect(url_for('thread.view_thread',thread_id=thread_id))
+        vote_id = None
+        if thread['poll'] is not None:
+            pollval = request.form.get('poll')
+            try:
+                vote_id = register_vote(thread,pollval)
+            except ValueError:
+                flash("invalid poll form value")
+                return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
-            cur = db.cursor()
-            cur.execute("""
-                INSERT INTO posts (thread,author,content,created,vote)
-                VALUES (?,?,?,current_timestamp,?);
-                """,(thread_id,g.user,content,vote_id))
-            post_id = cur.lastrowid
-            cur.execute(
-                "UPDATE threads SET updated = current_timestamp WHERE id = ?;",
-                (thread_id,)
-            )
-            db.commit()
-            flash("post posted postfully")
-            return redirect(post_jump(thread_id, post_id))
+        cur = db.cursor()
+        cur.execute("""
+            INSERT INTO posts (thread,author,content,created,vote)
+            VALUES (?,?,?,current_timestamp,?);
+            """,(thread_id,g.user,content,vote_id))
+        post_id = cur.lastrowid
+        cur.execute(
+            "UPDATE threads SET updated = current_timestamp WHERE id = ?;",
+            (thread_id,)
+        )
+        db.commit()
+        flash("post posted postfully")
+        return redirect(post_jump(thread_id, post_id))
     return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
 def delete_post(post_id):
     db = get_db()
     post = db.execute("SELECT * FROM posts WHERE id = ?",(post_id,)).fetchone()
+    thread = db.execute("SELECT * FROM threads WHERE id = ?",(post['thread'],)).fetchone()
     if post is None:
         flash("that post doesn't exist")
         return redirect("/")
-    if post['author'] != g.user:
-        flash("you can only delete posts that you created")
+    if post['author'] != g.user and not has_permission(thread['forum'], g.user, "p_delete_posts"):
+        flash("you do not have permission to do that")
         return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
     if request.method == "POST":
-        # todo: don't actually delete, just mark as deleted or something (and wipe content)
-        # so that you can have a "this post was deleted" thing
-        db.execute("DELETE FROM posts WHERE id = ?",(post_id,))
+        db.execute("""
+            UPDATE posts SET 
+                content = '',
+                deleted = 1
+            WHERE id = ?""",(post_id,))
         db.commit()
         flash("post deleted deletedly")
         return redirect(url_for("thread.view_thread",thread_id=post["thread"]))
     else:
         return render_template("delete_post.html",post=post)
+        
+@bp.route("/delete_thread/<int:thread_id>", methods=["GET","POST"])
+def delete_thread(thread_id):
+    db = get_db()
+    thread = db.execute("SELECT * FROM threads WHERE id = ?",(thread_id,)).fetchone()
+    if thread is None:
+        flash("that thread doesn't exist")
+        return redirect("/")
+    if not has_permission(thread['forum'], g.user, "p_delete_posts"):
+        flash("you do not have permission to do that")
+        return redirect(url_for("thread.view_thread",thread_id=thread_id))
+    if request.method == "POST":
+        db.execute("DELETE FROM posts WHERE thread = ?",(thread_id,))
+        db.execute("DELETE FROM threads WHERE id = ?",(thread_id,))
+        db.commit()
+        flash("thread deleted deletedly")
+        return redirect(url_for("forum.view_forum",forum_id=thread['forum']))
+    else:
+        count = db.execute("SELECT num_replies FROM number_of_posts WHERE thread = ?",
+                (thread_id,)).fetchone()[0]
+        return render_template("delete_thread.html",thread=thread,post_count=count)
         
 
 @bp.route("/edit_post/<int:post_id>",methods=["GET","POST"])
@@ -280,7 +314,9 @@ def config_thread(thread_id):
     err = None
     if g.user is None:
         err = "you need to be logged in to do that"
-    elif g.user != thread['creator']:
+    elif not has_permission(thread['forum'], g.user, "p_view_threads"):
+        err = "you do not have permission to do that"
+    elif g.user != thread['creator'] and not has_permission(thread['forum'], g.user, "p_manage_threads"):
         err = "you can only configure threads that you own"
 
     if err is not None:
