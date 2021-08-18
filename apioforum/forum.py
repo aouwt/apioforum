@@ -22,23 +22,34 @@ class Forum(DbWrapper):
     primary_key = "id"
     references = {"parent", Forum}
 
+    def has_permission(self, user, permission, login_required=True):
+        return(has_permission(self._key, str(user), permission, login_required))
+
+    def has_bureaucrat(self, user):
+        return(is_bureaucraft(self._key, str(user)))
+
+    def get_avail_tags(self):
+        db = get_db()
+        return Tag.query_some("""
+            WITH RECURSIVE fs AS
+                    (SELECT * FROM forums WHERE id = ?
+                     UNION ALL
+                     SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
+            SELECT * FROM tags
+            WHERE tags.forum in (SELECT id FROM fs)
+            ORDER BY id;    	
+            """,(self,))
+
+    def get_forum(self):
+        return self
+
+class Tag(DbWrapper):
+    table = "tags"
+    references = {"forum": Forum}
 
 @bp.route("/")
 def not_actual_index():
     return redirect("/1")
-
-def get_avail_tags(forum_id):
-    db = get_db()
-    tags = db.execute("""
-    	WITH RECURSIVE fs AS
-    		(SELECT * FROM forums WHERE id = ?
-    		 UNION ALL
-    		 SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
-    	SELECT * FROM tags
-    	WHERE tags.forum in (SELECT id FROM fs)
-    	ORDER BY id;    	
-    	""",(forum_id,)).fetchall()
-    return tags 
 
 def forum_path(forum_id):
     db = get_db()

@@ -95,3 +95,28 @@ def has_permission(forum_id, username, permission, login_required=True):
 def is_bureaucrat(forum_id, user):
     if user == None: return False
     return get_user_role(forum_id, user) == "bureaucrat"
+
+# ^ the above could perhaps be refactored to use the new DB wrappers, but I am
+# not focusing on it right now
+
+# decorators for paths that require certain permissions
+# the path must accept an object implementing get_forum
+def requires_permission(*a, **k):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(obj, *args, **kwargs):
+            if not obj.get_forum().has_permission(g.user, *a, **k):
+                abort(403)
+            return f(obj, *args, **kwargs)
+        return wrapper
+    return decorator
+
+def requires_bureaucrat(f):
+    @functools.wraps(f)
+    @requires_permission("p_view_forum")
+    def wrapper(obj, *args, **kwargs):
+        if not obj.get_forum().is_bureaucrat(g.user):
+            abort(403)
+        return f(forum, *args, **kwargs)
+    return wrapper
+

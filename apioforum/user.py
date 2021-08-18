@@ -16,6 +16,9 @@ class User(DbWrapper):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    def __str__(self):
+        return self._key
+
 
 @bp.route("/<username>")
 def view_user(username):

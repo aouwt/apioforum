@@ -7,8 +7,8 @@ from flask import (
     url_for, flash, jsonify
 )
 from .db import get_db, DbWrapper
-from .roles import has_permission
-from .forum import get_avail_tags, Forum
+from .roles import has_permission, requires_permission
+from .forum import Forum, Tag
 from .user import User
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
@@ -45,10 +45,6 @@ class Vote(DbWrapper):
     table = "votes"
     references = {"poll": Poll, "user": User}
 
-class Tag(DbWrapper):
-    table = "tags"
-    references = {"forum": Forum}
-
 class Thread(DbWrapper):
     table = "threads"
     references = {"forum": Forum, "poll": Poll}
@@ -67,6 +63,9 @@ class Thread(DbWrapper):
             ORDER BY tags.id
             """,(self,))
 
+    def get_forum(self):
+        return self.forum
+
 class Post(DbWrapper):
     table = "posts"
     references = {"thread": Thread, "author": User, "vote": Vote}
@@ -76,10 +75,9 @@ def post_jump(thread_id, post_id):
     return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
 
 @bp.route("/<db(Thread):thread>")
+@requires_permission("p_view_threads")
 def view_thread(thread):
     db = get_db()
-    if not has_permission(thread['forum'], g.user, "p_view_threads", False):
-        abort(403)
     posts = thread.get_posts()
     tags = thread.get_tags()
 
@@ -100,7 +98,6 @@ def view_thread(thread):
         posts=posts,
         thread=thread,
         tags=tags,
-        poll=poll,
         has_voted=has_voted,
     )
 
