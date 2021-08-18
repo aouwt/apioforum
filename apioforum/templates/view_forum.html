@@ -1,25 +1,56 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, vote_meter %}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab, vote_meter %}
 {% block header %}
-<h1>{% block title %}{{forum.name}}{%endblock%}</h1>
+<h1>{% block title %}{{forum.name}}{% endblock %} <span class="thing-id">#{{forum.id}}</span></h1>
 {% if forum.id != 1 %}
 	{{ forum_breadcrumb(forum) }}
 {% endif %}
 {%endblock%}
 
 {%block content%}
-{% if forum.description %}
-{{forum.description|md|safe}}
-{% endif %}
-<p class="avail_tags">available tags:
-{% for the_tag in avail_tags %}
-{{tag(the_tag)}}
-{% else %}
-<em>(none available)</em>
-{% endfor %}
+{{forum.description|md|safe}} 
+
+<hr/>
+<div class="forum-info">
+	{% if bureaucrats|length > 0 %}
+		<p>
+			bureaucrats in this forum:
+			{% for b in bureaucrats %}
+				{{disp_user(b)}}
+			{% endfor %}
+		</p>
+	{% endif %}
+
+	{% set role = get_user_role(forum.id, g.user) %}
+	{% if role != "other" %}
+	<p>your role in this forum: {{role}}</p>
+	{% endif %}
+
+	<p>available tags:
+	{% for the_tag in avail_tags %}
+	{{tag(the_tag)}}
+	{% else %}
+	<em>(none available)</em>
+	{% endfor %}
+	</p>
+</div>
+
+<p>
+	{% if is_bureaucrat(forum.id, g.user) %}
+		{{ab("forum settings",url_for('forum.edit_forum',forum_id=forum.id))}}
+		{{ab("role/permission settings",url_for('forum.edit_roles',forum_id=forum.id))}}
+		{{ab("assign roles",url_for('forum.view_user_role',forum_id=forum.id))}}
+	{% endif %}
+	{% if has_permission(forum.id, g.user, "p_create_subforum") %}
+		{{ab("create subforum",url_for('forum.create_forum',forum_id=forum.id))}}
+	{% endif %}
+	{% if not is_bureaucrat(forum.id, g.user) and has_permission(forum.id, g.user, "p_approve") %}
+		{{ab("approve users",url_for('forum.view_user_role',forum_id=forum.id))}}
+	{% endif %}
+</p>
 
 {% if subforums %}
-<h2>subforae</h2>
+<h2>subforæ</h2>
 <div class="forum-list">
 	{% for subforum in subforums %}
 		<div class="listing">
@@ -44,12 +75,15 @@
 
 <h2>threads</h2>
 <p>
-{% if g.user %}
+{% if has_permission(forum.id, g.user, "p_create_threads") %}
 <a class="actionbutton" href="{{url_for('forum.create_thread',forum_id=forum.id)}}">create new thread</a>
-{% else %}
+{% elif has_permission(forum.id, g.user, "p_create_threads", login_required=False) %}
 please log in to create a new thread
+{% else %}
+you do not have permission to create threads in this forum
 {% endif %}
-</p>
+
+{% if has_permission(forum.id, g.user, "p_view_threads", login_required=False) %}
 <div class="thread-list">
 	{%for thread in threads%}
 		<div class="listing">
@@ -71,7 +105,7 @@ please log in to create a new thread
 					{{ ts(thread.created) }}
 				</div>
 			</div>
-			{#{% if thread.mrp_id %}#}
+			{% if not thread.mrp_deleted %}
 				<div class="listing-caption">
 					{{ disp_user(thread.mrp_author) }}
 					<span class="thread-preview-ts">
@@ -83,7 +117,14 @@ please log in to create a new thread
 						</a>
 					</span>
 				</div>
-			{#{% endif %}#}
+			{% else %}
+				<div class="listing-caption">
+					<a class="thread-preview-post" 
+					   href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+						latest post
+					</a>
+				</div>
+			{% endif %}
 			{% if thread_polls[thread.id] %}
 				<div class="thread-vote-summary">
 					{{ vote_meter(thread_polls[thread.id]) }}
@@ -105,6 +146,7 @@ please log in to create a new thread
 </nav>
 	
 	
-</nav>
-</main>
+{% else %}
+<p>you do not have permission to view threads in this forum</p>
+{% endif %}
 {%endblock%}

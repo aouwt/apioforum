@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% from 'common.html' import ab %}
+{% block header %}<h1>{% block title %}configure user role in '{{forum.name}}'{% endblock %}</h1>{% endblock %}
+{% block content %}
+<p>
+	each user has a role in the forum.
+	here, a user may be assigned a role in the forum.
+	otherwise, the user's role is the same as the parent forum.
+	everyone's role is "other" by default.
+</p>
+{% if not is_bureaucrat(forum.id, g.user) %}
+	<p>
+		you are only allowed to approve members in this forum.
+	</p>
+{% endif %}
+
+{# <p>{{ab("role assignment list",url_for("forum.role_list_select",forum_id=forum.id))}}</p> #}
+
+<form method="post" action="{{url_for('forum.view_user_role',forum_id=forum.id)}}">
+	<label for="user">role settings for user: </label>
+	<input type="text" class="name-input" id="user" name="user" value="{{user}}"/>
+	<input type="submit" value="view"/>
+</form>
+
+{% set can_change = not invalid_user and user %}
+{% if invalid_user %}
+	<p>requested user does not exist.</p>
+{% elif user %}
+<hr/>
+<form method="post" id="role-form">
+	<p>{{user}}'s role in this forum is "{{role}}"</p>
+	{% set can_change = role == "other" or is_bureaucrat(forum.id, g.user) %}
+	{% if can_change %}
+		<label for="role">assigned role: </label>
+		<select name="role" id="role" autocomplete="off">
+			<option value="" {% if not assigned_role %}selected{% endif %}>(no assigned role)</option>
+			{% for role in forum_roles %}
+				<option value="{{role}}" 
+						{% if role == assigned_role %}selected{% endif %}>
+					{{role}}
+				</option>
+			{% endfor %}
+		</select>
+	{% else %}
+		<p>you do not have permission to change the role of this user</p>
+	{% endif %}
+</form>
+{% endif %}
+
+{% if can_change %}<p>confirm changes?</p>{% endif %}
+<p>
+{% if can_change %}<input type="submit" value="confirm" form="role-form">{% endif %}
+	<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}">cancel</a>
+</p>
+
+{% endblock %}
