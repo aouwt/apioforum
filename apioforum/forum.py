@@ -17,6 +17,12 @@ import functools
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
+class Forum(DbWrapper):
+    table = "forums"
+    primary_key = "id"
+    references = {"parent", Forum}
+
+
 @bp.route("/")
 def not_actual_index():
     return redirect("/1")

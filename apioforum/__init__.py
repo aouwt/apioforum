@@ -22,6 +22,8 @@ def create_app():
 
     from . import db
     db.init_app(app)
+    app.url_map.converters['db'] = db.DbConverter
+
     from . import permissions
     permissions.init_app(app)
 

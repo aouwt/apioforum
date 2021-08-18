@@ -6,41 +6,26 @@ from flask import (
     Blueprint, render_template, abort, request, g, redirect,
     url_for, flash, jsonify
 )
-from .db import get_db
+from .db import get_db, DbWrapper
 from .roles import has_permission
-from .forum import get_avail_tags
+from .forum import get_avail_tags, Forum
+from .user import User
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
-def post_jump(thread_id, post_id):
-    return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
+class Poll(DbWrapper):
+    table = "polls"
 
-@bp.route("/<int:thread_id>")
-def view_thread(thread_id):
-    db = get_db()
-    thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
-    if thread is None:
-        abort(404)
-    if not has_permission(thread['forum'], g.user, "p_view_threads", False):
-        abort(403)
-    posts = db.execute("""
-        SELECT * FROM posts
-        WHERE posts.thread = ?
-        ORDER BY created ASC;
-        """,(thread_id,)).fetchall()
-    tags = db.execute(
-        """SELECT tags.* FROM tags
-        INNER JOIN thread_tags ON thread_tags.tag = tags.id
-        WHERE thread_tags.thread = ?
-        ORDER BY tags.id""",(thread_id,)).fetchall()
-    poll = None
-    votes = None
-    if thread['poll'] is not None:
-        poll_row= db.execute("""
+    @classmethod
+    def get_row(cls, key):
+        db = get_db()
+        row = db.execute("""
             SELECT polls.*,total_vote_counts.total_votes FROM polls
             LEFT OUTER JOIN total_vote_counts ON polls.id = total_vote_counts.poll
             WHERE polls.id = ?;                
-            """,(thread['poll'],)).fetchone()
+            """,(key,)).fetchone()
+        if row == None:
+            return None
         options = db.execute("""
             SELECT poll_options.*, vote_counts.num
             FROM poll_options
@@ -48,20 +33,66 @@ def view_thread(thread_id):
                                         AND poll_options.option_idx = vote_counts.option_idx 
             WHERE poll_options.poll = ?
             ORDER BY option_idx asc;
-            """,(poll_row['id'],)).fetchall()
-        poll = {}
-        poll.update(poll_row)
-        poll['options'] = options
-        votes = {}
-        # todo: optimise this somehow
-        for post in posts:
-            if post['vote'] is not None:
-                votes[post['id']] = db.execute("SELECT * FROM votes WHERE id = ?",(post['vote'],)).fetchone()
+            """,(key,)).fetchall()
+        row['options'] = options
 
-    if g.user is None or poll is None:
+class PollOption(DbWrapper):
+    table = "poll_options"
+    primary_key = None
+    references = {"poll": Poll}
+
+class Vote(DbWrapper):
+    table = "votes"
+    references = {"poll": Poll, "user": User}
+
+class Tag(DbWrapper):
+    table = "tags"
+    references = {"forum": Forum}
+
+class Thread(DbWrapper):
+    table = "threads"
+    references = {"forum": Forum, "poll": Poll}
+
+    def get_posts(self):
+        return Post.query_some("""
+            SELECT * FROM posts
+            WHERE thread = ?
+            ORDER BY created ASC;
+            """,(self,))
+
+    def get_tags(self):
+        return Tag.query_some("""
+            SELECT tags.* FROM tags
+            INNER JOIN thread_tags ON thread_tags.tag = tags.id
+            ORDER BY tags.id
+            """,(self,))
+
+class Post(DbWrapper):
+    table = "posts"
+    references = {"thread": Thread, "author": User, "vote": Vote}
+
+
+def post_jump(thread_id, post_id):
+    return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
+
+@bp.route("/<db(Thread):thread>")
+def view_thread(thread):
+    db = get_db()
+    if not has_permission(thread['forum'], g.user, "p_view_threads", False):
+        abort(403)
+    posts = thread.get_posts()
+    tags = thread.get_tags()
+
+    if g.user is None or thread.poll is None:
         has_voted = None
     else:
-        v = db.execute("SELECT * FROM votes WHERE poll = ? AND user = ? AND current AND NOT is_retraction;",(poll['id'],g.user)).fetchone()
+        v = Vote.query_one("""
+            SELECT * FROM votes 
+            WHERE poll = ? 
+                AND user = ? 
+                AND current 
+                AND NOT is_retraction;
+            """,(thread.poll,g.user))
         has_voted = v is not None
         
     return render_template(
@@ -70,7 +101,6 @@ def view_thread(thread_id):
         thread=thread,
         tags=tags,
         poll=poll,
-        votes=votes,
         has_voted=has_voted,
     )
 
