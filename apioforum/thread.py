@@ -77,7 +77,6 @@ def post_jump(thread_id, post_id):
 @bp.route("/<db(Thread):thread>")
 @requires_permission("p_view_threads")
 def view_thread(thread):
-    db = get_db()
     posts = thread.get_posts()
     tags = thread.get_tags()
 
