@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro post_url(post) -%}
-	{{url_for('thread.view_thread', thread_id=post.thread)}}#post_{{post.id}}
+	{{url_for('thread.view_thread', obj=post.thread)}}#post_{{post.id}}
 {%- endmacro %}
 
 {% macro disp_post(post, buttons=False, forum=None, footer=None) %}
@@ -107,7 +107,7 @@
 {% endmacro %}
 
 {% macro vote_meter(poll) %}
-	{% set total_votes = poll.total_votes %}
+	{% set total_votes = poll.get_total_votes() %}
 	{% set n = namespace() %}
 	{% set n.runningtotal = 0 %}
 	<svg width="100%" height="15px" xmlns="http://www.w3.org/2000/svg">

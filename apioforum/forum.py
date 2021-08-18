@@ -7,7 +7,7 @@ from flask import (
     g, redirect, url_for, flash, abort
 )
 
-from .db import get_db
+from .db import get_db, DbWrapper
 from .mdrender import render
 from .roles import get_forum_roles,has_permission,is_bureaucrat,get_user_role, permissions as role_permissions
 from .permissions import is_admin
@@ -17,10 +17,11 @@ import functools
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
+forum_references = {}
 class Forum(DbWrapper):
     table = "forums"
     primary_key = "id"
-    references = {"parent", Forum}
+    references = forum_references
 
     def has_permission(self, user, permission, login_required=True):
         return(has_permission(self._key, str(user), permission, login_required))
@@ -42,6 +43,9 @@ class Forum(DbWrapper):
 
     def get_forum(self):
         return self
+
+# cannot references Forum inside of itself; workaround
+forum_references["parent"] = Forum
 
 class Tag(DbWrapper):
     table = "tags"

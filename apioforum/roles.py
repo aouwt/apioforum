@@ -1,6 +1,8 @@
 
 from .db import get_db
 from .permissions import is_admin
+from flask import g
+import functools
 
 permissions = [
     "p_create_threads",

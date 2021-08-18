@@ -4,7 +4,7 @@ from flask import current_app, g, abort
 from flask.cli import with_appcontext
 from werkzeug.routing import BaseConverter
 
-from db_migrations import migrations
+from .db_migrations import migrations
 
 def get_db():
     if 'db' not in g:
@@ -92,7 +92,7 @@ class DbWrapper:
 
         # if this column is a reference, fetch the referenced row as an object
         r = self.__class__.references.get(attr, None)
-        if r != None:
+        if r != None and self._row[attr] != None:
             # do not fetch it more than once
             if not attr in self.__dict__:
                 self.__dict__[attr] = r.fetch(self._row[attr])
@@ -100,17 +100,20 @@ class DbWrapper:
 
         try:
             return self._row[attr]
-        except KeyError as k:
-            raise AttributeError() from k
+        except IndexError as i:
+            try:
+                return self.__dict__[attr]
+            except KeyError:
+                raise AttributeError(attr) from i
 
     def __setattr__(self, attr, value):
-        if not self.__class__.primary_key:
-            raise(RuntimeError('cannot set attributes on this object'))
-
         # special attributes are set on the object itself
         if attr[0] == '_':
             self.__dict__[attr] = value
             return
+
+        if not self.__class__.primary_key:
+            raise(RuntimeError('cannot set attributes on this object'))
 
         cls = self.__class__
 
@@ -118,8 +121,6 @@ class DbWrapper:
             v = value
         else:
             v = value._key
-
-        print(f"UPDATE {cls.table} SET {attr} = ? WHERE {cls.primary_key} = ?")
 
         get_db().execute(
             f"UPDATE {cls.table} SET {attr} = ? WHERE {cls.primary_key} = ?",
@@ -148,9 +149,12 @@ class DbWrapper:
 
 # flask path converter
 class DbConverter(BaseConverter):
+    # associate names with DbWrapper classes
+    db_classes = {}
+
     def __init__(self, m, db_class, abort=True):
         super(DbConverter, self).__init__(m)
-        self.db_class = db_class
+        self.db_class = self.__class__.db_classes[db_class]
         self.abort = abort
     
     def to_python(self, value):

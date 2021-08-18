@@ -36,7 +36,7 @@
     {% for post in posts %}
         {% if post.vote %}
 
-            {% set vote = votes[post.id] %}        
+            {% set vote = post.vote %}        
             {% set option_idx = vote.option_idx %}
             
             {# this is bad but it's going to get refactored anyway #}
