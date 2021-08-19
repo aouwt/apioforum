@@ -55,6 +55,10 @@ def view_thread(thread_id,page=1):
             POSTS_PER_PAGE,
             (page-1)*POSTS_PER_PAGE,
         )).fetchall()
+
+    num_posts = db.execute("SELECT count(*) as count FROM posts WHERE posts.thread = ?",(thread_id,)).fetchone()['count']
+    max_pageno = math.ceil(num_posts/POSTS_PER_PAGE)
+    
     tags = db.execute(
         """SELECT tags.* FROM tags
         INNER JOIN thread_tags ON thread_tags.tag = tags.id
@@ -99,6 +103,8 @@ def view_thread(thread_id,page=1):
         poll=poll,
         votes=votes,
         has_voted=has_voted,
+        page=page,
+        max_pageno=max_pageno,
     )
 
 def register_vote(thread,pollval):
