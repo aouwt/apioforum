@@ -206,8 +206,17 @@ ALTER TABLE forums ADD COLUMN unlisted NOT NULL DEFAULT 0;
 """,
 """
 ALTER TABLE role_config ADD COLUMN p_view_forum INT NOT NULL DEFAULT 1;
+""",
 """
+CREATE TABLE webhooks (
+    id INTEGER PRIMARY KEY,
+    type TEXT NOT NULL,
+    url TEXT NOT NULL,
+    forum INTEGER NOT NULL REFERENCES forums(id),
+    inherits INTEGER NOT NULL DEFAULT 0
+);""",
 ]
+
 
 def init_db():
     db = get_db()
