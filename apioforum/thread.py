@@ -14,7 +14,7 @@ bp = Blueprint("thread", __name__, url_prefix="/thread")
 
 POSTS_PER_PAGE = 20
 
-def which_page(post_id):
+def which_page(post_id,return_thread_id=False):
     # on which page lieth the post in question?
     # forget not that page numbers employeth a system that has a base of 1.
     # the
@@ -25,14 +25,22 @@ def which_page(post_id):
 
     db = get_db()
     # ASSUMES THAT post ids are consecutive and things
-    # this is probably a reasonable assumption 
-    number_of_things_before_the_thing = db.execute('select count(*) as c from posts where thread = (select thread from posts where id = ?) and id < ?;',(post_id,post_id)).fetchone()['c']
+    # this is probably a reasonable assumption
+
+    thread_id = db.execute('select thread from posts where id = ?',(post_id,)).fetchone()['thread']
     
-    return 1+math.floor(number_of_things_before_the_thing/POSTS_PER_PAGE)
+    number_of_things_before_the_thing = db.execute('select count(*) as c, thread as t from posts where thread = ? and id < ?;',(thread_id,post_id)).fetchone()['c']
 
+    
+    page =  1+math.floor(number_of_things_before_the_thing/POSTS_PER_PAGE)
+    if return_thread_id:
+        return page, thread_id
+    else:
+        return page
 
-def post_jump(thread_id, post_id):
-    return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
+def post_jump(post_id):
+    page,thread_id=which_page(post_id,True)
+    return url_for("thread.view_thread",thread_id=thread_id,page=page)+"#post_"+str(post_id)
 
 @bp.route("/<int:thread_id>")
 @bp.route("/<int:thread_id>/page/<int:page>")
@@ -248,7 +256,7 @@ def create_post(thread_id):
         )
         db.commit()
         flash("post posted postfully")
-        return redirect(post_jump(thread_id, post_id))
+        return redirect(post_jump(post_id))
     return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
@@ -320,7 +328,7 @@ def edit_post(post_id):
                 "UPDATE posts SET content = ?, edited = 1, updated = current_timestamp WHERE id = ?",(newcontent,post_id))
             db.commit()
             flash("post edited editiously")
-            return redirect(post_jump(post['thread'],post_id))
+            return redirect(post_jump(post_id))
         else:
             flash(err)
     return render_template("edit_post.html",post=post)

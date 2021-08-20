@@ -112,7 +112,7 @@ you do not have permission to create threads in this forum
 						{{ ts(thread.mrp_created) }}
 					</span>
 					<span class="thread-preview-post">
-						<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+						<a href="{{post_jump(thread.mrp_id)}}">
 							{{ thread.mrp_content[:500]|e }}
 						</a>
 					</span>
@@ -120,7 +120,7 @@ you do not have permission to create threads in this forum
 			{% else %}
 				<div class="listing-caption">
 					<a class="thread-preview-post" 
-					   href="{{url_for('thread.view_thread',thread_id=thread.id)}}#post_{{thread.mrp_id}}">
+					   href="{{post_jump(thread.mrp_id)}}">
 						latest post
 					</a>
 				</div>
