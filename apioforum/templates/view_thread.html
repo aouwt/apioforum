@@ -1,4 +1,4 @@
-{% from 'common.html' import disp_post,tag,thread_breadcrumb,vote_meter %}
+{% from 'common.html' import disp_post,tag,thread_breadcrumb,vote_meter,pagination_nav %}
 {% extends 'base.html' %}
 {% block header %}
 <h1>{%block title %}{{thread.title}}{% endblock %} <span class="thing-id">#{{thread.id}}</span></h1>
@@ -69,17 +69,7 @@
         {% endif %}
     {% endfor %}
 </div>
-<nav aria-label="pagination" id="pages">
-	{% if page > 1 %}
-	<a href="{{url_for('thread.view_thread',thread_id=thread.id)}}" aria-label="first page">&lt;&lt;</a>
-	<a href="{{url_for('thread.view_thread',thread_id=thread.id,page=page-1)}}" aria-label="previous page">&lt;</a>
-	{% endif %}
-	page {{page}} of {{max_pageno}}
-	{% if page < max_pageno %} {# > #}
-	<a href="{{url_for('thread.view_thread',thread_id=thread.id,page=page+1)}}" aria-label="next page">&gt;</a>
-	<a href="{{url_for('thread.view_thread',thread_id=thread.id,page=max_pageno)}}" aria-label="last page">&gt;&gt;</a>
-	{% endif %}
-</nav>
+{{ pagination_nav(page,max_pageno,'thread.view_thread',thread_id=thread.id) }}
 {% if g.user and has_permission(thread.forum, g.user, "p_reply_threads") %}
 <form class="new-post" action="{{url_for('thread.create_post',thread_id=thread.id)}}" method="POST">
     <textarea class="new-post-box" placeholder="your post here..." name="content"></textarea>

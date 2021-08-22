@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab, vote_meter %}
+{% from 'common.html' import ts, tag, disp_user, post_url, forum_breadcrumb, ab, vote_meter, pagination_nav %}
 {% block header %}
 <h1>{% block title %}{{forum.name}}{% endblock %} <span class="thing-id">#{{forum.id}}</span></h1>
 {% if forum.id != 1 %}
@@ -133,18 +133,8 @@ you do not have permission to create threads in this forum
 		</div>
 	{%endfor%}
 </div>
-<nav aria-label="pagination" id="pages">
-	{% if page > 1 %}
-	<a href="{{url_for('forum.view_forum',forum_id=forum.id)}}" aria-label="first page">&lt;&lt;</a>
-	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=page-1)}}" aria-label="previous page">&lt;</a>
-	{% endif %}
-	page {{page}} of {{max_pageno}}
-	{% if page < max_pageno %} {# > #}
-	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=page+1)}}" aria-label="next page">&gt;</a>
-	<a href="{{url_for('forum.view_forum',forum_id=forum.id,page=max_pageno)}}" aria-label="last page">&gt;&gt;</a>
-	{% endif %}
-</nav>
-	
+{{ pagination_nav(page,max_pageno,'forum.view_forum',forum_id=forum.id) }}
+
 	
 {% else %}
 <p>you do not have permission to view threads in this forum</p>
