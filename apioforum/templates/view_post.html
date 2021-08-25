@@ -8,5 +8,5 @@
 {{disp_post(post,False)}}
 <p>post source:</p>
 <textarea readonly class="new-post-box" name="newcontent">{{post.content}}</textarea>
-<a href="{{url_for('thread.view_thread',thread_id=post.thread)}}">i am satisfied</a>
+<a href="{{post_jump(post.id)}}">i am satisfied</a>
 {% endblock %}

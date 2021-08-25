@@ -54,6 +54,7 @@ def create_app():
         return dict(path_for_next=p)
 
     app.jinja_env.globals.update(forum_path=forum.forum_path)
+    app.jinja_env.globals.update(post_jump=thread.post_jump)
     from .roles import has_permission, is_bureaucrat, get_user_role
     app.jinja_env.globals.update(
             has_permission=has_permission,

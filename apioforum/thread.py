@@ -1,6 +1,6 @@
 # view posts in thread
 
-import itertools
+import itertools, math
 
 from flask import (
     Blueprint, render_template, abort, request, g, redirect,
@@ -12,11 +12,41 @@ from .forum import get_avail_tags
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
 
-def post_jump(thread_id, post_id):
-    return url_for("thread.view_thread",thread_id=thread_id)+"#post_"+str(post_id)
+POSTS_PER_PAGE = 20
+
+def which_page(post_id,return_thread_id=False):
+    # on which page lieth the post in question?
+    # forget not that page numbers employeth a system that has a base of 1.
+    # the
+    # we need impart the knowledgf e into ourselves pertaining to the
+    # number of things
+    # before the thing
+    # yes
+
+    db = get_db()
+    # ASSUMES THAT post ids are consecutive and things
+    # this is probably a reasonable assumption
+
+    thread_id = db.execute('select thread from posts where id = ?',(post_id,)).fetchone()['thread']
+    
+    number_of_things_before_the_thing = db.execute('select count(*) as c, thread as t from posts where thread = ? and id < ?;',(thread_id,post_id)).fetchone()['c']
+
+    
+    page =  1+math.floor(number_of_things_before_the_thing/POSTS_PER_PAGE)
+    if return_thread_id:
+        return page, thread_id
+    else:
+        return page
+
+def post_jump(post_id):
+    page,thread_id=which_page(post_id,True)
+    return url_for("thread.view_thread",thread_id=thread_id,page=page)+"#post_"+str(post_id)
 
 @bp.route("/<int:thread_id>")
-def view_thread(thread_id):
+@bp.route("/<int:thread_id>/page/<int:page>")
+def view_thread(thread_id,page=1):
+    if page < 1:
+        abort(400)
     db = get_db()
     thread = db.execute("SELECT * FROM threads WHERE id = ?;",(thread_id,)).fetchone()
     if thread is None:
@@ -26,8 +56,17 @@ def view_thread(thread_id):
     posts = db.execute("""
         SELECT * FROM posts
         WHERE posts.thread = ?
-        ORDER BY created ASC;
-        """,(thread_id,)).fetchall()
+        ORDER BY created ASC
+        LIMIT ? OFFSET ?;
+        """,(
+            thread_id,
+            POSTS_PER_PAGE,
+            (page-1)*POSTS_PER_PAGE,
+        )).fetchall()
+
+    num_posts = db.execute("SELECT count(*) as count FROM posts WHERE posts.thread = ?",(thread_id,)).fetchone()['count']
+    max_pageno = math.ceil(num_posts/POSTS_PER_PAGE)
+    
     tags = db.execute(
         """SELECT tags.* FROM tags
         INNER JOIN thread_tags ON thread_tags.tag = tags.id
@@ -72,6 +111,8 @@ def view_thread(thread_id):
         poll=poll,
         votes=votes,
         has_voted=has_voted,
+        page=page,
+        max_pageno=max_pageno,
     )
 
 def register_vote(thread,pollval):
@@ -215,7 +256,7 @@ def create_post(thread_id):
         )
         db.commit()
         flash("post posted postfully")
-        return redirect(post_jump(thread_id, post_id))
+        return redirect(post_jump(post_id))
     return redirect(url_for('thread.view_thread',thread_id=thread_id))
 
 @bp.route("/delete_post/<int:post_id>", methods=["GET","POST"])
@@ -287,7 +328,7 @@ def edit_post(post_id):
                 "UPDATE posts SET content = ?, edited = 1, updated = current_timestamp WHERE id = ?",(newcontent,post_id))
             db.commit()
             flash("post edited editiously")
-            return redirect(post_jump(post['thread'],post_id))
+            return redirect(post_jump(post_id))
         else:
             flash(err)
     return render_template("edit_post.html",post=post)
