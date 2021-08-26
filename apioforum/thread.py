@@ -8,6 +8,7 @@ from flask import (
 )
 from .db import get_db
 from .roles import has_permission
+from . import webhooks
 from .forum import get_avail_tags
 
 bp = Blueprint("thread", __name__, url_prefix="/thread")
@@ -38,9 +39,9 @@ def which_page(post_id,return_thread_id=False):
     else:
         return page
 
-def post_jump(post_id):
+def post_jump(post_id,*,external=False):
     page,thread_id=which_page(post_id,True)
-    return url_for("thread.view_thread",thread_id=thread_id,page=page)+"#post_"+str(post_id)
+    return url_for("thread.view_thread",thread_id=thread_id,page=page,_external=external)+"#post_"+str(post_id)
 
 @bp.route("/<int:thread_id>")
 @bp.route("/<int:thread_id>/page/<int:page>")
@@ -255,6 +256,8 @@ def create_post(thread_id):
             (thread_id,)
         )
         db.commit()
+        post = db.execute("select * from posts where id = ?",(post_id,)).fetchone()
+        webhooks.do_webhooks_post(thread['forum'],post)
         flash("post posted postfully")
         return redirect(post_jump(post_id))
     return redirect(url_for('thread.view_thread',thread_id=thread_id))

@@ -225,6 +225,10 @@ def create_thread(forum):
                 (thread_id,g.user,content)
             )
             db.commit()
+
+            from . import webhooks
+            thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+            webhooks.do_webhooks_thread(forum['id'],thread)
             return redirect(url_for('thread.view_thread',thread_id=thread_id))
         flash(err)
         
