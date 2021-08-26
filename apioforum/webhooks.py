@@ -105,7 +105,18 @@ def discord_on_new_post(wh_url, post):
 def _do_webhooks(forum_id,thing,fn):
     db = get_db()
     # todo inheritance
-    webhooks = db.execute("select * from webhooks where forum = ? and type = 'discord'",(forum_id,)).fetchall()
+    webhooks = db.execute("""
+        WITH RECURSIVE fs AS
+            (SELECT * FROM forums WHERE id = ?
+             UNION ALL
+             SELECT forums.* FROM forums, fs WHERE fs.parent=forums.id)
+        SELECT * from webhooks
+        WHERE
+            webhooks.forum = ?
+        OR
+            webhooks.inherits AND webhooks.forum IN (SELECT id FROM fS);
+
+    """,(forum_id,forum_id)).fetchall()
     for wh in webhooks:
         wh_url = wh['url']
         try:
