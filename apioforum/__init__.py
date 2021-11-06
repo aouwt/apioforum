@@ -1,7 +1,7 @@
 # boilerplate boilerplate boilerplate
 # yay
 
-from flask import Flask, request
+from flask import Flask, request, session
 from .db import get_db
 import os
 
@@ -64,6 +64,10 @@ def create_app():
     @app.template_filter('md')
     def md_render(s):
         return render(s)
+
+    @app.before_request
+    def permanent_session():
+        session.permanent = True
 
     app.add_url_rule("/",endpoint="index")
 
