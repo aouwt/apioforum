@@ -31,6 +31,9 @@ def login():
         if err is None:
             session.clear()
             session['user'] = username
+            if 'keep_logged_in' in request.form:
+                session['keep_logged_in']=True
+                session.permanent = True
             flash("logged in successfully")
             return redirect(get_next())
 
@@ -65,8 +68,11 @@ def register():
                 (username,generate_password_hash(password))
             )
             db.commit()
-            flash("successfully created account")
             session['user'] = username
+            if 'keep_logged_in' in request.form:
+                session['keep_logged_in'] = True
+                session.permanent = True
+            flash("successfully created account")
             return redirect(get_next())
 
         flash(err)
@@ -82,6 +88,8 @@ def logout():
 @bp.before_app_request
 def load_user():
     username = session.get("user")
+    if session.get("keep_logged_in",False):
+        session.permanent = True
     if username is None:
         g.user = None
         g.user_info = None

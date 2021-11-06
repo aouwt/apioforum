@@ -65,10 +65,6 @@ def create_app():
     def md_render(s):
         return render(s)
 
-    @app.before_request
-    def permanent_session():
-        session.permanent = True
-
     app.add_url_rule("/",endpoint="index")
 
     return app

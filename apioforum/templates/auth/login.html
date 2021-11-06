@@ -6,11 +6,14 @@
 {% block content %}
 <p>log in using an existing account here. if you don't already have an account, <a href="{{url_for('auth.register')}}">register</a> first instead.</p>
 <form method="post">
-    <label for="username">Username</label>
+    <label for="username">username</label>
     <input name="username" id="username" required>
     <br>
-    <label for="password">Password</label>
+    <label for="password">password</label>
     <input type="password" name="password" id="password" required>
+    <br>
+    <input type="checkbox" name="keep_logged_in" id="keep_logged_in">
+    <label for="keep_logged_in">keep me logged in</label>
     <br>
     <input type="submit" value="login">
 </form>
