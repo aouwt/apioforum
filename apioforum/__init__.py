@@ -1,7 +1,7 @@
 # boilerplate boilerplate boilerplate
 # yay
 
-from flask import Flask, request, session
+from flask import Flask, request, session, render_template
 from .db import get_db
 import os
 
@@ -64,6 +64,13 @@ def create_app():
     @app.template_filter('md')
     def md_render(s):
         return render(s)
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template('err/404.html'), 404
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template('err/403.html'), 403
 
     app.add_url_rule("/",endpoint="index")
 
