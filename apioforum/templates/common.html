@@ -142,13 +142,13 @@
 {% macro pagination_nav(page,max_pageno,view) %}
 <nav aria-label="pagination" id="pages">
 	{% if page > 1 %}
-	<a href="{{url_for(view,**kwargs)}}" aria-label="first page">&lt;&lt;</a>
-	<a href="{{url_for(view,page=page-1,**kwargs)}}" aria-label="previous page">&lt;</a>
+	<a href="{{url_for(view,**kwargs)}}" aria-label="first page">&lt;&lt; first</a>
+	<a href="{{url_for(view,page=page-1,**kwargs)}}" aria-label="previous page">&lt; prev</a>
 	{% endif %}
 	page {{page}} of {{max_pageno}}
 	{% if page < max_pageno %} {# > #}
-	<a href="{{url_for(view,page=page+1,**kwargs)}}" aria-label="next page">&gt;</a>
-	<a href="{{url_for(view,page=max_pageno,**kwargs)}}" aria-label="last page">&gt;&gt;</a>
+	<a href="{{url_for(view,page=page+1,**kwargs)}}" aria-label="next page">next &gt;</a>
+	<a href="{{url_for(view,page=max_pageno,**kwargs)}}" aria-label="last page">last &gt;&gt;</a>
 	{% endif %}
 </nav>
 {% endmacro %}
