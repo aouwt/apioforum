@@ -212,8 +212,7 @@ CREATE TABLE webhooks (
     id INTEGER PRIMARY KEY,
     type TEXT NOT NULL,
     url TEXT NOT NULL,
-    forum INTEGER NOT NULL REFERENCES forums(id),
-    inherits INTEGER NOT NULL DEFAULT 0
+    forum INTEGER NOT NULL REFERENCES forums(id)
 );""",
 ]
 
