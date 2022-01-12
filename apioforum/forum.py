@@ -13,7 +13,10 @@ from .roles import get_forum_roles,has_permission,is_bureaucrat,get_user_role, p
 from .permissions import is_admin
 from sqlite3 import OperationalError
 import datetime
+import math
 import functools
+
+THREADS_PER_PAGE = 20
 
 bp = Blueprint("forum", __name__, url_prefix="/")
 
@@ -46,7 +49,7 @@ def forum_path(forum_id):
     ancestors.reverse()
     return ancestors
 
-def forum_route(relative_path, **kwargs):
+def forum_route(relative_path, pagination=False, **kwargs):
     def decorator(f):
         path = "/<int:forum_id>"
         if relative_path != "":
@@ -61,6 +64,9 @@ def forum_route(relative_path, **kwargs):
             if forum == None:
                 abort(404)
             return f(forum, *args, **kwargs)
+
+        if pagination:
+            wrapper = bp.route(path+"/page/<int:page>", **kwargs)(wrapper)
 
     return decorator
 
@@ -83,9 +89,12 @@ def requires_bureaucrat(f):
         return f(forum, *args, **kwargs)
     return wrapper
 
-@forum_route("")
+
+@forum_route("",pagination=True)
 @requires_permission("p_view_forum", login_required=False)
-def view_forum(forum):
+def view_forum(forum,page=1):
+    if page < 1:
+        abort(400)
     db = get_db()
     threads = db.execute(
         """SELECT
@@ -100,8 +109,18 @@ def view_forum(forum):
         INNER JOIN most_recent_posts ON most_recent_posts.thread = threads.id
         INNER JOIN number_of_posts ON number_of_posts.thread = threads.id
         WHERE threads.forum = ?
-        ORDER BY threads.updated DESC;
-        """,(forum['id'],)).fetchall()
+        ORDER BY threads.updated DESC
+        LIMIT ? OFFSET ?;
+        """,(
+            forum['id'],
+            THREADS_PER_PAGE,
+            (page-1)*THREADS_PER_PAGE,
+        )).fetchall()
+
+    # XXX: update this when thread filtering happens
+    num_threads = db.execute("SELECT count(*) AS count FROM threads WHERE threads.forum = ?",(forum['id'],)).fetchone()['count']
+    max_pageno = math.ceil(num_threads/THREADS_PER_PAGE)
+    
     thread_tags = {}
     thread_polls = {}
 
@@ -169,6 +188,8 @@ def view_forum(forum):
             bureaucrats=bureaucrats,
             thread_polls=thread_polls,
             avail_tags=avail_tags,
+            max_pageno=max_pageno,
+            page=page,
             )
 
 @forum_route("create_thread",methods=("GET","POST"))
@@ -204,6 +225,10 @@ def create_thread(forum):
                 (thread_id,g.user,content)
             )
             db.commit()
+
+            from . import webhooks
+            thread = db.execute("select * from threads where id = ?",(thread_id,)).fetchone()
+            webhooks.do_webhooks_thread(forum['id'],thread)
             return redirect(url_for('thread.view_thread',thread_id=thread_id))
         flash(err)
         

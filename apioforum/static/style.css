@@ -116,6 +116,10 @@ nav#navbar p:first-of-type { margin-left:0.5em }
 nav#navbar a { color: blue; text-decoration: none }
 nav#navbar .links { display: flex; }
 
+nav#pages { text-align: center; margin-top: 2vh; margin-bottom: 2vh; }
+nav#pages a { margin-left: 2vw; margin-right: 2vw; }
+nav#pages .mid { margin-left: 5vw; margin-right: 5vw; }
+
 /* todo: make the navbar less bad */
 .flashmsg { border: 1px solid black; background-color: yellow; max-width: max-content; padding: 5px; clear: both;}
 
