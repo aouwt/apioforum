@@ -5,3 +5,5 @@ venv/*
 build/*
 dist/*
 apioforum.egg-info/*
+push.sh
+.env
