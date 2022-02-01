@@ -49,7 +49,7 @@ def create_app():
     @app.context_processor
     def path_for_next():
         p = request.path
-        if len(request.query_string) > 0:
+        if len(request.query_string) > 0 and not p.startswith("/auth"):
             p += "?" + request.query_string.decode("utf-8")
         return dict(path_for_next=p)
 
